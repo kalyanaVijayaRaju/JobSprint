@@ -1,31 +1,66 @@
-import dotenv from 'dotenv';
+import env from './config/env.js';
 import app from './app.js';
-import connectDB from './config/db.js';
+import connectDB, { disconnectDB } from './config/db.js';
+import { markReady, markShuttingDown } from './config/health.js';
 import logger from './utils/logger.js';
-
-// Load Environment Configuration
-dotenv.config();
 
 // Register Uncaught Exception Handler
 process.on('uncaughtException', (err) => {
-  logger.error('UNCAUGHT EXCEPTION! Server is shutting down...', err);
+  logger.error('Uncaught exception. Server is shutting down.', { error: err });
   process.exit(1);
 });
 
-// Connect to MongoDB Database
-connectDB();
+let server;
+let shutdownStarted = false;
 
-const PORT = process.env.PORT || 5000;
+const shutdown = async (signal, exitCode = 0) => {
+  if (shutdownStarted) return;
 
-// Start Server Listener
-const server = app.listen(PORT, () => {
-  logger.info(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-});
+  shutdownStarted = true;
+  markShuttingDown();
+  logger.info(`${signal} received. Starting graceful shutdown.`);
 
-// Register Unhandled Rejection Handler
-process.on('unhandledRejection', (err) => {
-  logger.error('UNHANDLED REJECTION! Server is shutting down...', err);
-  server.close(() => {
+  const forceShutdownTimer = setTimeout(() => {
+    logger.error('Graceful shutdown timed out. Forcing process exit.');
     process.exit(1);
-  });
+  }, 10000);
+  forceShutdownTimer.unref();
+
+  try {
+    if (server) {
+      await new Promise((resolve, reject) => {
+        server.close((error) => (error ? reject(error) : resolve()));
+      });
+    }
+
+    await disconnectDB();
+    process.exit(exitCode);
+  } catch (error) {
+    logger.error('Graceful shutdown failed.', { error });
+    process.exit(1);
+  }
+};
+
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    server = app.listen(env.PORT, () => {
+      markReady();
+      logger.info(`Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);
+    });
+  } catch (error) {
+    logger.error('Application startup failed.', { error });
+    await disconnectDB().catch(() => {});
+    process.exit(1);
+  }
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('unhandledRejection', (error) => {
+  logger.error('Unhandled rejection. Server is shutting down.', { error });
+  shutdown('unhandledRejection', 1);
 });
+
+startServer();

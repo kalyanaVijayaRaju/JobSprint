@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import logger from './utils/logger.js';
 import errorHandler from './middlewares/errorMiddleware.js';
 import ApiError from './utils/apiError.js';
+import { getHealthState } from './config/health.js';
 
 const app = express();
 
@@ -32,12 +33,24 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 // Sanitize inputs to protect against NoSQL Injection
 app.use(mongoSanitize());
 
-// Base health check routing
-app.get('/health', (req, res) => {
+// Liveness confirms the Node.js process can serve HTTP.
+app.get(['/health', '/health/live'], (req, res) => {
   res.status(200).json({
     success: true,
     status: 'UP',
-    timestamp: new Date()
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Readiness controls whether the process should receive application traffic.
+app.get('/health/ready', (req, res) => {
+  const health = getHealthState();
+  const ready = health.ready && !health.shuttingDown;
+
+  res.status(ready ? 200 : 503).json({
+    success: ready,
+    status: ready ? 'READY' : 'NOT_READY',
+    timestamp: new Date().toISOString()
   });
 });
 
