@@ -7,6 +7,7 @@ import logger from './utils/logger.js';
 import errorHandler from './middlewares/errorMiddleware.js';
 import ApiError from './utils/apiError.js';
 import { getHealthState } from './config/health.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 
@@ -61,6 +62,8 @@ app.get('/', (req, res) => {
     message: 'Welcome to the JobSprint API.'
   });
 });
+
+app.use('/api/v1/auth', authRoutes);
 
 // Unhandled HTTP route parser
 app.all('*', (req, res, next) => {
