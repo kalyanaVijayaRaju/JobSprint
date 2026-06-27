@@ -8,7 +8,8 @@ const environmentSchema = z.object({
   PORT: z.coerce.number().int().positive().max(65535).default(5000),
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
-  JWT_SECRET: z.string().min(32, 'JWT_SECRET must contain at least 32 characters')
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must contain at least 32 characters'),
+  JWT_EXPIRES_IN: z.string().default('24h')
 });
 
 const parsedEnvironment = environmentSchema.safeParse(process.env);
