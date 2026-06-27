@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import app from '../src/app.js';
+
+// Set env vars BEFORE importing the app so env.js validates them.
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-with-at-least-thirty-two-chars';
+process.env.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/jobsprint_test';
+
+const { default: app } = await import('../src/app.js');
 import { markReady, markShuttingDown } from '../src/config/health.js';
 
 test('health probes reflect the application lifecycle', async (t) => {

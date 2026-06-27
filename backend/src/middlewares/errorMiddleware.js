@@ -30,7 +30,8 @@ const errorHandler = (err, req, res, next) => {
     error: {
       code: err.status || 'error',
       message,
-      ...(details && { details })
+      ...(details && { details }),
+      ...(err.details && !details && { details: err.details })
     }
   };
 

@@ -1,8 +1,12 @@
 # JobSprint Microservices Migration Roadmap
 
-The migration uses small, deployable milestones. Each day ends with one focused
-commit on a feature branch. A service is deployed only after its health checks,
-tests, container image, configuration, and observability are in place.
+The migration uses small, deployable milestones. Each milestone ends with one
+focused commit on a feature branch. A service is deployed only after its health
+checks, tests, container image, configuration, and observability are in place.
+
+JobSprint follows a free/local-first infrastructure rule. Local development and
+tests must not require paid API keys. See
+`docs/adr-001-free-local-first-infrastructure.md`.
 
 ## Delivery sequence
 
@@ -14,7 +18,7 @@ tests, container image, configuration, and observability are in place.
 | 4 | Profile and company APIs | Candidate/recruiter profiles, company membership, and ownership rules |
 | 5 | Job service | Job lifecycle, search, Redis caching, independent database, and gateway route |
 | 6 | Application service | Application submission, ATS workflow, idempotency, and independent database |
-| 7 | Kafka platform | Event envelope, transactional outbox, retries, dead-letter topics, and consumer idempotency |
+| 7 | Local Kafka platform | Event envelope, transactional outbox, retries, dead-letter topics, and consumer idempotency using local Kafka/Redpanda first |
 | 8 | Notification and audit services | Event-driven notifications and immutable audit records |
 | 9 | Engagement service | Saved jobs and job-alert subscriptions |
 | 10 | Kubernetes production baseline | Ingress, autoscaling, network policies, secrets, telemetry, and rollout strategy |
@@ -26,6 +30,8 @@ tests, container image, configuration, and observability are in place.
 - Keep database ownership exclusive to its service.
 - Require passing checks before pushing.
 - Tag the first production-ready release of each extracted service.
+- Prefer feature-based branch names, for example `feature/identity-api`.
+- Default to free/local adapters before adding optional paid-provider adapters.
 
 ## Deployment gates
 
