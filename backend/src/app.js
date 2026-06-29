@@ -3,11 +3,15 @@ import cors from 'cors';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import logger from './utils/logger.js';
 import errorHandler from './middlewares/errorMiddleware.js';
+import { apiLimiter, authLimiter } from './middlewares/rateLimiter.js';
 import ApiError from './utils/apiError.js';
 import { getHealthState } from './config/health.js';
 import authRoutes from './routes/authRoutes.js';
+import jobRoutes from './routes/jobRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
 
 const app = express();
 
@@ -31,8 +35,14 @@ app.use(morgan(morganFormat, {
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
+// Cookie parser — needed for JWT cookie extraction
+app.use(cookieParser());
+
 // Sanitize inputs to protect against NoSQL Injection
 app.use(mongoSanitize());
+
+// Global rate limiter — applies to all routes
+app.use(apiLimiter);
 
 // Liveness confirms the Node.js process can serve HTTP.
 app.get(['/health', '/health/live'], (req, res) => {
@@ -63,7 +73,10 @@ app.get('/', (req, res) => {
   });
 });
 
-app.use('/api/v1/auth', authRoutes);
+// API routes
+app.use('/api/v1/auth', authLimiter, authRoutes);
+app.use('/api/v1/jobs', jobRoutes);
+app.use('/api/v1/users', profileRoutes);
 
 // Unhandled HTTP route parser
 app.all('*', (req, res, next) => {

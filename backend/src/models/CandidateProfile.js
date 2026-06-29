@@ -156,7 +156,7 @@ candidateProfileSchema.methods.addSkill = function(skill) {
 };
 
 // Indexes
-candidateProfileSchema.index({ userId: 1 });
+// Note: userId already has a unique index via `unique: true` on the schema field
 candidateProfileSchema.index({ skills: 1 }); // Multikey index for candidate skill searches
 
 const CandidateProfile = mongoose.models.CandidateProfile || mongoose.model('CandidateProfile', candidateProfileSchema);

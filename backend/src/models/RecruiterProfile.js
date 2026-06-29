@@ -29,7 +29,7 @@ const recruiterProfileSchema = new mongoose.Schema({
 });
 
 // Indexes
-recruiterProfileSchema.index({ userId: 1 });
+// Note: userId already has a unique index via `unique: true` on the schema field
 recruiterProfileSchema.index({ companyId: 1 });
 
 const RecruiterProfile = mongoose.models.RecruiterProfile || mongoose.model('RecruiterProfile', recruiterProfileSchema);

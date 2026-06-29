@@ -74,7 +74,7 @@ companySchema.statics.findByName = function(name) {
 };
 
 // Indexes
-companySchema.index({ name: 1 });
+// Note: name already has a unique index via `unique: true` on the schema field
 companySchema.index({ industry: 1 });
 companySchema.index({ isVerified: 1 });
 
