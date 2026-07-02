@@ -2,6 +2,8 @@ import Application from '../models/Application.js';
 import Job from '../models/Job.js';
 import CandidateProfile from '../models/CandidateProfile.js';
 import ApiError from '../utils/apiError.js';
+import * as notificationService from './notificationService.js';
+import logger from '../utils/logger.js';
 
 /**
  * Submit a job application.
@@ -201,6 +203,15 @@ export const updateApplicationStatus = async (applicationId, recruiterId, newSta
   // updateStatus is an instance method on the Application model that
   // sets _updatedBy so the pre-save hook records the correct actor
   const updated = await application.updateStatus(newStatus, recruiterId);
+
+  // Trigger in-app notification to the candidate
+  try {
+    const title = 'Application Status Updated';
+    const message = `Your application for the position "${job.title}" has been moved to status: ${newStatus}.`;
+    await notificationService.createNotification(application.candidateId, title, message, 'application_status');
+  } catch (err) {
+    logger.error(`Failed to create notification for user ${application.candidateId}: ${err.message}`);
+  }
 
   return updated;
 };
