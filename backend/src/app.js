@@ -14,6 +14,7 @@ import jobRoutes from './routes/jobRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import applicationRoutes from './routes/applicationRoutes.js';
 import savedJobRoutes from './routes/savedJobRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 
 const app = express();
 
@@ -81,6 +82,7 @@ app.use('/api/v1/jobs', jobRoutes);
 app.use('/api/v1/users', profileRoutes);
 app.use('/api/v1/applications', applicationRoutes);
 app.use('/api/v1/saved-jobs', savedJobRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 // Unhandled HTTP route parser
 app.all('*', (req, res, next) => {
