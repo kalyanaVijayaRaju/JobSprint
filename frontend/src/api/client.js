@@ -92,6 +92,60 @@ export const jobsApi = {
 // ---------------------------------------------------------------------------
 
 export const profileApi = {
-  get:    ()     => apiFetch('/api/v1/users/profile'),
-  update: (data) => apiFetch('/api/v1/users/profile', { method: 'PUT', body: data })
+  get:          ()     => apiFetch('/api/v1/users/profile'),
+  update:       (data) => apiFetch('/api/v1/users/profile', { method: 'PUT', body: data }),
+  uploadResume: (formData) => apiFetch('/api/v1/users/resume/upload', { method: 'POST', body: formData })
+};
+
+// ---------------------------------------------------------------------------
+// Applications API
+// ---------------------------------------------------------------------------
+
+export const applicationsApi = {
+  apply:           (jobId, data)       => apiFetch(`/api/v1/applications/${jobId}/apply`, { method: 'POST', body: data }),
+  myApplications:  (params = {})       => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/applications/my-applications${query ? `?${query}` : ''}`);
+  },
+  jobApplications: (jobId, params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/applications/job/${jobId}${query ? `?${query}` : ''}`);
+  },
+  updateStatus:    (id, status)        => apiFetch(`/api/v1/applications/${id}/status`, { method: 'PATCH', body: { status } }),
+  addNote:         (id, note)          => apiFetch(`/api/v1/applications/${id}/notes`, { method: 'POST', body: { note } })
+};
+
+// ---------------------------------------------------------------------------
+// Saved Jobs API
+// ---------------------------------------------------------------------------
+
+export const savedJobsApi = {
+  list:   (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/saved-jobs${query ? `?${query}` : ''}`);
+  },
+  save:   (jobId)       => apiFetch(`/api/v1/saved-jobs/${jobId}`, { method: 'POST' }),
+  unsave: (jobId)       => apiFetch(`/api/v1/saved-jobs/${jobId}`, { method: 'DELETE' })
+};
+
+// ---------------------------------------------------------------------------
+// Notifications API
+// ---------------------------------------------------------------------------
+
+export const notificationsApi = {
+  list:        (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/notifications${query ? `?${query}` : ''}`);
+  },
+  unreadCount: ()            => apiFetch('/api/v1/notifications/unread-count'),
+  markRead:    (id)          => apiFetch(`/api/v1/notifications/${id}/read`, { method: 'PATCH' }),
+  markAllRead: ()            => apiFetch('/api/v1/notifications/mark-all-read', { method: 'PATCH' })
 };

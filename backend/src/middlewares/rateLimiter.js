@@ -9,7 +9,7 @@ import rateLimit from 'express-rate-limit';
  */
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: process.env.NODE_ENV === 'production' ? 100 : 5000,
   standardHeaders: true,   // Return rate limit info in `RateLimit-*` headers
   legacyHeaders: false,     // Disable the `X-RateLimit-*` headers
   message: {
@@ -27,10 +27,9 @@ export const apiLimiter = rateLimit({
  * Caps login/register at 20 requests per 15-minute window per IP
  * to slow down brute-force and credential-stuffing attacks.
  */
-
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: process.env.NODE_ENV === 'production' ? 20 : 1000,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
