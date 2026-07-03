@@ -105,3 +105,20 @@ export const upsertProfileByRole = async (userId, role, data) => {
 
   throw new ApiError(400, 'Profile management is not available for this role');
 };
+
+/**
+ * Update the candidate's resume URL.
+ *
+ * @param {string} userId
+ * @param {string} resumeUrl
+ * @returns {Object} The updated candidate profile
+ */
+export const updateCandidateResume = async (userId, resumeUrl) => {
+  const profile = await CandidateProfile.findOneAndUpdate(
+    { userId },
+    { $set: { resumeUrl } },
+    { new: true, upsert: true, runValidators: true }
+  );
+
+  return profile;
+};

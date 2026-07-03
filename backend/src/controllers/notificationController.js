@@ -39,7 +39,7 @@ export const markAsRead = asyncHandler(async (req, res) => {
 });
 
 /**
- * @route   POST /api/v1/notifications/mark-all-read
+ * @route   PATCH /api/v1/notifications/mark-all-read
  * @access  Authenticated
  */
 export const markAllAsRead = asyncHandler(async (req, res) => {
