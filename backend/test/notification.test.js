@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 
 // --- Test environment setup ---
 process.env.JWT_SECRET = 'test-jwt-secret-with-at-least-thirty-two-chars';
-process.env.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/jobsprint_test';
+process.env.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/jobsprint_test_notification';
 
 const { default: app } = await import('../src/app.js');
 
@@ -187,7 +187,7 @@ test('Notifications Integration Suite', async (suite) => {
 
     // Candidate marks all as read
     const markAllResponse = await fetch(`${baseUrl}/api/v1/notifications/mark-all-read`, {
-      method: 'POST',
+      method: 'PATCH',
       headers: { Authorization: `Bearer ${candidateToken}` }
     });
     assert.equal(markAllResponse.status, 200);

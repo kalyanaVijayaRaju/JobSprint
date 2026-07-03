@@ -15,6 +15,6 @@ router.use(protect);
 router.get('/', getUserNotifications);
 router.get('/unread-count', getUnreadCount);
 router.patch('/:id/read', markAsRead);
-router.post('/mark-all-read', markAllAsRead);
+router.patch('/mark-all-read', markAllAsRead);
 
 export default router;

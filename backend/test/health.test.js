@@ -3,7 +3,7 @@ import test from 'node:test';
 
 // Set env vars BEFORE importing the app so env.js validates them.
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-with-at-least-thirty-two-chars';
-process.env.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/jobsprint_test';
+process.env.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/jobsprint_test_health';
 
 const { default: app } = await import('../src/app.js');
 import { markReady, markShuttingDown } from '../src/config/health.js';

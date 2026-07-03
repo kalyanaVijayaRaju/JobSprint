@@ -27,6 +27,7 @@ export const apiLimiter = rateLimit({
  * Caps login/register at 20 requests per 15-minute window per IP
  * to slow down brute-force and credential-stuffing attacks.
  */
+
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,

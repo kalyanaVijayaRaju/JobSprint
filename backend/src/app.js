@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import logger from './utils/logger.js';
 import errorHandler from './middlewares/errorMiddleware.js';
 import { apiLimiter, authLimiter } from './middlewares/rateLimiter.js';
@@ -15,6 +17,9 @@ import profileRoutes from './routes/profileRoutes.js';
 import applicationRoutes from './routes/applicationRoutes.js';
 import savedJobRoutes from './routes/savedJobRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -46,6 +51,9 @@ app.use(mongoSanitize());
 
 // Global rate limiter — applies to all routes
 app.use(apiLimiter);
+
+// Serve static uploads
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Liveness confirms the Node.js process can serve HTTP.
 app.get(['/health', '/health/live'], (req, res) => {

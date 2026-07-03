@@ -1,5 +1,6 @@
 import asyncHandler from '../utils/asyncHandler.js';
-import { getProfileByRole, upsertProfileByRole } from '../services/profileService.js';
+import { getProfileByRole, upsertProfileByRole, updateCandidateResume } from '../services/profileService.js';
+import ApiError from '../utils/apiError.js';
 
 /**
  * @route   GET /api/v1/users/profile
@@ -31,5 +32,27 @@ export const upsertProfile = asyncHandler(async (req, res) => {
     success: true,
     message: 'Profile updated successfully',
     data: { profile }
+  });
+});
+
+/**
+ * @route   POST /api/v1/users/resume/upload
+ * @access  Authenticated (Candidate)
+ */
+export const uploadResume = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    throw new ApiError(400, 'Please upload a file');
+  }
+
+  const resumeUrl = `${req.protocol}://${req.get('host')}/uploads/resumes/${req.file.filename}`;
+
+  await updateCandidateResume(req.user.id, resumeUrl);
+
+  res.status(200).json({
+    success: true,
+    message: 'Resume uploaded successfully',
+    data: {
+      resumeUrl
+    }
   });
 });

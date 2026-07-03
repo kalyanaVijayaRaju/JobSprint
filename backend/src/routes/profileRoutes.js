@@ -1,8 +1,9 @@
 import express from 'express';
-import { protect } from '../middlewares/authMiddleware.js';
+import { protect, authorizeRoles } from '../middlewares/authMiddleware.js';
 import { validate } from '../validations/authValidation.js';
 import { candidateProfileSchema, recruiterProfileSchema } from '../validations/profileValidation.js';
-import { getProfile, upsertProfile } from '../controllers/profileController.js';
+import { getProfile, upsertProfile, uploadResume } from '../controllers/profileController.js';
+import { handleResumeUpload } from '../utils/upload.js';
 
 const router = express.Router();
 
@@ -21,5 +22,6 @@ const validateProfile = (req, res, next) => {
 // All profile routes require authentication
 router.get('/profile', protect, getProfile);
 router.put('/profile', protect, validateProfile, upsertProfile);
+router.post('/resume/upload', protect, authorizeRoles('candidate'), handleResumeUpload, uploadResume);
 
 export default router;
