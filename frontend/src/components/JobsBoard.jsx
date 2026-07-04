@@ -24,6 +24,8 @@ export default function JobsBoard({
   onToggleSaveJob,
   onApply,
   onPostJob,
+  onUpdateJob,
+  onDeleteJob,
   submittingApplication,
   submittingJob,
   setActiveTab,
@@ -253,12 +255,15 @@ export default function JobsBoard({
                         </td>
                         <td>
                           <span className={`badge status-${job.status}`}>{job.status}</span>
+                          {job.expiresAt && new Date(job.expiresAt) < new Date() && (
+                            <span className="badge status-rejected" style={{ marginLeft: '6px', fontSize: '10px' }}>Expired</span>
+                          )}
                         </td>
                         <td>
                           <strong>{job.applicationsCount || 0}</strong> applicants
                         </td>
                         <td>{new Date(job.createdAt).toLocaleDateString()}</td>
-                        <td>
+                        <td style={{ display: 'flex', gap: '6px' }}>
                           <button
                             type="button"
                             className="btn btn-sm btn-outline"
@@ -270,6 +275,39 @@ export default function JobsBoard({
                           >
                             Manage ATS
                           </button>
+                          {job.status === 'active' ? (
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-outline"
+                              style={{ borderColor: '#d97706', color: '#d97706' }}
+                              onClick={() => onUpdateJob(job._id, { status: 'closed' })}
+                            >
+                              Close
+                            </button>
+                          ) : job.status === 'closed' ? (
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-outline"
+                              style={{ borderColor: '#059669', color: '#059669' }}
+                              onClick={() => onUpdateJob(job._id, { status: 'active' })}
+                            >
+                              Activate
+                            </button>
+                          ) : null}
+                          {job.status !== 'archived' && (
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-outline"
+                              style={{ borderColor: '#e11d48', color: '#e11d48' }}
+                              onClick={() => {
+                                if (window.confirm('Are you sure you want to archive this job posting?')) {
+                                  onDeleteJob(job._id);
+                                }
+                              }}
+                            >
+                              Archive
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}

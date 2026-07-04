@@ -22,11 +22,33 @@ export default function ProfileSettings({
     onResumeUpload(file);
   };
 
+  // Calculate profile completeness score
+  let completeness = 0;
+  if (profileForm.firstName) completeness += 20;
+  if (profileForm.lastName) completeness += 20;
+  if (profileForm.phone) completeness += 20;
+  if (profileForm.summary) completeness += 20;
+  
+  if (user.role === 'candidate') {
+    if (profile?.resumeUrl) completeness += 20;
+  } else {
+    if (profileForm.jobTitle || profileForm.companyId) completeness += 20;
+  }
+
   return (
     <div className="tab-content">
       <div className="profile-container-grid">
         <form onSubmit={handleProfileSubmit} className="profile-card">
           <h2>General Information</h2>
+          <div className="profile-strength-meter" style={{ marginBottom: '16px' }}>
+            <div className="strength-header" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
+              <span>Profile Completeness</span>
+              <span className="strength-percentage">{completeness}%</span>
+            </div>
+            <div className="strength-bar-bg" style={{ width: '100%', height: '8px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' }}>
+              <div className="strength-bar-fill" style={{ width: `${completeness}%`, height: '100%', background: '#0f766e', transition: 'width 0.5s ease-out' }}></div>
+            </div>
+          </div>
           <div className="form-row-2">
             <div className="form-group">
               <label htmlFor="first-name">First Name</label>
