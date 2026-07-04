@@ -25,6 +25,9 @@ export default function AtsPipeline({
 }) {
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [recruiterNote, setRecruiterNote] = useState('');
+  const [applicantSearch, setApplicantSearch] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
   const handleNoteSubmit = (e) => {
     e.preventDefault();
@@ -86,23 +89,41 @@ export default function AtsPipeline({
               {/* Applicant List */}
               <div className="applicants-sidebar-list">
                 <h3>Applicants ({selectedJobApplicants.length})</h3>
+                <div className="search-input" style={{ marginBottom: '12px', padding: '6px 10px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    placeholder="Filter by name/email..."
+                    value={applicantSearch}
+                    onChange={e => setApplicantSearch(e.target.value)}
+                    style={{ border: 'none', outline: 'none', fontSize: '13px', width: '100%' }}
+                  />
+                </div>
                 <div className="applicant-items">
-                  {selectedJobApplicants.map(app => (
-                    <div
-                      key={app._id}
-                      className={`applicant-item-card ${selectedApplication?._id === app._id ? 'active' : ''}`}
-                      onClick={() => {
-                        setSelectedApplication(app);
-                        setRecruiterNote('');
-                      }}
-                    >
-                      <div>
-                        <strong>{app.candidateId?.firstName} {app.candidateId?.lastName}</strong>
-                        <span className="applicant-email">{app.candidateId?.userId?.email || 'Candidate email'}</span>
+                  {selectedJobApplicants
+                    .filter(app => {
+                      const firstName = app.candidateId?.firstName || '';
+                      const lastName = app.candidateId?.lastName || '';
+                      const fullName = `${firstName} ${lastName}`;
+                      const email = app.candidateId?.userId?.email || '';
+                      return fullName.toLowerCase().includes(applicantSearch.toLowerCase()) ||
+                             email.toLowerCase().includes(applicantSearch.toLowerCase());
+                    })
+                    .map(app => (
+                      <div
+                        key={app._id}
+                        className={`applicant-item-card ${selectedApplication?._id === app._id ? 'active' : ''}`}
+                        onClick={() => {
+                          setSelectedApplication(app);
+                          setRecruiterNote('');
+                        }}
+                      >
+                        <div>
+                          <strong>{app.candidateId?.firstName} {app.candidateId?.lastName}</strong>
+                          <span className="applicant-email">{app.candidateId?.userId?.email || 'Candidate email'}</span>
+                        </div>
+                        <span className={`badge status-${app.status}`}>{app.status}</span>
                       </div>
-                      <span className={`badge status-${app.status}`}>{app.status}</span>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
 
@@ -206,25 +227,62 @@ export default function AtsPipeline({
   }
 
   // Candidate View
+  const filteredApps = myApps.filter(app => {
+    const jobTitle = app.jobId?.title || '';
+    const companyName = app.jobId?.companyId?.name || '';
+    const matchesSearch = jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          companyName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = !statusFilter || app.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <div className="tab-content">
       <div className="candidate-applications-view">
-        <h2>My Submitted Applications</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+          <h2>My Submitted Applications</h2>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <div className="search-input" style={{ padding: '6px 12px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', display: 'flex', alignItems: 'center', minWidth: '220px' }}>
+              <input
+                type="text"
+                placeholder="Search job or company..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                style={{ border: 'none', outline: 'none', fontSize: '13px', width: '100%' }}
+              />
+            </div>
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+              style={{ padding: '6px 12px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '13px', outline: 'none', cursor: 'pointer' }}
+            >
+              <option value="">All Statuses</option>
+              <option value="applied">Applied</option>
+              <option value="screening">Screening</option>
+              <option value="interviewing">Interviewing</option>
+              <option value="offered">Offered</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+
         {loadingMyApps ? (
           <div className="jobs-loader">
             <div className="loader-spinner"></div>
           </div>
-        ) : myApps.length === 0 ? (
+        ) : filteredApps.length === 0 ? (
           <div className="empty-state">
             <Clock size={40} />
-            <p>You haven't submitted any job applications yet.</p>
-            <button type="button" className="btn btn-primary" onClick={() => setActiveTab('jobs')}>
-              Browse Job Openings
-            </button>
+            <p>No submitted job applications found matching your criteria.</p>
+            {myApps.length === 0 && (
+              <button type="button" className="btn btn-primary" onClick={() => setActiveTab('jobs')}>
+                Browse Job Openings
+              </button>
+            )}
           </div>
         ) : (
           <div className="applications-timeline-grid">
-            {myApps.map(app => (
+            {filteredApps.map(app => (
               <div className="app-timeline-card" key={app._id}>
                 <div className="app-card-header">
                   <div>

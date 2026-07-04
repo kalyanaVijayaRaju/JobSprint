@@ -25,6 +25,7 @@ import OverviewTab from './components/OverviewTab.jsx';
 import JobsBoard from './components/JobsBoard.jsx';
 import AtsPipeline from './components/AtsPipeline.jsx';
 import ProfileSettings from './components/ProfileSettings.jsx';
+import SavedJobs from './components/SavedJobs.jsx';
 
 import './styles.css';
 
@@ -306,6 +307,34 @@ function App() {
     }
   };
 
+  const handleUpdateJob = async (jobId, data) => {
+    try {
+      await jobsApi.update(jobId, data);
+      triggerAlert('Job status updated successfully');
+      if (user.role === 'recruiter') {
+        fetchRecruiterJobs();
+      } else {
+        fetchJobs();
+      }
+    } catch (err) {
+      triggerAlert(err.message, 'error');
+    }
+  };
+
+  const handleDeleteJob = async (jobId) => {
+    try {
+      await jobsApi.delete(jobId);
+      triggerAlert('Job archived successfully');
+      if (user.role === 'recruiter') {
+        fetchRecruiterJobs();
+      } else {
+        fetchJobs();
+      }
+    } catch (err) {
+      triggerAlert(err.message, 'error');
+    }
+  };
+
   const handleUpdateStatus = async (appId, newStatus) => {
     try {
       await applicationsApi.updateStatus(appId, newStatus);
@@ -478,6 +507,15 @@ function App() {
           >
             <Clock size={18} /> {user.role === 'recruiter' ? 'ATS Pipelines' : 'Applications'}
           </button>
+          {user?.role === 'candidate' && (
+            <button
+              type="button"
+              className={`nav-link-btn ${activeTab === 'saved-jobs' ? 'active' : ''}`}
+              onClick={() => setActiveTab('saved-jobs')}
+            >
+              <Bookmark size={18} /> Saved Jobs
+            </button>
+          )}
           <button
             type="button"
             className={`nav-link-btn ${activeTab === 'profile' ? 'active' : ''}`}
@@ -500,6 +538,7 @@ function App() {
             <h1>
               {activeTab === 'overview' && 'Operations dashboard'}
               {activeTab === 'jobs' && (user.role === 'recruiter' ? 'Job Listings Board' : 'Discover Careers')}
+              {activeTab === 'saved-jobs' && 'Bookmarked Roles'}
               {activeTab === 'applications' && (user.role === 'recruiter' ? 'ATS Candidate Pipelines' : 'Applied Jobs Tracker')}
               {activeTab === 'profile' && 'Professional Profile'}
             </h1>
@@ -530,6 +569,8 @@ function App() {
             applicantsCount={user.role === 'recruiter' ? recruiterJobs.reduce((acc, j) => acc + (j.applicationsCount || 0), 0) : myApps.length}
             savedCount={savedJobs.length}
             readiness={readiness}
+            myApps={myApps}
+            recruiterJobs={recruiterJobs}
           />
         )}
 
@@ -545,11 +586,26 @@ function App() {
             onToggleSaveJob={handleToggleSaveJob}
             onApply={handleApplySubmit}
             onPostJob={handleCreateJob}
+            onUpdateJob={handleUpdateJob}
+            onDeleteJob={handleDeleteJob}
             submittingApplication={submittingApplication}
             submittingJob={submittingJob}
             setActiveTab={setActiveTab}
             setSelectedJobForApplicants={setSelectedJobForApplicants}
             fetchJobApplicants={fetchJobApplicants}
+          />
+        )}
+
+        {activeTab === 'saved-jobs' && (
+          <SavedJobs
+            user={user}
+            profile={profile}
+            savedJobs={savedJobs}
+            myApps={myApps}
+            onToggleSaveJob={handleToggleSaveJob}
+            onApply={handleApplySubmit}
+            submittingApplication={submittingApplication}
+            setActiveTab={setActiveTab}
           />
         )}
 
