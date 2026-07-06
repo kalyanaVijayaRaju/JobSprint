@@ -63,3 +63,30 @@ export const getUnreadCount = asyncHandler(async (req, res) => {
     data: { count }
   });
 });
+
+/**
+ * @route   DELETE /api/v1/notifications/read
+ * @access  Authenticated
+ */
+export const clearReadNotifications = asyncHandler(async (req, res) => {
+  const deletedCount = await notificationService.clearReadNotifications(req.user.id);
+
+  res.status(200).json({
+    success: true,
+    message: 'Read notifications cleared',
+    data: { deletedCount }
+  });
+});
+
+/**
+ * @route   DELETE /api/v1/notifications/:id
+ * @access  Authenticated (Owner only)
+ */
+export const deleteNotification = asyncHandler(async (req, res) => {
+  await notificationService.deleteNotification(req.params.id, req.user.id);
+
+  res.status(200).json({
+    success: true,
+    message: 'Notification deleted'
+  });
+});

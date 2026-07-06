@@ -198,5 +198,40 @@ test('Notifications Integration Suite', async (suite) => {
     });
     const countBody2 = await countResponse2.json();
     assert.equal(countBody2.data.count, 0);
+
+    // Candidate can delete one of their notifications
+    const deleteResponse = await fetch(`${baseUrl}/api/v1/notifications/${notifId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${candidateToken}` }
+    });
+    assert.equal(deleteResponse.status, 200);
+
+    // Another user cannot delete a notification they do not own
+    const Notification = (await import('../src/models/Notification.js')).default;
+    const remainingNotification = await Notification.findOne({ userId: candidateId });
+    const otherUserToken = createTestToken({ role: 'candidate' });
+    const forbiddenDeleteResponse = await fetch(
+      `${baseUrl}/api/v1/notifications/${remainingNotification._id}`,
+      {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${otherUserToken}` }
+      }
+    );
+    assert.equal(forbiddenDeleteResponse.status, 404);
+
+    // Clear all read notifications and report how many were removed
+    const clearResponse = await fetch(`${baseUrl}/api/v1/notifications/read`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${candidateToken}` }
+    });
+    const clearBody = await clearResponse.json();
+    assert.equal(clearResponse.status, 200);
+    assert.equal(clearBody.data.deletedCount, 1);
+
+    const finalListResponse = await fetch(`${baseUrl}/api/v1/notifications`, {
+      headers: { Authorization: `Bearer ${candidateToken}` }
+    });
+    const finalListBody = await finalListResponse.json();
+    assert.equal(finalListBody.data.notifications.length, 0);
   });
 });

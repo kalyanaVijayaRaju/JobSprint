@@ -339,3 +339,73 @@ test('POST /api/v1/auth/logout — clears token cookie', async (t) => {
   assert.ok(setCookieHeader, 'set-cookie header should be present');
   assert.ok(setCookieHeader.includes('token='), 'Should clear the token cookie');
 });
+
+test('PATCH /api/v1/auth/password — changes password and invalidates old credentials', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+  const registerResponse = await fetch(`${baseUrl}/api/v1/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: 'password-change@jobsprint.com',
+      password: 'SecurePass1!',
+      role: 'candidate'
+    })
+  });
+  const { data } = await registerResponse.json();
+  const token = jwt.sign(
+    { sub: data.user.id, email: data.user.email, role: data.user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '15m' }
+  );
+
+  const response = await fetch(`${baseUrl}/api/v1/auth/password`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({
+      currentPassword: 'SecurePass1!',
+      newPassword: 'StrongerPass2!'
+    })
+  });
+  assert.equal(response.status, 200);
+
+  const login = (password) => fetch(`${baseUrl}/api/v1/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: data.user.email, password })
+  });
+
+  assert.equal((await login('SecurePass1!')).status, 401);
+  assert.equal((await login('StrongerPass2!')).status, 200);
+});
+
+test('PATCH /api/v1/auth/password — rejects an incorrect current password', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const User = (await import('../src/models/User.js')).default;
+  const user = await User.create({
+    email: 'wrong-current@jobsprint.com',
+    passwordHash: 'SecurePass1!',
+    role: 'candidate'
+  });
+  const token = jwt.sign(
+    { sub: user._id.toString(), email: user.email, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '15m' }
+  );
+  const baseUrl = await startTestServer(t);
+
+  const response = await fetch(`${baseUrl}/api/v1/auth/password`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({
+      currentPassword: 'NotThePassword1!',
+      newPassword: 'StrongerPass2!'
+    })
+  });
+
+  assert.equal(response.status, 401);
+});

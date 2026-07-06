@@ -96,3 +96,25 @@ export const markAllAsRead = async (userId) => {
 export const getUnreadCount = async (userId) => {
   return await Notification.countDocuments({ userId, isRead: false });
 };
+
+/**
+ * Delete one notification while enforcing recipient ownership.
+ */
+export const deleteNotification = async (notificationId, userId) => {
+  const notification = await Notification.findOneAndDelete({
+    _id: notificationId,
+    userId
+  });
+
+  if (!notification) {
+    throw new ApiError(404, 'Notification not found');
+  }
+};
+
+/**
+ * Clear read notification history without affecting unread items.
+ */
+export const clearReadNotifications = async (userId) => {
+  const result = await Notification.deleteMany({ userId, isRead: true });
+  return result.deletedCount;
+};

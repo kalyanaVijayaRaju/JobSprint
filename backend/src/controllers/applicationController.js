@@ -49,6 +49,22 @@ export const getMyApplications = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @route   GET /api/v1/applications/summary
+ * @access  Authenticated (Candidate or Recruiter)
+ */
+export const getApplicationSummary = asyncHandler(async (req, res) => {
+  const summary = await applicationService.getApplicationSummary(
+    req.user.id,
+    req.user.role
+  );
+
+  res.status(200).json({
+    success: true,
+    data: { summary }
+  });
+});
+
+/**
  * @route   GET /api/v1/applications/job/:jobId
  * @access  Authenticated (Recruiter — owner of the job)
  */
