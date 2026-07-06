@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   BriefcaseBusiness,
   Bookmark,
@@ -10,13 +10,16 @@ import {
   FileText,
   Clock,
   ExternalLink,
-  CircleAlert
+  CircleAlert,
+  Sparkles,
+  ArrowUpDown
 } from 'lucide-react';
 
 export default function JobsBoard({
   user,
   profile,
   jobs,
+  myApps,
   loadingJobs,
   savedJobs,
   recruiterJobs,
@@ -35,6 +38,7 @@ export default function JobsBoard({
   const [jobSearch, setJobSearch] = useState('');
   const [jobTypeFilter, setJobTypeFilter] = useState('');
   const [locationTypeFilter, setLocationTypeFilter] = useState('');
+  const [sortBy, setSortBy] = useState('match');
   const [selectedJob, setSelectedJob] = useState(null);
   const [coverLetter, setCoverLetter] = useState('');
   const [showCreateJob, setShowCreateJob] = useState(false);
@@ -57,6 +61,42 @@ export default function JobsBoard({
     e.preventDefault();
     onSearch({ search: jobSearch, jobType: jobTypeFilter, locationType: locationTypeFilter });
   };
+
+  const handleClearFilters = () => {
+    setJobSearch('');
+    setJobTypeFilter('');
+    setLocationTypeFilter('');
+    onSearch({});
+  };
+
+  const hasActiveFilters = Boolean(jobSearch || jobTypeFilter || locationTypeFilter);
+
+  const candidateSkills = useMemo(
+    () => (profile?.skills || []).map(skill => skill.trim().toLowerCase()).filter(Boolean),
+    [profile?.skills]
+  );
+
+  const rankedJobs = useMemo(() => {
+    const withMatchData = jobs.map(job => {
+      const requiredSkills = job.skillsRequired || [];
+      const matchingSkills = requiredSkills.filter(skill => candidateSkills.includes(skill.toLowerCase()));
+      const matchScore = requiredSkills.length > 0
+        ? Math.round((matchingSkills.length / requiredSkills.length) * 100)
+        : 0;
+
+      return { job, matchingSkills, matchScore };
+    });
+
+    return withMatchData.sort((a, b) => {
+      if (sortBy === 'newest') {
+        return new Date(b.job.createdAt || 0) - new Date(a.job.createdAt || 0);
+      }
+      if (sortBy === 'salary') {
+        return (b.job.salaryRange?.max || 0) - (a.job.salaryRange?.max || 0);
+      }
+      return b.matchScore - a.matchScore;
+    });
+  }, [candidateSkills, jobs, sortBy]);
 
   const handleCreateJobSubmit = (e) => {
     e.preventDefault();
@@ -349,10 +389,40 @@ export default function JobsBoard({
             <option value="hybrid">Hybrid</option>
             <option value="onsite">Onsite</option>
           </select>
+          <label className="sort-control">
+            <ArrowUpDown size={16} aria-hidden="true" />
+            <span className="sr-only">Sort jobs by</span>
+            <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
+              <option value="match">Best match</option>
+              <option value="newest">Newest first</option>
+              <option value="salary">Highest salary</option>
+            </select>
+          </label>
           <button type="submit" className="btn btn-primary">
             Search
           </button>
+          {hasActiveFilters && (
+            <button type="button" className="btn btn-outline" onClick={handleClearFilters}>
+              Clear
+            </button>
+          )}
         </form>
+
+        {candidateSkills.length === 0 && (
+          <div className="match-guidance">
+            <Sparkles size={18} aria-hidden="true" />
+            <div>
+              <strong>Unlock personalized job matches</strong>
+              <span>Add skills to your profile to rank roles by fit.</span>
+            </div>
+            <button type="button" onClick={() => setActiveTab('profile')}>Update profile</button>
+          </div>
+        )}
+
+        <div className="results-summary" aria-live="polite">
+          <span>{loadingJobs ? 'Searching open roles…' : `${jobs.length} ${jobs.length === 1 ? 'role' : 'roles'} found`}</span>
+          {hasActiveFilters && !loadingJobs && <span>Filtered results</span>}
+        </div>
 
         {/* Job grid */}
         {loadingJobs ? (
@@ -366,8 +436,9 @@ export default function JobsBoard({
           </div>
         ) : (
           <div className="jobs-grid">
-            {jobs.map(job => {
+            {rankedJobs.map(({ job, matchingSkills, matchScore }) => {
               const isBookmarked = savedJobs.some(s => (s.jobId?._id || s.jobId) === job._id);
+              const isApplied = myApps.some(app => (app.jobId?._id || app.jobId) === job._id);
               return (
                 <article className="job-card" key={job._id}>
                   <div className="job-card-header">
@@ -384,6 +455,13 @@ export default function JobsBoard({
                       <Bookmark size={18} />
                     </button>
                   </div>
+
+                  {candidateSkills.length > 0 && (
+                    <div className={`match-score ${matchScore >= 60 ? 'strong' : ''}`} title={`${matchingSkills.length} matching skills`}>
+                      <Sparkles size={14} aria-hidden="true" />
+                      <span>{matchScore}% skill match</span>
+                    </div>
+                  )}
 
                   <div className="job-tags">
                     <span className="badge job-type-badge">{job.jobType}</span>
@@ -406,8 +484,10 @@ export default function JobsBoard({
                   </div>
 
                   <div className="job-skills">
-                    {job.skillsRequired.map(skill => (
-                      <span key={skill} className="skill-tag">{skill}</span>
+                    {(job.skillsRequired || []).map(skill => (
+                      <span key={skill} className={`skill-tag ${matchingSkills.includes(skill) ? 'skill-match' : ''}`}>
+                        {skill}
+                      </span>
                     ))}
                   </div>
 
@@ -417,7 +497,7 @@ export default function JobsBoard({
                       className="btn btn-outline btn-block"
                       onClick={() => setSelectedJob(job)}
                     >
-                      Details & Apply
+                      {isApplied ? 'View application details' : 'Details & Apply'}
                     </button>
                   </div>
                 </article>
@@ -478,7 +558,11 @@ export default function JobsBoard({
 
                 <section className="detail-section apply-section">
                   <h4>Apply for this role</h4>
-                  {profile?.resumeUrl ? (
+                  {myApps.some(app => (app.jobId?._id || app.jobId) === selectedJob._id) ? (
+                    <div className="already-applied-notice" role="status">
+                      You have already applied for this role. Track its progress from Applications.
+                    </div>
+                  ) : profile?.resumeUrl ? (
                     <form onSubmit={handleApplySubmit}>
                       <div className="form-group">
                         <label htmlFor="cover-letter">Cover Letter (Optional)</label>

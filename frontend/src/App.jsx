@@ -6,7 +6,9 @@ import {
   Bookmark,
   LogOut,
   Clock,
-  User
+  User,
+  Menu,
+  X
 } from 'lucide-react';
 import {
   getReadiness,
@@ -34,6 +36,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [loadingSession, setLoadingSession] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [readiness, setReadiness] = useState({
     loading: true,
     ok: false,
@@ -122,6 +125,17 @@ function App() {
     return () => clearInterval(interval);
   }, [user]);
 
+  useEffect(() => {
+    if (!isMobileNavOpen) return undefined;
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') setIsMobileNavOpen(false);
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isMobileNavOpen]);
+
   // ---------------------------------------------------------------------------
   // Data Fetch Helpers
   // ---------------------------------------------------------------------------
@@ -133,6 +147,11 @@ function App() {
       setErrorMsg(msg);
       setTimeout(() => setErrorMsg(null), 4000);
     }
+  };
+
+  const navigateTo = (tab) => {
+    setActiveTab(tab);
+    setIsMobileNavOpen(false);
   };
 
   const fetchNotifications = () => {
@@ -463,14 +482,37 @@ function App() {
 
   return (
     <div className="app-shell">
-      {successMsg && <div className="alert success-toast">{successMsg}</div>}
-      {errorMsg && <div className="alert error-toast">{errorMsg}</div>}
+      {successMsg && <div className="alert success-toast" role="status">{successMsg}</div>}
+      {errorMsg && <div className="alert error-toast" role="alert">{errorMsg}</div>}
+
+      <button
+        type="button"
+        className="mobile-menu-btn"
+        onClick={() => setIsMobileNavOpen(true)}
+        aria-label="Open navigation menu"
+        aria-expanded={isMobileNavOpen}
+        aria-controls="primary-sidebar"
+      >
+        <Menu size={22} />
+      </button>
+
+      {isMobileNavOpen && (
+        <button
+          type="button"
+          className="sidebar-backdrop"
+          onClick={() => setIsMobileNavOpen(false)}
+          aria-label="Close navigation menu"
+        />
+      )}
 
       {/* Sidebar Navigation */}
-      <aside className="sidebar" aria-label="Primary navigation">
+      <aside id="primary-sidebar" className={`sidebar ${isMobileNavOpen ? 'mobile-open' : ''}`} aria-label="Primary navigation">
         <div className="brand">
           <span className="brand-mark">JS</span>
           <span>JobSprint</span>
+          <button type="button" className="mobile-menu-close" onClick={() => setIsMobileNavOpen(false)} aria-label="Close navigation menu">
+            <X size={20} />
+          </button>
         </div>
 
         <div className="user-context">
@@ -489,21 +531,21 @@ function App() {
           <button
             type="button"
             className={`nav-link-btn ${activeTab === 'overview' ? 'active' : ''}`}
-            onClick={() => setActiveTab('overview')}
+            onClick={() => navigateTo('overview')}
           >
             <Activity size={18} /> Overview
           </button>
           <button
             type="button"
             className={`nav-link-btn ${activeTab === 'jobs' ? 'active' : ''}`}
-            onClick={() => setActiveTab('jobs')}
+            onClick={() => navigateTo('jobs')}
           >
             <BriefcaseBusiness size={18} /> {user.role === 'recruiter' ? 'My Job Posts' : 'Find Jobs'}
           </button>
           <button
             type="button"
             className={`nav-link-btn ${activeTab === 'applications' ? 'active' : ''}`}
-            onClick={() => setActiveTab('applications')}
+            onClick={() => navigateTo('applications')}
           >
             <Clock size={18} /> {user.role === 'recruiter' ? 'ATS Pipelines' : 'Applications'}
           </button>
@@ -511,7 +553,7 @@ function App() {
             <button
               type="button"
               className={`nav-link-btn ${activeTab === 'saved-jobs' ? 'active' : ''}`}
-              onClick={() => setActiveTab('saved-jobs')}
+              onClick={() => navigateTo('saved-jobs')}
             >
               <Bookmark size={18} /> Saved Jobs
             </button>
@@ -519,7 +561,7 @@ function App() {
           <button
             type="button"
             className={`nav-link-btn ${activeTab === 'profile' ? 'active' : ''}`}
-            onClick={() => setActiveTab('profile')}
+            onClick={() => navigateTo('profile')}
           >
             <User size={18} /> Profile settings
           </button>
@@ -579,6 +621,7 @@ function App() {
             user={user}
             profile={profile}
             jobs={jobs}
+            myApps={myApps}
             loadingJobs={loadingJobs}
             savedJobs={savedJobs}
             recruiterJobs={recruiterJobs}
