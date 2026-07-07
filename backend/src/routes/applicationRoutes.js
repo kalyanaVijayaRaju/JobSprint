@@ -9,12 +9,21 @@ import {
 import {
   applyToJob,
   getMyApplications,
+  getApplicationSummary,
   getJobApplications,
   updateApplicationStatus,
   addRecruiterNote
 } from '../controllers/applicationController.js';
 
 const router = express.Router();
+
+// Role-aware dashboard totals for candidates and recruiters
+router.get(
+  '/summary',
+  protect,
+  authorizeRoles('candidate', 'recruiter'),
+  getApplicationSummary
+);
 
 // --- Candidate routes ---
 

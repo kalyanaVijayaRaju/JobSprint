@@ -61,6 +61,19 @@ export const loginUser = async ({ email, password }) => {
   };
 };
 
+export const changeUserPassword = async (userId, currentPassword, newPassword) => {
+  const user = await User.findById(userId).select('+passwordHash');
+
+  if (!user || !(await user.comparePassword(currentPassword))) {
+    throw new ApiError(401, 'Current password is incorrect');
+  }
+
+  user.passwordHash = newPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+};
+
 /**
  * Generate a signed JWT for a user.
  *

@@ -1,9 +1,60 @@
+import mongoose from 'mongoose';
 import Application from '../models/Application.js';
 import Job from '../models/Job.js';
 import CandidateProfile from '../models/CandidateProfile.js';
 import ApiError from '../utils/apiError.js';
 import * as notificationService from './notificationService.js';
 import logger from '../utils/logger.js';
+
+const APPLICATION_STATUSES = ['applied', 'screening', 'interviewing', 'offered', 'rejected'];
+
+const normalizeStatusCounts = (rows) => {
+  const counts = Object.fromEntries(APPLICATION_STATUSES.map((status) => [status, 0]));
+  rows.forEach(({ _id, count }) => {
+    if (_id in counts)
+      counts[_id] = count;
+  });
+  return counts;
+};
+
+/**
+ * Return authoritative dashboard totals without depending on paginated lists.
+ * Candidates see their own pipeline; recruiters see applications across jobs
+ * they own. Empty stages are always represented with a zero value.
+ */
+export const getApplicationSummary = async (userId, role) => {
+  let filter;
+  let totalJobs = null;
+
+  if (role === 'candidate') {
+    filter = { candidateId: new mongoose.Types.ObjectId(userId) };
+  } else {
+    const ownedJobs = await Job.find({ recruiterId: userId }).select('_id').lean();
+    const jobIds = ownedJobs.map(({ _id }) => _id);
+    filter = { jobId: { $in: jobIds } };
+    totalJobs = ownedJobs.length;
+  }
+
+  const [statusRows, total] = await Promise.all([
+    Application.aggregate([
+      { $match: filter },
+      { $group: { _id: '$status', count: { $sum: 1 } } }
+    ]),
+    Application.countDocuments(filter)
+  ]);
+
+  const byStatus = normalizeStatusCounts(statusRows);
+
+  return {
+    total,
+    byStatus,
+    ...(role === 'recruiter' && {
+      totalJobs,
+      activePipeline: byStatus.screening + byStatus.interviewing,
+      offerRate: total > 0 ? Math.round((byStatus.offered / total) * 100) : 0
+    })
+  };
+};
 
 /**
  * Submit a job application.

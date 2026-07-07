@@ -1,5 +1,5 @@
 import asyncHandler from '../utils/asyncHandler.js';
-import { registerUser, loginUser, generateToken } from '../services/authService.js';
+import { registerUser, loginUser, generateToken, changeUserPassword } from '../services/authService.js';
 import env from '../config/env.js';
 
 /**
@@ -82,5 +82,14 @@ export const getMe = asyncHandler(async (req, res) => {
     data: {
       user: req.user
     }
+  });
+});
+
+export const changePassword = asyncHandler(async (req, res) => {
+  await changeUserPassword(req.user.id, req.body.currentPassword, req.body.newPassword);
+
+  res.status(200).json({
+    success: true,
+    message: 'Password changed successfully'
   });
 });

@@ -117,6 +117,69 @@ const createJobViaApi = async (baseUrl, token) => {
 };
 
 // ============================================================
+// GET /api/v1/applications/summary — Role-aware dashboard totals
+// ============================================================
+
+test('GET /summary — returns authoritative candidate and recruiter pipeline totals', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+  const recruiterId = new mongoose.Types.ObjectId().toString();
+  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter' });
+  await seedRecruiterWithCompany(recruiterId);
+  const firstJob = await createJobViaApi(baseUrl, recruiterToken);
+  const secondJob = await createJobViaApi(baseUrl, recruiterToken);
+
+  const candidateId = new mongoose.Types.ObjectId().toString();
+  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  await seedCandidateProfile(candidateId);
+
+  for (const job of [firstJob, secondJob]) {
+    await fetch(`${baseUrl}/api/v1/applications/${job._id}/apply`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${candidateToken}`
+      },
+      body: JSON.stringify({})
+    });
+  }
+
+  const Application = (await import('../src/models/Application.js')).default;
+  const screeningApplication = await Application.findOne({ jobId: firstJob._id });
+  screeningApplication.status = 'screening';
+  await screeningApplication.save();
+
+  const candidateResponse = await fetch(`${baseUrl}/api/v1/applications/summary`, {
+    headers: { Authorization: `Bearer ${candidateToken}` }
+  });
+  const candidateBody = await candidateResponse.json();
+
+  assert.equal(candidateResponse.status, 200);
+  assert.equal(candidateBody.data.summary.total, 2);
+  assert.deepEqual(candidateBody.data.summary.byStatus, {
+    applied: 1,
+    screening: 1,
+    interviewing: 0,
+    offered: 0,
+    rejected: 0
+  });
+  assert.equal(candidateBody.data.summary.totalJobs, undefined);
+
+  const recruiterResponse = await fetch(`${baseUrl}/api/v1/applications/summary`, {
+    headers: { Authorization: `Bearer ${recruiterToken}` }
+  });
+  const recruiterBody = await recruiterResponse.json();
+
+  assert.equal(recruiterResponse.status, 200);
+  assert.equal(recruiterBody.data.summary.total, 2);
+  assert.equal(recruiterBody.data.summary.totalJobs, 2);
+  assert.equal(recruiterBody.data.summary.activePipeline, 1);
+  assert.equal(recruiterBody.data.summary.offerRate, 0);
+});
+
+// ============================================================
 // POST /api/v1/applications/:jobId/apply — Submit Application
 // ============================================================
 
