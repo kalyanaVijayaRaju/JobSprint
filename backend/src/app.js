@@ -13,6 +13,7 @@ import ApiError from './utils/apiError.js';
 import { getHealthState } from './config/health.js';
 import authRoutes from './routes/authRoutes.js';
 import jobRoutes from './routes/jobRoutes.js';
+import companyRoutes from './routes/companyRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import applicationRoutes from './routes/applicationRoutes.js';
 import savedJobRoutes from './routes/savedJobRoutes.js';
@@ -99,6 +100,7 @@ app.get('/', (req, res) => {
 // API routes
 app.use('/api/v1/auth', authLimiter, authRoutes);
 app.use('/api/v1/jobs', jobRoutes);
+app.use('/api/v1/companies', companyRoutes);
 app.use('/api/v1/users', profileRoutes);
 app.use('/api/v1/applications', applicationRoutes);
 app.use('/api/v1/saved-jobs', savedJobRoutes);
