@@ -102,6 +102,17 @@ export const updateCompanySchema = z.object({
 export const companyQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(50).default(10),
+  search: z.string().trim().optional(),
+  industry: z.string().trim().optional(),
+  size: z.enum(['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+']).optional(),
+  isVerified: z.preprocess(
+    (val) => {
+      if (val === 'true') return true;
+      if (val === 'false') return false;
+      return undefined;
+    },
+    z.boolean().optional()
+  ),
   sortBy: z.enum(['createdAt', 'name', 'foundedYear']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc')
 });

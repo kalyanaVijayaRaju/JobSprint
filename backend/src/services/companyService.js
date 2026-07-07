@@ -42,9 +42,26 @@ export const createCompany = async (recruiterId, data) => {
  * @returns {{ companies: Array, pagination: Object }}
  */
 export const getCompanies = async (query) => {
-  const { page, limit, sortBy, sortOrder } = query;
+  const { page, limit, sortBy, sortOrder, industry, size, isVerified, search } = query;
 
   const filter = {};
+
+  if (industry) {
+    filter.industry = { $regex: industry, $options: 'i' };
+  }
+
+  if (size) {
+    filter.size = size;
+  }
+
+  if (isVerified !== undefined) {
+    filter.isVerified = isVerified;
+  }
+
+  if (search) {
+    filter.name = { $regex: search, $options: 'i' };
+  }
+
   const skip = (page - 1) * limit;
   const sortDirection = sortOrder === 'asc' ? 1 : -1;
 
