@@ -163,7 +163,8 @@ test('GET /summary — returns authoritative candidate and recruiter pipeline to
     screening: 1,
     interviewing: 0,
     offered: 0,
-    rejected: 0
+    rejected: 0,
+    withdrawn: 0
   });
   assert.equal(candidateBody.data.summary.totalJobs, undefined);
 
@@ -592,4 +593,91 @@ test('POST /:id/notes — empty note returns 400', async (t) => {
   });
 
   assert.equal(response.status, 400);
+});
+
+// ============================================================
+// PATCH /api/v1/applications/:id/withdraw - Candidate Withdrawal
+// ============================================================
+
+test('PATCH /:id/withdraw - candidate withdraws their own application', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+
+  const recruiterId = new mongoose.Types.ObjectId().toString();
+  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  await seedRecruiterWithCompany(recruiterId);
+  const job = await createJobViaApi(baseUrl, recruiterToken);
+
+  const candidateId = new mongoose.Types.ObjectId().toString();
+  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  await seedCandidateProfile(candidateId);
+
+  const applyRes = await fetch(`${baseUrl}/api/v1/applications/${job._id}/apply`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${candidateToken}`
+    },
+    body: JSON.stringify({})
+  });
+  const applyBody = await applyRes.json();
+  const applicationId = applyBody.data.application._id;
+
+  const response = await fetch(`${baseUrl}/api/v1/applications/${applicationId}/withdraw`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${candidateToken}` }
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(body.success, true);
+  assert.equal(body.data.status, 'withdrawn');
+
+  const Application = (await import('../src/models/Application.js')).default;
+  const application = await Application.findById(applicationId).lean();
+
+  assert.equal(application.status, 'withdrawn');
+  assert.equal(application.statusTimeline.at(-1).status, 'withdrawn');
+  assert.equal(application.statusTimeline.at(-1).updatedBy.toString(), candidateId);
+});
+
+test('PATCH /:id/withdraw - candidate cannot withdraw another candidate application', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+
+  const recruiterId = new mongoose.Types.ObjectId().toString();
+  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  await seedRecruiterWithCompany(recruiterId);
+  const job = await createJobViaApi(baseUrl, recruiterToken);
+
+  const ownerId = new mongoose.Types.ObjectId().toString();
+  const ownerToken = createTestToken({ id: ownerId, role: 'candidate', email: 'owner@test.com' });
+  await seedCandidateProfile(ownerId);
+
+  const applyRes = await fetch(`${baseUrl}/api/v1/applications/${job._id}/apply`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${ownerToken}`
+    },
+    body: JSON.stringify({})
+  });
+  const applyBody = await applyRes.json();
+
+  const otherCandidateToken = createTestToken({
+    id: new mongoose.Types.ObjectId().toString(),
+    role: 'candidate',
+    email: 'other@test.com'
+  });
+
+  const response = await fetch(`${baseUrl}/api/v1/applications/${applyBody.data.application._id}/withdraw`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${otherCandidateToken}` }
+  });
+
+  assert.equal(response.status, 404);
 });

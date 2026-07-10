@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const statusHistorySchema = new mongoose.Schema({
   status: {
     type: String,
-    enum: ['applied', 'screening', 'interviewing', 'offered', 'rejected'],
+    enum: ['applied', 'screening', 'interviewing', 'offered', 'rejected', 'withdrawn'],
     required: true
   },
   updatedBy: {
@@ -57,7 +57,7 @@ const applicationSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['applied', 'screening', 'interviewing', 'offered', 'rejected'],
+    enum: ['applied', 'screening', 'interviewing', 'offered', 'rejected', 'withdrawn'],
     default: 'applied'
   },
   statusTimeline: [statusHistorySchema],
@@ -76,11 +76,11 @@ applicationSchema.index({ candidateId: 1, createdAt: -1 }); // Candidate applica
 applicationSchema.index({ jobId: 1, status: 1 });           // Recruiter ATS dashboard pipeline
 
 // Pre-save middleware to automatically log status changes in the timeline
-applicationSchema.pre('save', function(next) {
+applicationSchema.pre('save', function (next) {
   if (this.isModified('status')) {
     // Note: The updatedBy property should be passed in controller logic, default to candidate if new, otherwise we update it in service/controller
     const updater = this._updatedBy || this.candidateId;
-    
+
     this.statusTimeline.push({
       status: this.status,
       updatedBy: updater,
@@ -91,7 +91,7 @@ applicationSchema.pre('save', function(next) {
 });
 
 // Instance helper to update status along with updater ID
-applicationSchema.methods.updateStatus = function(newStatus, updaterId) {
+applicationSchema.methods.updateStatus = function (newStatus, updaterId) {
   this.status = newStatus;
   this._updatedBy = updaterId;
   return this.save();

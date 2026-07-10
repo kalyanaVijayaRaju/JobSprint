@@ -6,7 +6,7 @@ import ApiError from '../utils/apiError.js';
 import * as notificationService from './notificationService.js';
 import logger from '../utils/logger.js';
 
-const APPLICATION_STATUSES = ['applied', 'screening', 'interviewing', 'offered', 'rejected'];
+const APPLICATION_STATUSES = ['applied', 'screening', 'interviewing', 'offered', 'rejected', 'withdrawn'];
 
 const normalizeStatusCounts = (rows) => {
   const counts = Object.fromEntries(APPLICATION_STATUSES.map((status) => [status, 0]));
@@ -265,6 +265,36 @@ export const updateApplicationStatus = async (applicationId, recruiterId, newSta
   }
 
   return updated;
+};
+
+/**
+ * Withdraw a candidate's own application from an active hiring pipeline.
+ * Rejected or already-withdrawn applications are immutable from the
+ * candidate side so the application history stays audit-friendly.
+ *
+ * @param {string} applicationId - Target application ObjectId
+ * @param {string} candidateId   - Authenticated candidate user ID
+ * @returns {Object} The updated application document
+ */
+export const withdrawApplication = async (applicationId, candidateId) => {
+  const application = await Application.findOne({
+    _id: applicationId,
+    candidateId
+  });
+
+  if (!application) {
+    throw new ApiError(404, 'Application not found');
+  }
+
+  if (application.status === 'withdrawn') {
+    throw new ApiError(400, 'Application has already been withdrawn');
+  }
+
+  if (application.status === 'rejected') {
+    throw new ApiError(400, 'Rejected applications cannot be withdrawn');
+  }
+
+  return application.updateStatus('withdrawn', candidateId);
 };
 
 /**
