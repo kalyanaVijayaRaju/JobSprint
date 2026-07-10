@@ -12,6 +12,7 @@ import {
   getApplicationSummary,
   getJobApplications,
   updateApplicationStatus,
+  withdrawApplication,
   addRecruiterNote
 } from '../controllers/applicationController.js';
 
@@ -42,6 +43,14 @@ router.get(
   protect,
   authorizeRoles('candidate'),
   getMyApplications
+);
+
+// Withdraw one of the candidate's own applications
+router.patch(
+  '/:id/withdraw',
+  protect,
+  authorizeRoles('candidate'),
+  withdrawApplication
 );
 
 // --- Recruiter routes ---

@@ -111,6 +111,26 @@ export const updateApplicationStatus = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @route   PATCH /api/v1/applications/:id/withdraw
+ * @access  Authenticated (Candidate — own application only)
+ */
+export const withdrawApplication = asyncHandler(async (req, res) => {
+  const application = await applicationService.withdrawApplication(
+    req.params.id,
+    req.user.id
+  );
+
+  res.status(200).json({
+    success: true,
+    message: 'Application withdrawn successfully',
+    data: {
+      applicationId: application._id,
+      status: application.status
+    }
+  });
+});
+
+/**
  * @route   POST /api/v1/applications/:id/notes
  * @access  Authenticated (Recruiter — owner of the job)
  */
