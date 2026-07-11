@@ -56,12 +56,21 @@ test('GET /api/v1/auth/me rejects requests without a bearer token', async (t) =>
 });
 
 test('GET /api/v1/auth/me returns the current token user', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const User = (await import('../src/models/User.js')).default;
+  const user = await User.create({
+    email: 'candidate@example.com',
+    passwordHash: 'SecurePass1!',
+    role: 'candidate'
+  });
   const baseUrl = await startTestServer(t);
   const token = jwt.sign(
     {
-      sub: 'user_123',
-      email: 'candidate@example.com',
-      role: 'candidate'
+      sub: user._id.toString(),
+      email: user.email,
+      role: user.role
     },
     process.env.JWT_SECRET,
     { expiresIn: '15m' }
@@ -76,10 +85,124 @@ test('GET /api/v1/auth/me returns the current token user', async (t) => {
 
   assert.equal(response.status, 200);
   assert.deepEqual(body.data.user, {
-    id: 'user_123',
+    id: user._id.toString(),
     email: 'candidate@example.com',
     role: 'candidate'
   });
+});
+
+test('GET /api/v1/auth/me accepts the token from an HttpOnly cookie', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const User = (await import('../src/models/User.js')).default;
+  const user = await User.create({
+    email: 'cookie-user@jobsprint.com',
+    passwordHash: 'SecurePass1!',
+    role: 'recruiter'
+  });
+  const token = jwt.sign(
+    {
+      sub: user._id.toString(),
+      email: user.email,
+      role: user.role
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: '15m' }
+  );
+  const baseUrl = await startTestServer(t);
+
+  const response = await fetch(`${baseUrl}/api/v1/auth/me`, {
+    headers: {
+      Cookie: `token=${token}`
+    }
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(body.data.user, {
+    id: user._id.toString(),
+    email: 'cookie-user@jobsprint.com',
+    role: 'recruiter'
+  });
+});
+
+test('GET /api/v1/auth/me prefers bearer token when cookie is also present', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const User = (await import('../src/models/User.js')).default;
+  const bearerUser = await User.create({
+    email: 'bearer-user@jobsprint.com',
+    passwordHash: 'SecurePass1!',
+    role: 'candidate'
+  });
+  const cookieUser = await User.create({
+    email: 'cookie-fallback@jobsprint.com',
+    passwordHash: 'SecurePass1!',
+    role: 'recruiter'
+  });
+  const bearerToken = jwt.sign(
+    {
+      sub: bearerUser._id.toString(),
+      email: bearerUser.email,
+      role: bearerUser.role
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: '15m' }
+  );
+  const cookieToken = jwt.sign(
+    {
+      sub: cookieUser._id.toString(),
+      email: cookieUser.email,
+      role: cookieUser.role
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: '15m' }
+  );
+  const baseUrl = await startTestServer(t);
+
+  const response = await fetch(`${baseUrl}/api/v1/auth/me`, {
+    headers: {
+      Authorization: `Bearer ${bearerToken}`,
+      Cookie: `token=${cookieToken}`
+    }
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(body.data.user, {
+    id: bearerUser._id.toString(),
+    email: 'bearer-user@jobsprint.com',
+    role: 'candidate'
+  });
+});
+
+test('GET /api/v1/auth/me rejects a valid token for a deleted user', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+  const token = jwt.sign(
+    {
+      sub: new mongoose.Types.ObjectId().toString(),
+      email: 'deleted@jobsprint.com',
+      role: 'candidate'
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: '15m' }
+  );
+
+  const response = await fetch(`${baseUrl}/api/v1/auth/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 401);
+  assert.equal(body.success, false);
+  assert.equal(body.error.message, 'Authentication user no longer exists');
 });
 
 // ============================================================
