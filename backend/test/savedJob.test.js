@@ -75,7 +75,7 @@ const seedRecruiterWithCompany = async (userId) => {
 /**
  * Creates a job via the API and returns the job object.
  */
-const createJobViaApi = async (baseUrl, token) => {
+const createJobViaApi = async (baseUrl, token, overrides = {}) => {
   const response = await fetch(`${baseUrl}/api/v1/jobs`, {
     method: 'POST',
     headers: {
@@ -91,7 +91,8 @@ const createJobViaApi = async (baseUrl, token) => {
       location: 'Worldwide',
       salaryRange: { min: 80000, max: 120000, currency: 'USD' },
       jobType: 'full-time',
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      ...overrides
     })
   });
   const body = await response.json();
@@ -349,4 +350,67 @@ test('GET /saved-jobs — unsaved job no longer appears in the list', async (t) 
 
   assert.equal(response.status, 200);
   assert.equal(body.data.savedJobs.length, 0);
+});
+
+test('GET /saved-jobs - filters saved jobs by search and job attributes', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+
+  const recruiterId = new mongoose.Types.ObjectId().toString();
+  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  await seedRecruiterWithCompany(recruiterId);
+
+  const frontendJob = await createJobViaApi(baseUrl, recruiterToken, {
+    title: 'Frontend Developer',
+    description: 'Build polished React interfaces for job seekers.',
+    skillsRequired: ['React', 'CSS', 'JavaScript'],
+    locationType: 'remote',
+    location: 'Worldwide',
+    jobType: 'full-time'
+  });
+  const backendJob = await createJobViaApi(baseUrl, recruiterToken, {
+    title: 'Backend API Engineer',
+    description: 'Design reliable Node.js APIs and MongoDB data flows.',
+    skillsRequired: ['Node.js', 'Express', 'MongoDB'],
+    locationType: 'hybrid',
+    location: 'Bengaluru, India',
+    jobType: 'contract'
+  });
+
+  const candidateId = new mongoose.Types.ObjectId().toString();
+  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+
+  for (const job of [frontendJob, backendJob]) {
+    await fetch(`${baseUrl}/api/v1/saved-jobs/${job._id}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${candidateToken}` }
+    });
+  }
+
+  const response = await fetch(
+    `${baseUrl}/api/v1/saved-jobs?search=mongodb&locationType=hybrid&jobType=contract`,
+    { headers: { Authorization: `Bearer ${candidateToken}` } }
+  );
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(body.success, true);
+  assert.equal(body.data.savedJobs.length, 1);
+  assert.equal(body.data.pagination.totalSavedJobs, 1);
+  assert.equal(body.data.savedJobs[0].jobId.title, 'Backend API Engineer');
+});
+
+test('GET /saved-jobs - returns validation errors for unsupported filters', async (t) => {
+  const baseUrl = await startTestServer(t);
+  const candidateToken = createTestToken({ role: 'candidate' });
+
+  const response = await fetch(`${baseUrl}/api/v1/saved-jobs?locationType=office`, {
+    headers: { Authorization: `Bearer ${candidateToken}` }
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 400);
+  assert.equal(body.success, false);
 });

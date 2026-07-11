@@ -1,6 +1,7 @@
 import SavedJob from '../models/SavedJob.js';
 import Job from '../models/Job.js';
 import ApiError from '../utils/apiError.js';
+import mongoose from 'mongoose';
 
 /**
  * Toggle-save a job for a candidate.  If the job is already saved the
@@ -52,28 +53,109 @@ export const unsaveJob = async (candidateId, jobId) => {
  * @returns {{ savedJobs: Array, pagination: Object }}
  */
 export const getSavedJobs = async (candidateId, query) => {
-  const { page, limit, sortBy, sortOrder } = query;
+  const {
+    page,
+    limit,
+    search,
+    location,
+    locationType,
+    jobType,
+    status,
+    sortBy,
+    sortOrder
+  } = query;
 
-  const filter = { candidateId };
   const skip = (page - 1) * limit;
   const sortDirection = sortOrder === 'asc' ? 1 : -1;
+  const candidateObjectId = new mongoose.Types.ObjectId(candidateId);
+  const jobFilters = {};
 
-  const [savedJobs, total] = await Promise.all([
-    SavedJob.find(filter)
-      .sort({ [sortBy]: sortDirection })
-      .skip(skip)
-      .limit(limit)
-      .populate({
-        path: 'jobId',
-        select: 'title description location locationType jobType salaryRange status expiresAt companyId createdAt',
-        populate: {
-          path: 'companyId',
-          select: 'name logo'
+  if (status) {
+    jobFilters['job.status'] = status;
+  }
+
+  if (locationType) {
+    jobFilters['job.locationType'] = locationType;
+  }
+
+  if (jobType) {
+    jobFilters['job.jobType'] = jobType;
+  }
+
+  if (location) {
+    jobFilters['job.location'] = { $regex: location, $options: 'i' };
+  }
+
+  if (search) {
+    jobFilters.$or = [
+      { 'job.title': { $regex: search, $options: 'i' } },
+      { 'job.description': { $regex: search, $options: 'i' } },
+      { 'job.skillsRequired': { $regex: search, $options: 'i' } }
+    ];
+  }
+
+  const basePipeline = [
+    { $match: { candidateId: candidateObjectId } },
+    {
+      $lookup: {
+        from: 'jobs',
+        localField: 'jobId',
+        foreignField: '_id',
+        as: 'job'
+      }
+    },
+    { $unwind: '$job' },
+    ...(Object.keys(jobFilters).length > 0 ? [{ $match: jobFilters }] : []),
+    {
+      $lookup: {
+        from: 'companies',
+        localField: 'job.companyId',
+        foreignField: '_id',
+        as: 'company'
+      }
+    },
+    {
+      $unwind: {
+        path: '$company',
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $set: {
+        'job.companyId': {
+          _id: '$company._id',
+          name: '$company.name',
+          logo: '$company.logo'
         }
-      })
-      .lean(),
-    SavedJob.countDocuments(filter)
+      }
+    },
+    {
+      $project: {
+        company: 0,
+        'job.recruiterId': 0,
+        'job.requirements': 0,
+        'job.__v': 0,
+        __v: 0
+      }
+    }
+  ];
+
+  const [savedJobs, totalRows] = await Promise.all([
+    SavedJob.aggregate([
+      ...basePipeline,
+      { $sort: { [sortBy]: sortDirection } },
+      { $skip: skip },
+      { $limit: limit },
+      { $set: { jobId: '$job' } },
+      { $project: { job: 0 } }
+    ]),
+    SavedJob.aggregate([
+      ...basePipeline,
+      { $count: 'total' }
+    ])
   ]);
+
+  const total = totalRows[0]?.total || 0;
 
   return {
     savedJobs,
