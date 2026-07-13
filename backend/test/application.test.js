@@ -40,11 +40,27 @@ const teardownDatabase = async () => {
   await mongoose.connection.close();
 };
 
-const createTestToken = (overrides = {}) => {
+const createTestToken = async (overrides = {}) => {
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(process.env.MONGODB_URI);
+  }
+
+  const User = (await import('../src/models/User.js')).default;
+  const id = overrides.id || new mongoose.Types.ObjectId().toString();
+  const email = overrides.email || `${overrides.role || 'candidate'}-${id}@test.com`;
+  const role = overrides.role || 'candidate';
+
+  await User.create({
+    _id: id,
+    email,
+    passwordHash: 'SecurePass1!',
+    role
+  });
+
   const payload = {
-    sub: overrides.id || new mongoose.Types.ObjectId().toString(),
-    email: overrides.email || 'user@test.com',
-    role: overrides.role || 'candidate'
+    sub: id,
+    email,
+    role
   };
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m' });
 };
@@ -126,13 +142,13 @@ test('GET /summary — returns authoritative candidate and recruiter pipeline to
 
   const baseUrl = await startTestServer(t);
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter' });
   await seedRecruiterWithCompany(recruiterId);
   const firstJob = await createJobViaApi(baseUrl, recruiterToken);
   const secondJob = await createJobViaApi(baseUrl, recruiterToken);
 
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
   await seedCandidateProfile(candidateId);
 
   for (const job of [firstJob, secondJob]) {
@@ -192,13 +208,13 @@ test('POST /apply — candidate applies to a job successfully', async (t) => {
 
   // Setup recruiter with a job
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
   await seedRecruiterWithCompany(recruiterId);
   const job = await createJobViaApi(baseUrl, recruiterToken);
 
   // Setup candidate with profile
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
   await seedCandidateProfile(candidateId);
 
   // Apply
@@ -228,12 +244,12 @@ test('POST /apply — duplicate application returns 409', async (t) => {
   const baseUrl = await startTestServer(t);
 
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
   await seedRecruiterWithCompany(recruiterId);
   const job = await createJobViaApi(baseUrl, recruiterToken);
 
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
   await seedCandidateProfile(candidateId);
 
   // First application
@@ -264,7 +280,7 @@ test('POST /apply — duplicate application returns 409', async (t) => {
 
 test('POST /apply — recruiter cannot apply to a job (403)', async (t) => {
   const baseUrl = await startTestServer(t);
-  const token = createTestToken({ role: 'recruiter' });
+  const token = await createTestToken({ role: 'recruiter' });
 
   const fakeJobId = new mongoose.Types.ObjectId().toString();
   const response = await fetch(`${baseUrl}/api/v1/applications/${fakeJobId}/apply`, {
@@ -299,7 +315,7 @@ test('POST /apply — applying to a nonexistent job returns 404', async (t) => {
   const baseUrl = await startTestServer(t);
 
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
   await seedCandidateProfile(candidateId);
 
   const fakeJobId = new mongoose.Types.ObjectId().toString();
@@ -330,13 +346,13 @@ test('GET /my-applications — candidate sees their applications', async (t) => 
 
   // Setup recruiter + job
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
   await seedRecruiterWithCompany(recruiterId);
   const job = await createJobViaApi(baseUrl, recruiterToken);
 
   // Setup candidate + apply
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
   await seedCandidateProfile(candidateId);
 
   await fetch(`${baseUrl}/api/v1/applications/${job._id}/apply`, {
@@ -366,7 +382,7 @@ test('GET /my-applications — returns empty list for candidate with no applicat
   t.after(teardownDatabase);
 
   const baseUrl = await startTestServer(t);
-  const candidateToken = createTestToken({ role: 'candidate' });
+  const candidateToken = await createTestToken({ role: 'candidate' });
 
   const response = await fetch(`${baseUrl}/api/v1/applications/my-applications`, {
     headers: { Authorization: `Bearer ${candidateToken}` }
@@ -391,13 +407,13 @@ test('GET /job/:jobId — recruiter sees applicants for their job', async (t) =>
 
   // Setup recruiter + job
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
   await seedRecruiterWithCompany(recruiterId);
   const job = await createJobViaApi(baseUrl, recruiterToken);
 
   // Candidate applies
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
   await seedCandidateProfile(candidateId);
 
   await fetch(`${baseUrl}/api/v1/applications/${job._id}/apply`, {
@@ -430,13 +446,13 @@ test('GET /job/:jobId — non-owner recruiter gets 403', async (t) => {
 
   // Owner recruiter creates a job
   const ownerId = new mongoose.Types.ObjectId().toString();
-  const ownerToken = createTestToken({ id: ownerId, role: 'recruiter', email: 'owner@test.com' });
+  const ownerToken = await createTestToken({ id: ownerId, role: 'recruiter', email: 'owner@test.com' });
   await seedRecruiterWithCompany(ownerId);
   const job = await createJobViaApi(baseUrl, ownerToken);
 
   // Another recruiter tries to view applicants
   const otherId = new mongoose.Types.ObjectId().toString();
-  const otherToken = createTestToken({ id: otherId, role: 'recruiter', email: 'other@test.com' });
+  const otherToken = await createTestToken({ id: otherId, role: 'recruiter', email: 'other@test.com' });
 
   const response = await fetch(`${baseUrl}/api/v1/applications/job/${job._id}`, {
     headers: { Authorization: `Bearer ${otherToken}` }
@@ -457,13 +473,13 @@ test('PATCH /:id/status — recruiter updates application status', async (t) => 
 
   // Setup recruiter + job
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
   await seedRecruiterWithCompany(recruiterId);
   const job = await createJobViaApi(baseUrl, recruiterToken);
 
   // Candidate applies
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
   await seedCandidateProfile(candidateId);
 
   const applyRes = await fetch(`${baseUrl}/api/v1/applications/${job._id}/apply`, {
@@ -496,7 +512,7 @@ test('PATCH /:id/status — recruiter updates application status', async (t) => 
 
 test('PATCH /:id/status — candidate cannot update application status (403)', async (t) => {
   const baseUrl = await startTestServer(t);
-  const candidateToken = createTestToken({ role: 'candidate' });
+  const candidateToken = await createTestToken({ role: 'candidate' });
   const fakeId = new mongoose.Types.ObjectId().toString();
 
   const response = await fetch(`${baseUrl}/api/v1/applications/${fakeId}/status`, {
@@ -513,7 +529,7 @@ test('PATCH /:id/status — candidate cannot update application status (403)', a
 
 test('PATCH /:id/status — invalid status value returns 400', async (t) => {
   const baseUrl = await startTestServer(t);
-  const recruiterToken = createTestToken({ role: 'recruiter' });
+  const recruiterToken = await createTestToken({ role: 'recruiter' });
   const fakeId = new mongoose.Types.ObjectId().toString();
 
   const response = await fetch(`${baseUrl}/api/v1/applications/${fakeId}/status`, {
@@ -540,13 +556,13 @@ test('POST /:id/notes — recruiter adds a note to an application', async (t) =>
 
   // Setup recruiter + job
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
   await seedRecruiterWithCompany(recruiterId);
   const job = await createJobViaApi(baseUrl, recruiterToken);
 
   // Candidate applies
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
   await seedCandidateProfile(candidateId);
 
   const applyRes = await fetch(`${baseUrl}/api/v1/applications/${job._id}/apply`, {
@@ -580,7 +596,7 @@ test('POST /:id/notes — recruiter adds a note to an application', async (t) =>
 
 test('POST /:id/notes — empty note returns 400', async (t) => {
   const baseUrl = await startTestServer(t);
-  const recruiterToken = createTestToken({ role: 'recruiter' });
+  const recruiterToken = await createTestToken({ role: 'recruiter' });
   const fakeId = new mongoose.Types.ObjectId().toString();
 
   const response = await fetch(`${baseUrl}/api/v1/applications/${fakeId}/notes`, {
@@ -606,12 +622,12 @@ test('PATCH /:id/withdraw - candidate withdraws their own application', async (t
   const baseUrl = await startTestServer(t);
 
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
   await seedRecruiterWithCompany(recruiterId);
   const job = await createJobViaApi(baseUrl, recruiterToken);
 
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
   await seedCandidateProfile(candidateId);
 
   const applyRes = await fetch(`${baseUrl}/api/v1/applications/${job._id}/apply`, {
@@ -650,12 +666,12 @@ test('PATCH /:id/withdraw - candidate cannot withdraw another candidate applicat
   const baseUrl = await startTestServer(t);
 
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
   await seedRecruiterWithCompany(recruiterId);
   const job = await createJobViaApi(baseUrl, recruiterToken);
 
   const ownerId = new mongoose.Types.ObjectId().toString();
-  const ownerToken = createTestToken({ id: ownerId, role: 'candidate', email: 'owner@test.com' });
+  const ownerToken = await createTestToken({ id: ownerId, role: 'candidate', email: 'owner@test.com' });
   await seedCandidateProfile(ownerId);
 
   const applyRes = await fetch(`${baseUrl}/api/v1/applications/${job._id}/apply`, {
@@ -668,7 +684,7 @@ test('PATCH /:id/withdraw - candidate cannot withdraw another candidate applicat
   });
   const applyBody = await applyRes.json();
 
-  const otherCandidateToken = createTestToken({
+  const otherCandidateToken = await createTestToken({
     id: new mongoose.Types.ObjectId().toString(),
     role: 'candidate',
     email: 'other@test.com'

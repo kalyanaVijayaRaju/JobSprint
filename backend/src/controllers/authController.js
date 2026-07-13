@@ -1,6 +1,19 @@
 import asyncHandler from '../utils/asyncHandler.js';
-import { registerUser, loginUser, generateToken, changeUserPassword } from '../services/authService.js';
+import {
+  registerUser,
+  loginUser,
+  generateToken,
+  changeUserPassword,
+  getSecurityActivity
+} from '../services/authService.js';
 import env from '../config/env.js';
+import ApiError from '../utils/apiError.js';
+import { securityActivityQuerySchema } from '../validations/authValidation.js';
+
+const getRequestContext = (req) => ({
+  ipAddress: req.ip,
+  userAgent: req.get('user-agent') || ''
+});
 
 /**
  * Cookie options for the JWT token.
@@ -40,7 +53,7 @@ export const register = asyncHandler(async (req, res) => {
  * @access  Public
  */
 export const login = asyncHandler(async (req, res) => {
-  const userData = await loginUser(req.body);
+  const userData = await loginUser(req.body, getRequestContext(req));
   const token = generateToken(userData);
 
   res
@@ -86,10 +99,32 @@ export const getMe = asyncHandler(async (req, res) => {
 });
 
 export const changePassword = asyncHandler(async (req, res) => {
-  await changeUserPassword(req.user.id, req.body.currentPassword, req.body.newPassword);
+  await changeUserPassword(
+    req.user.id,
+    req.body.currentPassword,
+    req.body.newPassword,
+    getRequestContext(req)
+  );
 
   res.status(200).json({
     success: true,
     message: 'Password changed successfully'
+  });
+});
+
+export const getSecurityActivityLog = asyncHandler(async (req, res) => {
+  const queryResult = securityActivityQuerySchema.safeParse(req.query);
+
+  if (!queryResult.success) {
+    const error = new ApiError(400, 'Invalid query parameters', true);
+    error.details = queryResult.error.issues.map((issue) => issue.message);
+    throw error;
+  }
+
+  const activity = await getSecurityActivity(req.user.id, queryResult.data);
+
+  res.status(200).json({
+    success: true,
+    data: activity
   });
 });

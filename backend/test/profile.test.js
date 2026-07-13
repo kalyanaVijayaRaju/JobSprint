@@ -37,11 +37,23 @@ const teardownDatabase = async () => {
   await mongoose.connection.close();
 };
 
-const createTestToken = (overrides = {}) => {
+const createTestToken = async (overrides = {}) => {
+  const User = (await import('../src/models/User.js')).default;
+  const id = overrides.id || new mongoose.Types.ObjectId().toString();
+  const email = overrides.email || `${overrides.role || 'candidate'}-${id}@test.com`;
+  const role = overrides.role || 'candidate';
+
+  await User.create({
+    _id: id,
+    email,
+    passwordHash: 'SecurePass1!',
+    role
+  });
+
   const payload = {
-    sub: overrides.id || new mongoose.Types.ObjectId().toString(),
-    email: overrides.email || 'user@test.com',
-    role: overrides.role || 'candidate'
+    sub: id,
+    email,
+    role
   };
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m' });
 };
@@ -55,7 +67,7 @@ test('Profile & Resume Integration Suite', async (suite) => {
     t.after(teardownDatabase);
 
     const baseUrl = await startTestServer(t);
-    const token = createTestToken({ role: 'candidate' });
+    const token = await createTestToken({ role: 'candidate' });
 
     const response = await fetch(`${baseUrl}/api/v1/users/profile`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -72,7 +84,7 @@ test('Profile & Resume Integration Suite', async (suite) => {
     t.after(teardownDatabase);
 
     const baseUrl = await startTestServer(t);
-    const token = createTestToken({ role: 'candidate' });
+    const token = await createTestToken({ role: 'candidate' });
 
     const response = await fetch(`${baseUrl}/api/v1/users/profile`, {
       method: 'PUT',
@@ -110,7 +122,7 @@ test('Profile & Resume Integration Suite', async (suite) => {
     t.after(teardownDatabase);
 
     const baseUrl = await startTestServer(t);
-    const token = createTestToken({ role: 'candidate' });
+    const token = await createTestToken({ role: 'candidate' });
 
     // Pre-create the candidate profile
     await fetch(`${baseUrl}/api/v1/users/profile`, {
@@ -159,7 +171,7 @@ test('Profile & Resume Integration Suite', async (suite) => {
     t.after(teardownDatabase);
 
     const baseUrl = await startTestServer(t);
-    const token = createTestToken({ role: 'candidate' });
+    const token = await createTestToken({ role: 'candidate' });
 
     const formData = new FormData();
     const mockTextContent = 'This is plain text content';
@@ -185,7 +197,7 @@ test('Profile & Resume Integration Suite', async (suite) => {
     t.after(teardownDatabase);
 
     const baseUrl = await startTestServer(t);
-    const token = createTestToken({ role: 'recruiter' });
+    const token = await createTestToken({ role: 'recruiter' });
 
     const formData = new FormData();
     const blob = new Blob(['%PDF-1.4'], { type: 'application/pdf' });

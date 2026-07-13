@@ -28,6 +28,18 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  lastLoginAt: Date,
+  failedLoginAttempts: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  lockUntil: Date,
+  passwordChangedAt: Date,
   verificationToken: String,
   passwordResetToken: String,
   passwordResetExpires: Date
@@ -38,7 +50,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Pre-save hook to hash password
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('passwordHash')) return next();
   try {
     const salt = await bcrypt.genSalt(12);
@@ -50,29 +62,30 @@ userSchema.pre('save', async function(next) {
 });
 
 // Instance method to compare password
-userSchema.methods.comparePassword = async function(candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.passwordHash);
 };
 
 // Instance method to generate password reset token
-userSchema.methods.generatePasswordResetToken = function() {
+userSchema.methods.generatePasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString('hex');
-  
+
   this.passwordResetToken = crypto
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
-    
+
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
-  
+
   return resetToken;
 };
 
 // Static method to find by email
-userSchema.statics.findByEmail = function(email) {
+userSchema.statics.findByEmail = function (email) {
   return this.findOne({ email: email.toLowerCase().trim() });
 };
 
+userSchema.index({ role: 1, isActive: 1, createdAt: -1 });
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 export default User;

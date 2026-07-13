@@ -39,11 +39,27 @@ const teardownDatabase = async () => {
   await mongoose.connection.close();
 };
 
-const createTestToken = (overrides = {}) => {
+const createTestToken = async (overrides = {}) => {
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(process.env.MONGODB_URI);
+  }
+
+  const User = (await import('../src/models/User.js')).default;
+  const id = overrides.id || new mongoose.Types.ObjectId().toString();
+  const email = overrides.email || `${overrides.role || 'candidate'}-${id}@test.com`;
+  const role = overrides.role || 'candidate';
+
+  await User.create({
+    _id: id,
+    email,
+    passwordHash: 'SecurePass1!',
+    role
+  });
+
   const payload = {
-    sub: overrides.id || new mongoose.Types.ObjectId().toString(),
-    email: overrides.email || 'candidate@test.com',
-    role: overrides.role || 'candidate'
+    sub: id,
+    email,
+    role
   };
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m' });
 };
@@ -111,13 +127,13 @@ test('POST /saved-jobs/:jobId — candidate saves a job successfully', async (t)
 
   // Setup recruiter with a job
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
   await seedRecruiterWithCompany(recruiterId);
   const job = await createJobViaApi(baseUrl, recruiterToken);
 
   // Candidate saves the job
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
 
   const response = await fetch(`${baseUrl}/api/v1/saved-jobs/${job._id}`, {
     method: 'POST',
@@ -139,12 +155,12 @@ test('POST /saved-jobs/:jobId — saving the same job twice is idempotent', asyn
   const baseUrl = await startTestServer(t);
 
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
   await seedRecruiterWithCompany(recruiterId);
   const job = await createJobViaApi(baseUrl, recruiterToken);
 
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
 
   // Save once
   await fetch(`${baseUrl}/api/v1/saved-jobs/${job._id}`, {
@@ -169,7 +185,7 @@ test('POST /saved-jobs/:jobId — saving a nonexistent job returns 404', async (
   t.after(teardownDatabase);
 
   const baseUrl = await startTestServer(t);
-  const candidateToken = createTestToken({ role: 'candidate' });
+  const candidateToken = await createTestToken({ role: 'candidate' });
   const fakeJobId = new mongoose.Types.ObjectId().toString();
 
   const response = await fetch(`${baseUrl}/api/v1/saved-jobs/${fakeJobId}`, {
@@ -184,8 +200,11 @@ test('POST /saved-jobs/:jobId — saving a nonexistent job returns 404', async (
 });
 
 test('POST /saved-jobs/:jobId — recruiter cannot save a job (403)', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
   const baseUrl = await startTestServer(t);
-  const recruiterToken = createTestToken({ role: 'recruiter' });
+  const recruiterToken = await createTestToken({ role: 'recruiter' });
   const fakeJobId = new mongoose.Types.ObjectId().toString();
 
   const response = await fetch(`${baseUrl}/api/v1/saved-jobs/${fakeJobId}`, {
@@ -218,12 +237,12 @@ test('DELETE /saved-jobs/:jobId — candidate unsaves a job', async (t) => {
   const baseUrl = await startTestServer(t);
 
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
   await seedRecruiterWithCompany(recruiterId);
   const job = await createJobViaApi(baseUrl, recruiterToken);
 
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
 
   // Save first
   await fetch(`${baseUrl}/api/v1/saved-jobs/${job._id}`, {
@@ -249,7 +268,7 @@ test('DELETE /saved-jobs/:jobId — unsaving a non-saved job returns 404', async
   t.after(teardownDatabase);
 
   const baseUrl = await startTestServer(t);
-  const candidateToken = createTestToken({ role: 'candidate' });
+  const candidateToken = await createTestToken({ role: 'candidate' });
   const fakeJobId = new mongoose.Types.ObjectId().toString();
 
   const response = await fetch(`${baseUrl}/api/v1/saved-jobs/${fakeJobId}`, {
@@ -272,13 +291,13 @@ test('GET /saved-jobs — candidate lists their saved jobs', async (t) => {
 
   // Setup recruiter with a job
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
   await seedRecruiterWithCompany(recruiterId);
   const job = await createJobViaApi(baseUrl, recruiterToken);
 
   // Candidate saves the job
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
 
   await fetch(`${baseUrl}/api/v1/saved-jobs/${job._id}`, {
     method: 'POST',
@@ -304,7 +323,7 @@ test('GET /saved-jobs — returns empty list for candidate with no saved jobs', 
   t.after(teardownDatabase);
 
   const baseUrl = await startTestServer(t);
-  const candidateToken = createTestToken({ role: 'candidate' });
+  const candidateToken = await createTestToken({ role: 'candidate' });
 
   const response = await fetch(`${baseUrl}/api/v1/saved-jobs`, {
     headers: { Authorization: `Bearer ${candidateToken}` }
@@ -324,12 +343,12 @@ test('GET /saved-jobs — unsaved job no longer appears in the list', async (t) 
   const baseUrl = await startTestServer(t);
 
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
   await seedRecruiterWithCompany(recruiterId);
   const job = await createJobViaApi(baseUrl, recruiterToken);
 
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
 
   // Save then unsave
   await fetch(`${baseUrl}/api/v1/saved-jobs/${job._id}`, {
@@ -359,7 +378,7 @@ test('GET /saved-jobs - filters saved jobs by search and job attributes', async 
   const baseUrl = await startTestServer(t);
 
   const recruiterId = new mongoose.Types.ObjectId().toString();
-  const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
   await seedRecruiterWithCompany(recruiterId);
 
   const frontendJob = await createJobViaApi(baseUrl, recruiterToken, {
@@ -380,7 +399,7 @@ test('GET /saved-jobs - filters saved jobs by search and job attributes', async 
   });
 
   const candidateId = new mongoose.Types.ObjectId().toString();
-  const candidateToken = createTestToken({ id: candidateId, role: 'candidate' });
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
 
   for (const job of [frontendJob, backendJob]) {
     await fetch(`${baseUrl}/api/v1/saved-jobs/${job._id}`, {
@@ -403,8 +422,11 @@ test('GET /saved-jobs - filters saved jobs by search and job attributes', async 
 });
 
 test('GET /saved-jobs - returns validation errors for unsupported filters', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
   const baseUrl = await startTestServer(t);
-  const candidateToken = createTestToken({ role: 'candidate' });
+  const candidateToken = await createTestToken({ role: 'candidate' });
 
   const response = await fetch(`${baseUrl}/api/v1/saved-jobs?locationType=office`, {
     headers: { Authorization: `Bearer ${candidateToken}` }
