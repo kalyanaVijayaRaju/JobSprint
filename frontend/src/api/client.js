@@ -58,10 +58,37 @@ export const getReadiness = async () => {
 // ---------------------------------------------------------------------------
 
 export const authApi = {
-  register: (data) => apiFetch('/api/v1/auth/register', { method: 'POST', body: data }),
-  login:    (data) => apiFetch('/api/v1/auth/login', { method: 'POST', body: data }),
-  logout:   ()     => apiFetch('/api/v1/auth/logout', { method: 'POST' }),
-  getMe:    ()     => apiFetch('/api/v1/auth/me')
+  register:         (data) => apiFetch('/api/v1/auth/register', { method: 'POST', body: data }),
+  login:            (data) => apiFetch('/api/v1/auth/login', { method: 'POST', body: data }),
+  logout:           ()     => apiFetch('/api/v1/auth/logout', { method: 'POST' }),
+  getMe:            ()     => apiFetch('/api/v1/auth/me'),
+  changePassword:   (data) => apiFetch('/api/v1/auth/password', { method: 'PATCH', body: data }),
+  securityActivity: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/auth/security/activity${query ? `?${query}` : ''}`);
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Admin API
+// ---------------------------------------------------------------------------
+
+export const adminApi = {
+  listUsers: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/admin/users${query ? `?${query}` : ''}`);
+  },
+  updateUserStatus: (id, data) => apiFetch(`/api/v1/admin/users/${id}/status`, { method: 'PATCH', body: data }),
+  auditLogs: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/admin/audit-logs${query ? `?${query}` : ''}`);
+  }
 };
 
 // ---------------------------------------------------------------------------

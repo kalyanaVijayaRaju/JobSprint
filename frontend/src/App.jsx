@@ -28,6 +28,9 @@ import JobsBoard from './components/JobsBoard.jsx';
 import AtsPipeline from './components/AtsPipeline.jsx';
 import ProfileSettings from './components/ProfileSettings.jsx';
 import SavedJobs from './components/SavedJobs.jsx';
+import ChangePassword from './components/ChangePassword.jsx';
+import SecurityActivity from './components/SecurityActivity.jsx';
+import AdminDashboard from './components/AdminDashboard.jsx';
 
 import './styles.css';
 
@@ -120,6 +123,8 @@ function App() {
       fetchMyApplications();
     } else if (user.role === 'recruiter') {
       fetchRecruiterJobs();
+    } else if (user.role === 'admin') {
+      setActiveTab('admin');
     }
 
     return () => clearInterval(interval);
@@ -535,20 +540,33 @@ function App() {
           >
             <Activity size={18} /> Overview
           </button>
-          <button
-            type="button"
-            className={`nav-link-btn ${activeTab === 'jobs' ? 'active' : ''}`}
-            onClick={() => navigateTo('jobs')}
-          >
-            <BriefcaseBusiness size={18} /> {user.role === 'recruiter' ? 'My Job Posts' : 'Find Jobs'}
-          </button>
-          <button
-            type="button"
-            className={`nav-link-btn ${activeTab === 'applications' ? 'active' : ''}`}
-            onClick={() => navigateTo('applications')}
-          >
-            <Clock size={18} /> {user.role === 'recruiter' ? 'ATS Pipelines' : 'Applications'}
-          </button>
+          {user?.role === 'admin' && (
+            <button
+              type="button"
+              className={`nav-link-btn ${activeTab === 'admin' ? 'active' : ''}`}
+              onClick={() => navigateTo('admin')}
+            >
+              <UsersRound size={18} /> Admin Console
+            </button>
+          )}
+          {user?.role !== 'admin' && (
+            <>
+              <button
+                type="button"
+                className={`nav-link-btn ${activeTab === 'jobs' ? 'active' : ''}`}
+                onClick={() => navigateTo('jobs')}
+              >
+                <BriefcaseBusiness size={18} /> {user.role === 'recruiter' ? 'My Job Posts' : 'Find Jobs'}
+              </button>
+              <button
+                type="button"
+                className={`nav-link-btn ${activeTab === 'applications' ? 'active' : ''}`}
+                onClick={() => navigateTo('applications')}
+              >
+                <Clock size={18} /> {user.role === 'recruiter' ? 'ATS Pipelines' : 'Applications'}
+              </button>
+            </>
+          )}
           {user?.role === 'candidate' && (
             <button
               type="button"
@@ -576,9 +594,10 @@ function App() {
       <section className="workspace">
         <header className="topbar">
           <div>
-            <p className="eyebrow">Recruiting workspace</p>
+            <p className="eyebrow">{user.role === 'admin' ? 'Administrative workspace' : 'Recruiting workspace'}</p>
             <h1>
               {activeTab === 'overview' && 'Operations dashboard'}
+              {activeTab === 'admin' && 'System Admin Console'}
               {activeTab === 'jobs' && (user.role === 'recruiter' ? 'Job Listings Board' : 'Discover Careers')}
               {activeTab === 'saved-jobs' && 'Bookmarked Roles'}
               {activeTab === 'applications' && (user.role === 'recruiter' ? 'ATS Candidate Pipelines' : 'Applied Jobs Tracker')}
@@ -670,18 +689,28 @@ function App() {
           />
         )}
 
+        {activeTab === 'admin' && (
+          <AdminDashboard user={user} />
+        )}
+
         {activeTab === 'profile' && (
-          <ProfileSettings
-            user={user}
-            profile={profile}
-            loadingProfile={loadingProfile}
-            profileForm={profileForm}
-            setProfileForm={setProfileForm}
-            onSaveProfile={handleProfileSave}
-            onResumeUpload={handleResumeUpload}
-            resumeUploadStatus={resumeUploadStatus}
-            resumeUploadError={resumeUploadError}
-          />
+          <div className="profile-tab-wrapper">
+            <ProfileSettings
+              user={user}
+              profile={profile}
+              loadingProfile={loadingProfile}
+              profileForm={profileForm}
+              setProfileForm={setProfileForm}
+              onSaveProfile={handleProfileSave}
+              onResumeUpload={handleResumeUpload}
+              resumeUploadStatus={resumeUploadStatus}
+              resumeUploadError={resumeUploadError}
+            />
+            <div className="profile-security-grid" style={{ marginTop: '24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
+              <ChangePassword onSuccess={(msg) => triggerAlert(msg, 'success')} />
+              <SecurityActivity />
+            </div>
+          </div>
         )}
       </section>
     </div>
