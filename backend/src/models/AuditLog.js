@@ -34,7 +34,7 @@ const auditLogSchema = new mongoose.Schema({
 });
 
 // Static log helper for server-wide audit entries
-auditLogSchema.statics.logEvent = function({ userId = null, action, details = {}, severity = 'info', ipAddress = '', userAgent = '' }) {
+auditLogSchema.statics.logEvent = function ({ userId = null, action, details = {}, severity = 'info', ipAddress = '', userAgent = '' }) {
   return this.create({
     userId,
     action,
@@ -48,6 +48,8 @@ auditLogSchema.statics.logEvent = function({ userId = null, action, details = {}
 // Indexes
 auditLogSchema.index({ createdAt: -1 });
 auditLogSchema.index({ userId: 1, createdAt: -1 });
+auditLogSchema.index({ userId: 1, action: 1, createdAt: -1 });
+auditLogSchema.index({ action: 1, createdAt: -1 });
 auditLogSchema.index({ severity: 1 });
 
 const AuditLog = mongoose.models.AuditLog || mongoose.model('AuditLog', auditLogSchema);

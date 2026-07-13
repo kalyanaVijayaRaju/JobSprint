@@ -22,17 +22,19 @@ const startTestServer = async (t) => {
 };
 
 /**
- * Connects to the test database and drops the users collection
+ * Connects to the test database and drops auth-related collections
  * to ensure a clean state for each test suite run.
  */
 const setupDatabase = async () => {
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(process.env.MONGODB_URI);
   }
-  // Clean up users collection for a fresh test state
-  const collections = await mongoose.connection.db.listCollections({ name: 'users' }).toArray();
-  if (collections.length > 0) {
-    await mongoose.connection.db.collection('users').deleteMany({});
+
+  for (const collectionName of ['users', 'auditlogs']) {
+    const collections = await mongoose.connection.db.listCollections({ name: collectionName }).toArray();
+    if (collections.length > 0) {
+      await mongoose.connection.db.collection(collectionName).deleteMany({});
+    }
   }
 };
 
@@ -203,6 +205,65 @@ test('GET /api/v1/auth/me rejects a valid token for a deleted user', async (t) =
   assert.equal(response.status, 401);
   assert.equal(body.success, false);
   assert.equal(body.error.message, 'Authentication user no longer exists');
+});
+
+test('GET /api/v1/auth/me rejects inactive users', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const User = (await import('../src/models/User.js')).default;
+  const user = await User.create({
+    email: 'inactive@jobsprint.com',
+    passwordHash: 'SecurePass1!',
+    role: 'candidate',
+    isActive: false
+  });
+  const token = jwt.sign(
+    { sub: user._id.toString(), email: user.email, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '15m' }
+  );
+  const baseUrl = await startTestServer(t);
+
+  const response = await fetch(`${baseUrl}/api/v1/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 403);
+  assert.equal(body.error.message, 'This account has been deactivated');
+});
+
+test('GET /api/v1/auth/me rejects tokens issued before a password change', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const User = (await import('../src/models/User.js')).default;
+  const user = await User.create({
+    email: 'stale-token@jobsprint.com',
+    passwordHash: 'SecurePass1!',
+    role: 'candidate',
+    passwordChangedAt: new Date()
+  });
+  const staleToken = jwt.sign(
+    {
+      sub: user._id.toString(),
+      email: user.email,
+      role: user.role,
+      iat: Math.floor(Date.now() / 1000) - 60
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: '15m' }
+  );
+  const baseUrl = await startTestServer(t);
+
+  const response = await fetch(`${baseUrl}/api/v1/auth/me`, {
+    headers: { Authorization: `Bearer ${staleToken}` }
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 401);
+  assert.equal(body.error.message, 'Authentication token is no longer valid. Please log in again.');
 });
 
 // ============================================================
@@ -410,6 +471,143 @@ test('POST /api/v1/auth/login — non-existent email returns 401', async (t) => 
   assert.equal(body.error.message, 'Invalid email or password');
 });
 
+test('POST /api/v1/auth/login tracks failed attempts and locks the account', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+  const User = (await import('../src/models/User.js')).default;
+  await User.create({
+    email: 'lockout@jobsprint.com',
+    passwordHash: 'SecurePass1!',
+    role: 'candidate'
+  });
+
+  const loginWithWrongPassword = () => fetch(`${baseUrl}/api/v1/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: 'lockout@jobsprint.com',
+      password: 'WrongPassword1!'
+    })
+  });
+
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    const response = await loginWithWrongPassword();
+    assert.equal(response.status, 401);
+  }
+
+  const lockedUser = await User.findByEmail('lockout@jobsprint.com');
+  assert.equal(lockedUser.failedLoginAttempts, 5);
+  assert.ok(lockedUser.lockUntil > new Date());
+
+  const lockedResponse = await fetch(`${baseUrl}/api/v1/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: 'lockout@jobsprint.com',
+      password: 'SecurePass1!'
+    })
+  });
+  const lockedBody = await lockedResponse.json();
+
+  assert.equal(lockedResponse.status, 423);
+  assert.equal(lockedBody.error.message, 'Account is temporarily locked. Please try again later.');
+});
+
+test('POST /api/v1/auth/login resets failed attempts after a successful login', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+  const User = (await import('../src/models/User.js')).default;
+  await User.create({
+    email: 'reset-attempts@jobsprint.com',
+    passwordHash: 'SecurePass1!',
+    role: 'candidate',
+    failedLoginAttempts: 2
+  });
+
+  const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: 'reset-attempts@jobsprint.com',
+      password: 'SecurePass1!'
+    })
+  });
+
+  assert.equal(response.status, 200);
+
+  const user = await User.findByEmail('reset-attempts@jobsprint.com');
+  assert.equal(user.failedLoginAttempts, 0);
+  assert.equal(user.lockUntil, undefined);
+  assert.ok(user.lastLoginAt);
+});
+
+test('POST /api/v1/auth/login rejects inactive accounts', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+  const User = (await import('../src/models/User.js')).default;
+  await User.create({
+    email: 'inactive-login@jobsprint.com',
+    passwordHash: 'SecurePass1!',
+    role: 'candidate',
+    isActive: false
+  });
+
+  const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: 'inactive-login@jobsprint.com',
+      password: 'SecurePass1!'
+    })
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 403);
+  assert.equal(body.error.message, 'This account has been deactivated');
+});
+
+test('GET /api/v1/auth/security/activity returns the current user audit events', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+  await fetch(`${baseUrl}/api/v1/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: 'activity@jobsprint.com',
+      password: 'SecurePass1!',
+      role: 'candidate'
+    })
+  });
+
+  const loginResponse = await fetch(`${baseUrl}/api/v1/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: 'activity@jobsprint.com',
+      password: 'SecurePass1!'
+    })
+  });
+  const cookie = loginResponse.headers.get('set-cookie');
+
+  const response = await fetch(`${baseUrl}/api/v1/auth/security/activity`, {
+    headers: { Cookie: cookie }
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(body.success, true);
+  assert.ok(body.data.events.some((event) => event.action === 'auth.login_success'));
+  assert.equal(body.data.pagination.page, 1);
+});
+
 // ============================================================
 // POST /api/v1/auth/logout
 // ============================================================
@@ -479,7 +677,12 @@ test('PATCH /api/v1/auth/password — changes password and invalidates old crede
   });
   const { data } = await registerResponse.json();
   const token = jwt.sign(
-    { sub: data.user.id, email: data.user.email, role: data.user.role },
+    {
+      sub: data.user.id,
+      email: data.user.email,
+      role: data.user.role,
+      iat: Math.floor(Date.now() / 1000) - 60
+    },
     process.env.JWT_SECRET,
     { expiresIn: '15m' }
   );
@@ -502,6 +705,14 @@ test('PATCH /api/v1/auth/password — changes password and invalidates old crede
 
   assert.equal((await login('SecurePass1!')).status, 401);
   assert.equal((await login('StrongerPass2!')).status, 200);
+
+  const staleSessionResponse = await fetch(`${baseUrl}/api/v1/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const staleSessionBody = await staleSessionResponse.json();
+
+  assert.equal(staleSessionResponse.status, 401);
+  assert.equal(staleSessionBody.error.message, 'Authentication token is no longer valid. Please log in again.');
 });
 
 test('PATCH /api/v1/auth/password — rejects an incorrect current password', async (t) => {

@@ -39,11 +39,27 @@ const teardownDatabase = async () => {
   await mongoose.connection.close();
 };
 
-const createTestToken = (overrides = {}) => {
+const createTestToken = async (overrides = {}) => {
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(process.env.MONGODB_URI);
+  }
+
+  const User = (await import('../src/models/User.js')).default;
+  const id = overrides.id || new mongoose.Types.ObjectId().toString();
+  const email = overrides.email || `${overrides.role || 'candidate'}-${id}@test.com`;
+  const role = overrides.role || 'candidate';
+
+  await User.create({
+    _id: id,
+    email,
+    passwordHash: 'SecurePass1!',
+    role
+  });
+
   const payload = {
-    sub: overrides.id || new mongoose.Types.ObjectId().toString(),
-    email: overrides.email || 'user@test.com',
-    role: overrides.role || 'candidate'
+    sub: id,
+    email,
+    role
   };
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m' });
 };
@@ -97,7 +113,7 @@ test('Notifications Integration Suite', async (suite) => {
     const baseUrl = await startTestServer(t);
 
     const recruiterId = new mongoose.Types.ObjectId().toString();
-    const recruiterToken = createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
+    const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter', email: 'recruiter@test.com' });
     const company = await seedRecruiterWithCompany(recruiterId);
 
     // Create a job posting
@@ -118,7 +134,7 @@ test('Notifications Integration Suite', async (suite) => {
     });
 
     const candidateId = new mongoose.Types.ObjectId().toString();
-    const candidateToken = createTestToken({ id: candidateId, role: 'candidate', email: 'candidate@test.com' });
+    const candidateToken = await createTestToken({ id: candidateId, role: 'candidate', email: 'candidate@test.com' });
     await seedCandidate(candidateId);
 
     // Candidate applies to the job
@@ -209,7 +225,7 @@ test('Notifications Integration Suite', async (suite) => {
     // Another user cannot delete a notification they do not own
     const Notification = (await import('../src/models/Notification.js')).default;
     const remainingNotification = await Notification.findOne({ userId: candidateId });
-    const otherUserToken = createTestToken({ role: 'candidate' });
+    const otherUserToken = await createTestToken({ role: 'candidate' });
     const forbiddenDeleteResponse = await fetch(
       `${baseUrl}/api/v1/notifications/${remainingNotification._id}`,
       {

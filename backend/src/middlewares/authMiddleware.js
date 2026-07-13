@@ -24,10 +24,22 @@ export const protect = asyncHandler(async (req, res, next) => {
   }
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  const user = await User.findById(decoded.sub);
+  const user = await User.findById(decoded.sub).select('email role isActive passwordChangedAt');
 
   if (!user) {
     throw new ApiError(401, 'Authentication user no longer exists');
+  }
+
+  if (!user.isActive) {
+    throw new ApiError(403, 'This account has been deactivated');
+  }
+
+  if (user.passwordChangedAt && decoded.iat) {
+    const passwordChangedAtSeconds = Math.floor(user.passwordChangedAt.getTime() / 1000);
+
+    if (decoded.iat < passwordChangedAtSeconds) {
+      throw new ApiError(401, 'Authentication token is no longer valid. Please log in again.');
+    }
   }
 
   req.user = {
