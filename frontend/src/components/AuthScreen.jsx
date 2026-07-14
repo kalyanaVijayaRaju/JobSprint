@@ -1,22 +1,29 @@
 import { useState } from 'react';
-import { Activity } from 'lucide-react';
+import { Activity, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { authApi } from '../api/client.js';
 
 export default function AuthScreen({ setUser, readiness }) {
   const [isAuthMode, setIsAuthMode] = useState('login'); // 'login' | 'register'
   const [authForm, setAuthForm] = useState({ email: '', password: '', role: 'candidate' });
   const [errorMsg, setErrorMsg] = useState(null);
+  const [successMsg, setSuccessMsg] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg(null);
+    setSuccessMsg(null);
+    setSubmitting(true);
     try {
       let res;
       if (isAuthMode === 'login') {
         res = await authApi.login({ email: authForm.email, password: authForm.password });
       } else {
         res = await authApi.register(authForm);
+        setSuccessMsg('Account created successfully! Please sign in.');
         setIsAuthMode('login');
+        setSubmitting(false);
         return;
       }
 
@@ -25,6 +32,8 @@ export default function AuthScreen({ setUser, readiness }) {
       }
     } catch (err) {
       setErrorMsg(err.message || 'Authentication failed');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -73,6 +82,7 @@ export default function AuthScreen({ setUser, readiness }) {
           </p>
 
           {errorMsg && <div className="alert error">{errorMsg}</div>}
+          {successMsg && <div className="alert success">{successMsg}</div>}
 
           <form onSubmit={handleAuthSubmit} className="auth-form">
             {isAuthMode === 'register' && (
@@ -112,37 +122,54 @@ export default function AuthScreen({ setUser, readiness }) {
                 value={authForm.email}
                 onChange={(e) => setAuthForm(prev => ({ ...prev, email: e.target.value }))}
                 required
+                disabled={submitting}
               />
             </div>
 
             <div className="form-group">
               <label htmlFor="auth-password">Password</label>
-              <input
-                id="auth-password"
-                type="password"
-                placeholder="••••••••"
-                value={authForm.password}
-                onChange={(e) => setAuthForm(prev => ({ ...prev, password: e.target.value }))}
-                required
-              />
+              <div className="password-input-wrapper">
+                <input
+                  id="auth-password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={authForm.password}
+                  onChange={(e) => setAuthForm(prev => ({ ...prev, password: e.target.value }))}
+                  required
+                  disabled={submitting}
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </div>
 
-            <button type="submit" className="btn btn-primary btn-block">
-              {isAuthMode === 'login' ? 'Sign In' : 'Sign Up'}
+            <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+              {submitting ? (
+                <><Loader2 size={16} className="spinner-icon" /> {isAuthMode === 'login' ? 'Signing in...' : 'Creating account...'}</>
+              ) : (
+                isAuthMode === 'login' ? 'Sign In' : 'Sign Up'
+              )}
             </button>
 
             <div className="auth-toggle">
               {isAuthMode === 'login' ? (
                 <p>
                   Don't have an account?{' '}
-                  <button type="button" onClick={() => setIsAuthMode('register')}>
+                  <button type="button" onClick={() => { setIsAuthMode('register'); setErrorMsg(null); setSuccessMsg(null); }}>
                     Sign up
                   </button>
                 </p>
               ) : (
                 <p>
                   Already have an account?{' '}
-                  <button type="button" onClick={() => setIsAuthMode('login')}>
+                  <button type="button" onClick={() => { setIsAuthMode('login'); setErrorMsg(null); setSuccessMsg(null); }}>
                     Sign in
                   </button>
                 </p>
