@@ -92,6 +92,23 @@ export const adminApi = {
 };
 
 // ---------------------------------------------------------------------------
+// Companies API
+// ---------------------------------------------------------------------------
+
+export const companiesApi = {
+  list: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/companies${query ? `?${query}` : ''}`);
+  },
+  get:    (id)       => apiFetch(`/api/v1/companies/${id}`),
+  create: (data)     => apiFetch('/api/v1/companies', { method: 'POST', body: data }),
+  update: (id, data) => apiFetch(`/api/v1/companies/${id}`, { method: 'PUT', body: data }),
+  delete: (id)       => apiFetch(`/api/v1/companies/${id}`, { method: 'DELETE' })
+};
+
+// ---------------------------------------------------------------------------
 // Jobs API
 // ---------------------------------------------------------------------------
 

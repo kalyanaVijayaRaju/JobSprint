@@ -8,7 +8,10 @@ import {
   Clock,
   User,
   Menu,
-  X
+  X,
+  Building2,
+  Moon,
+  Sun
 } from 'lucide-react';
 import {
   getReadiness,
@@ -31,6 +34,7 @@ import SavedJobs from './components/SavedJobs.jsx';
 import ChangePassword from './components/ChangePassword.jsx';
 import SecurityActivity from './components/SecurityActivity.jsx';
 import AdminDashboard from './components/AdminDashboard.jsx';
+import CompanyDirectory from './components/CompanyDirectory.jsx';
 
 import './styles.css';
 
@@ -40,12 +44,19 @@ function App() {
   const [loadingSession, setLoadingSession] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('jobsprint-theme') === 'dark');
   const [readiness, setReadiness] = useState({
     loading: true,
     ok: false,
     status: 'CHECKING',
     timestamp: null
   });
+
+  // Persist dark mode
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    localStorage.setItem('jobsprint-theme', darkMode ? 'dark' : 'light');
+  }, [darkMode]);
 
   // UI Toast Alerts
   const [errorMsg, setErrorMsg] = useState(null);
@@ -567,6 +578,13 @@ function App() {
               </button>
             </>
           )}
+          <button
+            type="button"
+            className={`nav-link-btn ${activeTab === 'companies' ? 'active' : ''}`}
+            onClick={() => navigateTo('companies')}
+          >
+            <Building2 size={18} /> Companies
+          </button>
           {user?.role === 'candidate' && (
             <button
               type="button"
@@ -585,6 +603,15 @@ function App() {
           </button>
         </nav>
 
+        <button
+          type="button"
+          className="btn btn-outline dark-mode-btn"
+          onClick={() => setDarkMode(!darkMode)}
+          aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {darkMode ? <Sun size={16} /> : <Moon size={16} />}
+          {darkMode ? 'Light Mode' : 'Dark Mode'}
+        </button>
         <button type="button" className="btn btn-outline logout-btn" onClick={handleLogout}>
           <LogOut size={16} /> Log Out
         </button>
@@ -601,6 +628,7 @@ function App() {
               {activeTab === 'jobs' && (user.role === 'recruiter' ? 'Job Listings Board' : 'Discover Careers')}
               {activeTab === 'saved-jobs' && 'Bookmarked Roles'}
               {activeTab === 'applications' && (user.role === 'recruiter' ? 'ATS Candidate Pipelines' : 'Applied Jobs Tracker')}
+              {activeTab === 'companies' && 'Company Directory'}
               {activeTab === 'profile' && 'Professional Profile'}
             </h1>
           </div>
@@ -687,6 +715,10 @@ function App() {
             loadingMyApps={loadingMyApps}
             setActiveTab={setActiveTab}
           />
+        )}
+
+        {activeTab === 'companies' && (
+          <CompanyDirectory user={user} triggerAlert={triggerAlert} />
         )}
 
         {activeTab === 'admin' && (
