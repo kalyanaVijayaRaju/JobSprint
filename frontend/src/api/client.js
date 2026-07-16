@@ -63,7 +63,11 @@ export const authApi = {
   logout:           ()     => apiFetch('/api/v1/auth/logout', { method: 'POST' }),
   getMe:            ()     => apiFetch('/api/v1/auth/me'),
   changePassword:   (data) => apiFetch('/api/v1/auth/password', { method: 'PATCH', body: data }),
+  forgotPassword:   (email) => apiFetch('/api/v1/auth/forgot-password', { method: 'POST', body: { email } }),
+  resetPassword:    (token, password) => apiFetch(`/api/v1/auth/reset-password/${token}`, { method: 'POST', body: { password } }),
+  verifyEmail:      (token) => apiFetch(`/api/v1/auth/verify-email/${token}`),
   securityActivity: (params = {}) => {
+
     const query = new URLSearchParams(
       Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
     ).toString();

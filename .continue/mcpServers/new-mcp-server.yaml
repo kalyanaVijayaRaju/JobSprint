@@ -1,0 +1,13 @@
+name: Filesystem
+version: 0.0.1
+schema: v1
+
+mcpServers:
+  - name: Filesystem
+    command: npx
+    args:
+      - -y
+      - "@modelcontextprotocol/server-filesystem"
+      - "C:\\NodeProjects\\JobSprint"
+
+    env: {}
