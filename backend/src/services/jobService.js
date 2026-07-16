@@ -44,7 +44,9 @@ export const getJobs = async (query) => {
     jobType,
     status,
     sortBy,
-    sortOrder
+    sortOrder,
+    salaryMin,
+    salaryMax
   } = query;
 
   const filter = { status };
@@ -53,6 +55,15 @@ export const getJobs = async (query) => {
   if (status === 'active') {
     filter.expiresAt = { $gt: new Date() };
   }
+
+  if (salaryMin !== undefined) {
+    filter['salaryRange.min'] = { $gte: salaryMin };
+  }
+
+  if (salaryMax !== undefined) {
+    filter['salaryRange.max'] = { $lte: salaryMax };
+  }
+
 
   if (locationType) {
     filter.locationType = locationType;

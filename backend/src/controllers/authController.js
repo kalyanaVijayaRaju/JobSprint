@@ -4,11 +4,15 @@ import {
   loginUser,
   generateToken,
   changeUserPassword,
-  getSecurityActivity
+  getSecurityActivity,
+  verifyEmailUser,
+  forgotUserPassword,
+  resetUserPassword
 } from '../services/authService.js';
 import env from '../config/env.js';
 import ApiError from '../utils/apiError.js';
 import { securityActivityQuerySchema } from '../validations/authValidation.js';
+
 
 const getRequestContext = (req) => ({
   ipAddress: req.ip,
@@ -128,3 +132,50 @@ export const getSecurityActivityLog = asyncHandler(async (req, res) => {
     data: activity
   });
 });
+
+/**
+ * @route   GET /api/v1/auth/verify-email/:token
+ * @access  Public
+ */
+export const verifyEmail = asyncHandler(async (req, res) => {
+  const { token } = req.params;
+  const userData = await verifyEmailUser(token);
+
+  res.status(200).json({
+    success: true,
+    message: 'Email verified successfully. You can now login.',
+    data: {
+      user: userData
+    }
+  });
+});
+
+/**
+ * @route   POST /api/v1/auth/forgot-password
+ * @access  Public
+ */
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  await forgotUserPassword(email, getRequestContext(req));
+
+  res.status(200).json({
+    success: true,
+    message: 'If an account exists with that email, a password reset link has been generated and logged.'
+  });
+});
+
+/**
+ * @route   POST /api/v1/auth/reset-password/:token
+ * @access  Public
+ */
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+  await resetUserPassword(token, password, getRequestContext(req));
+
+  res.status(200).json({
+    success: true,
+    message: 'Password has been reset successfully.'
+  });
+});
+

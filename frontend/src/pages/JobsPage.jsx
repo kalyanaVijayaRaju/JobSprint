@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext.jsx';
-import { useApp } from '../../context/AppContext.jsx';
-import { jobsApi, applicationsApi, savedJobsApi } from '../../api/client.js';
-import JobsBoard from '../../components/JobsBoard.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useApp } from '../context/AppContext.jsx';
+import { jobsApi, applicationsApi, savedJobsApi } from '../api/client.js';
+import JobsBoard from '../components/JobsBoard.jsx';
 
 export default function JobsPage() {
   const { user } = useAuth();
@@ -19,14 +19,23 @@ export default function JobsPage() {
   const [submittingApplication, setSubmittingApplication] = useState(false);
   const [submittingJob, setSubmittingJob] = useState(false);
   const [selectedJobForApplicants, setSelectedJobForApplicants] = useState(null);
+  const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalJobs: 0, limit: 10 });
 
   const fetchJobs = useCallback((filters = {}) => {
     setLoadingJobs(true);
     jobsApi.list(filters)
-      .then((res) => { if (res.success) setJobs(res.data.jobs); })
+      .then((res) => {
+        if (res.success) {
+          setJobs(res.data.jobs);
+          if (res.data.pagination) {
+            setPagination(res.data.pagination);
+          }
+        }
+      })
       .catch((err) => triggerAlert(err.message, 'error'))
       .finally(() => setLoadingJobs(false));
   }, [triggerAlert]);
+
 
   const fetchSavedJobs = useCallback(() => {
     savedJobsApi.list()
@@ -166,6 +175,8 @@ export default function JobsPage() {
       setActiveTab={(tab) => navigate(`/${tab === 'profile' ? 'profile' : tab}`)}
       setSelectedJobForApplicants={setSelectedJobForApplicants}
       fetchJobApplicants={fetchJobApplicants}
+      pagination={pagination}
     />
   );
 }
+

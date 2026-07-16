@@ -50,6 +50,24 @@ export const securityActivityQuerySchema = z.object({
   limit: z.coerce.number().int().positive().max(50).default(20)
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string({ required_error: 'Email is required' })
+    .email('Please provide a valid email address')
+    .trim()
+    .toLowerCase()
+});
+
+export const resetPasswordSchema = z.object({
+  password: z
+    .string({ required_error: 'Password is required' })
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one special character')
+});
+
+
 // --- Middleware Factory ---
 
 /**

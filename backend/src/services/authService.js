@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import User from '../models/User.js';
 import AuditLog from '../models/AuditLog.js';
 import ApiError from '../utils/apiError.js';
@@ -48,14 +49,24 @@ export const registerUser = async ({ email, password, role }) => {
     throw new ApiError(400, 'An account with this email already exists');
   }
 
+  const verificationToken = crypto.randomBytes(32).toString('hex');
+
   const user = await User.create({
     email,
     passwordHash: password, // pre-save hook will hash this
-    role
+    role,
+    verificationToken
   });
+
+  // Log verification link to the console for development
+  console.log(`\n--- [DEVELOPER INFO] ---`);
+  console.log(`User registered: ${email}`);
+  console.log(`Verification Link: ${env.FRONTEND_URL || 'http://localhost:5173'}/verify-email/${verificationToken}`);
+  console.log(`------------------------\n`);
 
   return toSafeUser(user);
 };
+
 
 /**
  * Authenticate a user with email and password.
@@ -220,3 +231,82 @@ export const generateToken = (user) => {
     { expiresIn: env.JWT_EXPIRES_IN }
   );
 };
+
+export const verifyEmailUser = async (token) => {
+  const user = await User.findOne({ verificationToken: token });
+
+  if (!user) {
+    throw new ApiError(400, 'Invalid or expired verification token');
+  }
+
+  user.isVerified = true;
+  user.verificationToken = undefined;
+  await user.save({ validateBeforeSave: false });
+
+  await logSecurityEvent({
+    userId: user._id,
+    action: 'auth.email_verified',
+    severity: 'info'
+  });
+
+  return toSafeUser(user);
+};
+
+export const forgotUserPassword = async (email, requestContext = {}) => {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(404, 'No account found with this email');
+  }
+
+  const resetToken = user.generatePasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+
+  // Log reset link to the console for development
+  const resetUrl = `${env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
+  console.log(`\n--- [DEVELOPER INFO] ---`);
+  console.log(`Password reset requested for: ${email}`);
+  console.log(`Reset Link: ${resetUrl}`);
+  console.log(`------------------------\n`);
+
+  await logSecurityEvent({
+    userId: user._id,
+    action: 'auth.password_reset_requested',
+    severity: 'info',
+    ...requestContext
+  });
+
+  return resetToken;
+};
+
+export const resetUserPassword = async (token, newPassword, requestContext = {}) => {
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    throw new ApiError(400, 'Password reset token is invalid or has expired');
+  }
+
+  user.passwordHash = newPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  user.passwordChangedAt = new Date();
+  await user.save();
+
+  await logSecurityEvent({
+    userId: user._id,
+    action: 'auth.password_reset_success',
+    severity: 'info',
+    ...requestContext
+  });
+
+  return toSafeUser(user);
+};
+

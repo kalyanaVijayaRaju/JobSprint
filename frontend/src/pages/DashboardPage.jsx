@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext.jsx';
-import { useApp } from '../../context/AppContext.jsx';
-import { jobsApi, applicationsApi, savedJobsApi } from '../../api/client.js';
-import OverviewTab from '../../components/OverviewTab.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useApp } from '../context/AppContext.jsx';
+import { jobsApi, applicationsApi, savedJobsApi } from '../api/client.js';
+import OverviewTab from '../components/OverviewTab.jsx';
 
 export default function DashboardPage() {
   const { user } = useAuth();
