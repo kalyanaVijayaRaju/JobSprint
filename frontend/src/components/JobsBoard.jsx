@@ -14,6 +14,8 @@ import {
   Sparkles,
   ArrowUpDown
 } from 'lucide-react';
+import JobWizard from './JobWizard.jsx';
+
 
 export default function JobsBoard({
   user,
@@ -33,11 +35,16 @@ export default function JobsBoard({
   submittingJob,
   setActiveTab,
   setSelectedJobForApplicants,
-  fetchJobApplicants
+  fetchJobApplicants,
+  pagination
 }) {
   const [jobSearch, setJobSearch] = useState('');
   const [jobTypeFilter, setJobTypeFilter] = useState('');
   const [locationTypeFilter, setLocationTypeFilter] = useState('');
+  const [salaryMinFilter, setSalaryMinFilter] = useState('');
+  const [salaryMaxFilter, setSalaryMaxFilter] = useState('');
+  const [experienceFilter, setExperienceFilter] = useState('');
+  const [isFilterPaneOpen, setIsFilterPaneOpen] = useState(true);
   const [sortBy, setSortBy] = useState('match');
   const [selectedJob, setSelectedJob] = useState(null);
   const [coverLetter, setCoverLetter] = useState('');
@@ -58,18 +65,30 @@ export default function JobsBoard({
   });
 
   const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    onSearch({ search: jobSearch, jobType: jobTypeFilter, locationType: locationTypeFilter });
+    if (e) e.preventDefault();
+    onSearch({
+      search: jobSearch || undefined,
+      jobType: jobTypeFilter || undefined,
+      locationType: locationTypeFilter || undefined,
+      salaryMin: salaryMinFilter ? Number(salaryMinFilter) : undefined,
+      salaryMax: salaryMaxFilter ? Number(salaryMaxFilter) : undefined,
+      page: 1
+    });
   };
 
   const handleClearFilters = () => {
     setJobSearch('');
     setJobTypeFilter('');
     setLocationTypeFilter('');
+    setSalaryMinFilter('');
+    setSalaryMaxFilter('');
+    setExperienceFilter('');
     onSearch({});
   };
 
-  const hasActiveFilters = Boolean(jobSearch || jobTypeFilter || locationTypeFilter);
+  const hasActiveFilters = Boolean(
+    jobSearch || jobTypeFilter || locationTypeFilter || salaryMinFilter || salaryMaxFilter || experienceFilter
+  );
 
   const candidateSkills = useMemo(
     () => (profile?.skills || []).map(skill => skill.trim().toLowerCase()).filter(Boolean),
@@ -77,7 +96,7 @@ export default function JobsBoard({
   );
 
   const rankedJobs = useMemo(() => {
-    const withMatchData = jobs.map(job => {
+    let withMatchData = jobs.map(job => {
       const requiredSkills = job.skillsRequired || [];
       const matchingSkills = requiredSkills.filter(skill => candidateSkills.includes(skill.toLowerCase()));
       const matchScore = requiredSkills.length > 0
@@ -86,6 +105,25 @@ export default function JobsBoard({
 
       return { job, matchingSkills, matchScore };
     });
+
+    if (experienceFilter) {
+      withMatchData = withMatchData.filter(({ job }) => {
+        const textToSearch = `${job.title} ${job.description} ${job.requirements?.join(' ') || ''}`.toLowerCase();
+        if (experienceFilter === 'entry') {
+          return textToSearch.includes('entry') || textToSearch.includes('junior') || textToSearch.includes('intern') || textToSearch.includes('associate');
+        }
+        if (experienceFilter === 'mid') {
+          return textToSearch.includes('mid') || textToSearch.includes('intermediate') || textToSearch.includes('3+') || textToSearch.includes('4+');
+        }
+        if (experienceFilter === 'senior') {
+          return textToSearch.includes('senior') || textToSearch.includes('lead') || textToSearch.includes('5+') || textToSearch.includes('8+');
+        }
+        if (experienceFilter === 'executive') {
+          return textToSearch.includes('executive') || textToSearch.includes('director') || textToSearch.includes('vp') || textToSearch.includes('head of') || textToSearch.includes('manager');
+        }
+        return true;
+      });
+    }
 
     return withMatchData.sort((a, b) => {
       if (sortBy === 'newest') {
@@ -96,7 +134,7 @@ export default function JobsBoard({
       }
       return b.matchScore - a.matchScore;
     });
-  }, [candidateSkills, jobs, sortBy]);
+  }, [candidateSkills, jobs, sortBy, experienceFilter]);
 
   const handleCreateJobSubmit = (e) => {
     e.preventDefault();
@@ -126,6 +164,7 @@ export default function JobsBoard({
     });
   };
 
+
   if (user.role === 'recruiter') {
     return (
       <div className="tab-content">
@@ -138,130 +177,13 @@ export default function JobsBoard({
           </div>
 
           {showCreateJob && (
-            <div className="modal-backdrop">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h3>Post a New Job Opportunity</h3>
-                  <button type="button" onClick={() => setShowCreateJob(false)} aria-label="Close">
-                    <X size={20} />
-                  </button>
-                </div>
-                <form onSubmit={handleCreateJobSubmit} className="create-job-form">
-                  <div className="form-grid">
-                    <div className="form-group">
-                      <label>Job Title</label>
-                      <input
-                        type="text"
-                        value={newJobForm.title}
-                        onChange={e => setNewJobForm(prev => ({ ...prev, title: e.target.value }))}
-                        required
-                        placeholder="e.g. Senior Full Stack Architect"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Location (City, Country)</label>
-                      <input
-                        type="text"
-                        value={newJobForm.location}
-                        onChange={e => setNewJobForm(prev => ({ ...prev, location: e.target.value }))}
-                        required
-                        placeholder="e.g. San Francisco, CA"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Location Type</label>
-                      <select
-                        value={newJobForm.locationType}
-                        onChange={e => setNewJobForm(prev => ({ ...prev, locationType: e.target.value }))}
-                      >
-                        <option value="remote">Remote</option>
-                        <option value="onsite">Onsite</option>
-                        <option value="hybrid">Hybrid</option>
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label>Job Type</label>
-                      <select
-                        value={newJobForm.jobType}
-                        onChange={e => setNewJobForm(prev => ({ ...prev, jobType: e.target.value }))}
-                      >
-                        <option value="full-time">Full-time</option>
-                        <option value="part-time">Part-time</option>
-                        <option value="contract">Contract</option>
-                        <option value="internship">Internship</option>
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label>Salary Minimum</label>
-                      <input
-                        type="number"
-                        value={newJobForm.salaryMin}
-                        onChange={e => setNewJobForm(prev => ({ ...prev, salaryMin: e.target.value }))}
-                        placeholder="e.g. 90000"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Salary Maximum</label>
-                      <input
-                        type="number"
-                        value={newJobForm.salaryMax}
-                        onChange={e => setNewJobForm(prev => ({ ...prev, salaryMax: e.target.value }))}
-                        placeholder="e.g. 130000"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Skills Required (comma-separated)</label>
-                      <input
-                        type="text"
-                        value={newJobForm.skillsRequired}
-                        onChange={e => setNewJobForm(prev => ({ ...prev, skillsRequired: e.target.value }))}
-                        required
-                        placeholder="e.g. Node.js, Express, React, MongoDB"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Expires At</label>
-                      <input
-                        type="date"
-                        value={newJobForm.expiresAt}
-                        onChange={e => setNewJobForm(prev => ({ ...prev, expiresAt: e.target.value }))}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-group full-width">
-                    <label>Job Description</label>
-                    <textarea
-                      rows={4}
-                      value={newJobForm.description}
-                      onChange={e => setNewJobForm(prev => ({ ...prev, description: e.target.value }))}
-                      required
-                      placeholder="Write the responsibilities and scope of the role..."
-                    />
-                  </div>
-
-                  <div className="form-group full-width">
-                    <label>Key Requirements (One per line)</label>
-                    <textarea
-                      rows={3}
-                      value={newJobForm.requirements}
-                      onChange={e => setNewJobForm(prev => ({ ...prev, requirements: e.target.value }))}
-                      placeholder="e.g. 5+ years experience building APIs&#10;Excellent communication skills"
-                    />
-                  </div>
-
-                  <div className="modal-footer">
-                    <button type="button" className="btn btn-outline" onClick={() => setShowCreateJob(false)}>
-                      Cancel
-                    </button>
-                    <button type="submit" className="btn btn-primary" disabled={submittingJob}>
-                      {submittingJob ? 'Saving...' : 'Post Job'}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
+            <JobWizard
+              onPostJob={onPostJob}
+              onClose={() => setShowCreateJob(false)}
+              submittingJob={submittingJob}
+            />
           )}
+
 
           <div className="jobs-list">
             {recruiterJobs.length === 0 ? (
@@ -364,248 +286,364 @@ export default function JobsBoard({
   // Candidate view
   return (
     <div className="tab-content">
-      <div className="candidate-jobs-view">
-        {/* Filters Form */}
-        <form onSubmit={handleSearchSubmit} className="filters-bar">
-          <div className="search-input">
-            <Search size={18} />
-            <input
-              type="text"
-              placeholder="Search title, skills or details..."
-              value={jobSearch}
-              onChange={e => setJobSearch(e.target.value)}
-            />
-          </div>
-          <select value={jobTypeFilter} onChange={e => setJobTypeFilter(e.target.value)}>
-            <option value="">All Job Types</option>
-            <option value="full-time">Full-time</option>
-            <option value="part-time">Part-time</option>
-            <option value="contract">Contract</option>
-            <option value="internship">Internship</option>
-          </select>
-          <select value={locationTypeFilter} onChange={e => setLocationTypeFilter(e.target.value)}>
-            <option value="">All Locations</option>
-            <option value="remote">Remote</option>
-            <option value="hybrid">Hybrid</option>
-            <option value="onsite">Onsite</option>
-          </select>
-          <label className="sort-control">
-            <ArrowUpDown size={16} aria-hidden="true" />
-            <span className="sr-only">Sort jobs by</span>
-            <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
-              <option value="match">Best match</option>
-              <option value="newest">Newest first</option>
-              <option value="salary">Highest salary</option>
-            </select>
-          </label>
-          <button type="submit" className="btn btn-primary">
-            Search
-          </button>
-          {hasActiveFilters && (
-            <button type="button" className="btn btn-outline" onClick={handleClearFilters}>
-              Clear
+      <div className="candidate-jobs-layout">
+        
+        {/* Toggle filters button for mobile */}
+        <button 
+          type="button" 
+          className="btn btn-outline toggle-filters-btn"
+          onClick={() => setIsFilterPaneOpen(!isFilterPaneOpen)}
+        >
+          {isFilterPaneOpen ? 'Hide Filters' : 'Show Filters'}
+        </button>
+
+        {/* Collapsible sticky filter pane */}
+        <aside className={`filter-pane ${isFilterPaneOpen ? 'open' : 'collapsed'}`}>
+          <div className="filter-pane-header">
+            <h3>Filters</h3>
+            <button 
+              type="button" 
+              className="close-filters-btn"
+              onClick={() => setIsFilterPaneOpen(false)}
+            >
+              <X size={16} />
             </button>
-          )}
-        </form>
-
-        {candidateSkills.length === 0 && (
-          <div className="match-guidance">
-            <Sparkles size={18} aria-hidden="true" />
-            <div>
-              <strong>Unlock personalized job matches</strong>
-              <span>Add skills to your profile to rank roles by fit.</span>
-            </div>
-            <button type="button" onClick={() => setActiveTab('profile')}>Update profile</button>
           </div>
-        )}
-
-        <div className="results-summary" aria-live="polite">
-          <span>{loadingJobs ? 'Searching open roles…' : `${jobs.length} ${jobs.length === 1 ? 'role' : 'roles'} found`}</span>
-          {hasActiveFilters && !loadingJobs && <span>Filtered results</span>}
-        </div>
-
-        {/* Job grid */}
-        {loadingJobs ? (
-          <div className="jobs-loader">
-            <div className="loader-spinner"></div>
-          </div>
-        ) : jobs.length === 0 ? (
-          <div className="empty-state">
-            <BriefcaseBusiness size={40} />
-            <p>No job postings found matching your search.</p>
-          </div>
-        ) : (
-          <div className="jobs-grid">
-            {rankedJobs.map(({ job, matchingSkills, matchScore }) => {
-              const isBookmarked = savedJobs.some(s => (s.jobId?._id || s.jobId) === job._id);
-              const isApplied = myApps.some(app => (app.jobId?._id || app.jobId) === job._id);
-              return (
-                <article className="job-card" key={job._id}>
-                  <div className="job-card-header">
-                    <div>
-                      <h3>{job.title}</h3>
-                      <p className="job-company">{job.companyId?.name || 'Company Details'}</p>
-                    </div>
-                    <button
-                      type="button"
-                      className={`bookmark-btn ${isBookmarked ? 'active' : ''}`}
-                      onClick={() => onToggleSaveJob(job._id)}
-                      aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark job'}
-                    >
-                      <Bookmark size={18} />
-                    </button>
-                  </div>
-
-                  {candidateSkills.length > 0 && (
-                    <div className={`match-score ${matchScore >= 60 ? 'strong' : ''}`} title={`${matchingSkills.length} matching skills`}>
-                      <Sparkles size={14} aria-hidden="true" />
-                      <span>{matchScore}% skill match</span>
-                    </div>
-                  )}
-
-                  <div className="job-tags">
-                    <span className="badge job-type-badge">{job.jobType}</span>
-                    <span className="badge location-badge">{job.locationType}</span>
-                  </div>
-
-                  <div className="job-metadata">
-                    <div className="meta-item">
-                      <MapPin size={14} />
-                      <span>{job.location}</span>
-                    </div>
-                    {job.salaryRange && (
-                      <div className="meta-item">
-                        <DollarSign size={14} />
-                        <span>
-                          {job.salaryRange.min?.toLocaleString()} - {job.salaryRange.max?.toLocaleString()} {job.salaryRange.currency}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="job-skills">
-                    {(job.skillsRequired || []).map(skill => (
-                      <span key={skill} className={`skill-tag ${matchingSkills.includes(skill) ? 'skill-match' : ''}`}>
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="job-card-footer">
-                    <button
-                      type="button"
-                      className="btn btn-outline btn-block"
-                      onClick={() => setSelectedJob(job)}
-                    >
-                      {isApplied ? 'View application details' : 'Details & Apply'}
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Job Detail Modal & Cover Letter Apply */}
-        {selectedJob && (
-          <div className="modal-backdrop">
-            <div className="modal-content job-detail-modal">
-              <div className="modal-header">
-                <div>
-                  <h3>{selectedJob.title}</h3>
-                  <p className="job-company">{selectedJob.companyId?.name}</p>
-                </div>
-                <button type="button" onClick={() => setSelectedJob(null)} aria-label="Close">
-                  <X size={20} />
-                </button>
+          
+          <form onSubmit={handleSearchSubmit} className="filter-form">
+            <div className="form-group">
+              <label>Search Keyword</label>
+              <div className="search-input">
+                <Search size={16} />
+                <input
+                  type="text"
+                  placeholder="Title, description or skills..."
+                  value={jobSearch}
+                  onChange={e => setJobSearch(e.target.value)}
+                />
               </div>
+            </div>
 
-              <div className="modal-body">
-                <section className="detail-meta">
-                  <div className="meta-item">
-                    <MapPin size={16} />
-                    <span>{selectedJob.location} ({selectedJob.locationType})</span>
-                  </div>
-                  <div className="meta-item">
-                    <Clock size={16} />
-                    <span>{selectedJob.jobType}</span>
-                  </div>
-                  {selectedJob.salaryRange && (
-                    <div className="meta-item">
-                      <DollarSign size={16} />
-                      <span>
-                        {selectedJob.salaryRange.min?.toLocaleString()} - {selectedJob.salaryRange.max?.toLocaleString()} {selectedJob.salaryRange.currency}
-                      </span>
-                    </div>
-                  )}
-                </section>
+            <div className="form-group">
+              <label>Job Type</label>
+              <select value={jobTypeFilter} onChange={e => setJobTypeFilter(e.target.value)}>
+                <option value="">All Job Types</option>
+                <option value="full-time">Full-time</option>
+                <option value="part-time">Part-time</option>
+                <option value="contract">Contract</option>
+                <option value="internship">Internship</option>
+              </select>
+            </div>
 
-                <section className="detail-section">
-                  <h4>Job Description</h4>
-                  <p className="detail-description">{selectedJob.description}</p>
-                </section>
+            <div className="form-group">
+              <label>Location Type</label>
+              <select value={locationTypeFilter} onChange={e => setLocationTypeFilter(e.target.value)}>
+                <option value="">All Location Types</option>
+                <option value="remote">Remote</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="onsite">Onsite</option>
+              </select>
+            </div>
 
-                {selectedJob.requirements?.length > 0 && (
-                  <section className="detail-section">
-                    <h4>Requirements</h4>
-                    <ul>
-                      {selectedJob.requirements.map((req, i) => (
-                        <li key={i}>{req}</li>
-                      ))}
-                    </ul>
-                  </section>
-                )}
+            <div className="form-group">
+              <label>Experience Level</label>
+              <select value={experienceFilter} onChange={e => setExperienceFilter(e.target.value)}>
+                <option value="">All Experience Levels</option>
+                <option value="entry">Entry Level / Junior</option>
+                <option value="mid">Mid Level</option>
+                <option value="senior">Senior Level</option>
+                <option value="executive">Executive / VP</option>
+              </select>
+            </div>
 
-                <section className="detail-section apply-section">
-                  <h4>Apply for this role</h4>
-                  {myApps.some(app => (app.jobId?._id || app.jobId) === selectedJob._id) ? (
-                    <div className="already-applied-notice" role="status">
-                      You have already applied for this role. Track its progress from Applications.
-                    </div>
-                  ) : profile?.resumeUrl ? (
-                    <form onSubmit={handleApplySubmit}>
-                      <div className="form-group">
-                        <label htmlFor="cover-letter">Cover Letter (Optional)</label>
-                        <textarea
-                          id="cover-letter"
-                          rows={4}
-                          value={coverLetter}
-                          onChange={e => setCoverLetter(e.target.value)}
-                          placeholder="Introduce yourself and explain why you're a good fit for this role..."
-                        />
-                      </div>
-                      <div className="resume-info-pill">
-                        <FileText size={16} />
-                        <span>Resume on file: </span>
-                        <a href={profile.resumeUrl} target="_blank" rel="noreferrer">
-                          View Resume <ExternalLink size={12} />
-                        </a>
-                      </div>
-                      <button
-                        type="submit"
-                        className="btn btn-primary btn-block"
-                        disabled={submittingApplication}
-                      >
-                        {submittingApplication ? 'Submitting Application...' : 'Submit Application'}
-                      </button>
-                    </form>
-                  ) : (
-                    <div className="resume-warning">
-                      <CircleAlert size={20} />
-                      <div>
-                        <p>You must upload a resume before you can apply.</p>
-                        <button type="button" onClick={() => { setActiveTab('profile'); setSelectedJob(null); }}>
-                          Go to Profile & Upload Resume
+            <div className="form-group">
+              <label>Min Salary (Annual USD)</label>
+              <input
+                type="number"
+                placeholder="e.g. 50000"
+                value={salaryMinFilter}
+                onChange={e => setSalaryMinFilter(e.target.value)}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Max Salary (Annual USD)</label>
+              <input
+                type="number"
+                placeholder="e.g. 150000"
+                value={salaryMaxFilter}
+                onChange={e => setSalaryMaxFilter(e.target.value)}
+              />
+            </div>
+
+            <div className="filter-actions-row">
+              <button type="submit" className="btn btn-primary btn-block">
+                Apply Filters
+              </button>
+              {hasActiveFilters && (
+                <button type="button" className="btn btn-outline btn-block" onClick={handleClearFilters}>
+                  Clear Filters
+                </button>
+              )}
+            </div>
+          </form>
+        </aside>
+
+        {/* Content area */}
+        <div className="jobs-results-pane">
+          {candidateSkills.length === 0 && (
+            <div className="match-guidance">
+              <Sparkles size={18} aria-hidden="true" />
+              <div>
+                <strong>Unlock personalized job matches</strong>
+                <span>Add skills to your profile to rank roles by fit.</span>
+              </div>
+              <button type="button" onClick={() => setActiveTab('profile')}>Update profile</button>
+            </div>
+          )}
+
+          <div className="results-header">
+            <div className="results-summary" aria-live="polite">
+              <span>{loadingJobs ? 'Searching open roles…' : `${pagination?.totalJobs || jobs.length} ${pagination?.totalJobs === 1 ? 'role' : 'roles'} found`}</span>
+              {hasActiveFilters && !loadingJobs && <span> • Filtered results</span>}
+            </div>
+
+            <label className="sort-control">
+              <ArrowUpDown size={14} aria-hidden="true" />
+              <span>Sort:</span>
+              <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
+                <option value="match">Best match</option>
+                <option value="newest">Newest first</option>
+                <option value="salary">Highest salary</option>
+              </select>
+            </label>
+          </div>
+
+          {/* Job grid */}
+          {loadingJobs ? (
+            <div className="jobs-loader">
+              <div className="loader-spinner"></div>
+            </div>
+          ) : jobs.length === 0 ? (
+            <div className="empty-state">
+              <BriefcaseBusiness size={40} />
+              <p>No job postings found matching your search.</p>
+            </div>
+          ) : (
+            <>
+              <div className="jobs-grid">
+                {rankedJobs.map(({ job, matchingSkills, matchScore }) => {
+                  const isBookmarked = savedJobs.some(s => (s.jobId?._id || s.jobId) === job._id);
+                  const isApplied = myApps.some(app => (app.jobId?._id || app.jobId) === job._id);
+                  return (
+                    <article className="job-card" key={job._id}>
+                      <div className="job-card-header">
+                        <div>
+                          <h3>{job.title}</h3>
+                          <p className="job-company">{job.companyId?.name || 'Company Details'}</p>
+                        </div>
+                        <button
+                          type="button"
+                          className={`bookmark-btn ${isBookmarked ? 'active' : ''}`}
+                          onClick={() => onToggleSaveJob(job._id)}
+                          aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark job'}
+                        >
+                          <Bookmark size={18} />
                         </button>
                       </div>
-                    </div>
-                  )}
-                </section>
+
+                      {candidateSkills.length > 0 && (
+                        <div className={`match-score ${matchScore >= 60 ? 'strong' : ''}`} title={`${matchingSkills.length} matching skills`}>
+                          <Sparkles size={14} aria-hidden="true" />
+                          <span>{matchScore}% skill match</span>
+                        </div>
+                      )}
+
+                      <div className="job-tags">
+                        <span className="badge job-type-badge">{job.jobType}</span>
+                        <span className="badge location-badge">{job.locationType}</span>
+                      </div>
+
+                      <div className="job-metadata">
+                        <div className="meta-item">
+                          <MapPin size={14} />
+                          <span>{job.location}</span>
+                        </div>
+                        {job.salaryRange && (
+                          <div className="meta-item">
+                            <DollarSign size={14} />
+                            <span>
+                              {job.salaryRange.min?.toLocaleString()} - {job.salaryRange.max?.toLocaleString()} {job.salaryRange.currency}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="job-skills">
+                        {(job.skillsRequired || []).map(skill => (
+                          <span key={skill} className={`skill-tag ${matchingSkills.includes(skill) ? 'skill-match' : ''}`}>
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div className="job-card-footer">
+                        <button
+                          type="button"
+                          className="btn btn-outline btn-block"
+                          onClick={() => setSelectedJob(job)}
+                        >
+                          {isApplied ? 'View application details' : 'Details & Apply'}
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
+
+              {/* Pagination controls */}
+              {pagination && pagination.totalPages > 1 && (
+                <div className="pagination-wrapper" style={{ marginTop: '32px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px' }}>
+                  <button
+                    type="button"
+                    disabled={pagination.currentPage === 1}
+                    onClick={() => onSearch({
+                      search: jobSearch || undefined,
+                      jobType: jobTypeFilter || undefined,
+                      locationType: locationTypeFilter || undefined,
+                      salaryMin: salaryMinFilter ? Number(salaryMinFilter) : undefined,
+                      salaryMax: salaryMaxFilter ? Number(salaryMaxFilter) : undefined,
+                      page: pagination.currentPage - 1
+                    })}
+                    className="btn btn-outline"
+                  >
+                    Previous
+                  </button>
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--color-text-secondary)' }}>
+                    Page {pagination.currentPage} of {pagination.totalPages}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={pagination.currentPage === pagination.totalPages}
+                    onClick={() => onSearch({
+                      search: jobSearch || undefined,
+                      jobType: jobTypeFilter || undefined,
+                      locationType: locationTypeFilter || undefined,
+                      salaryMin: salaryMinFilter ? Number(salaryMinFilter) : undefined,
+                      salaryMax: salaryMaxFilter ? Number(salaryMaxFilter) : undefined,
+                      page: pagination.currentPage + 1
+                    })}
+                    className="btn btn-outline"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Slide-in Detail Drawer for desktop/mobile */}
+      {selectedJob && (
+        <div className="drawer-overlay" onClick={() => setSelectedJob(null)}>
+          <div className="drawer-container" onClick={e => e.stopPropagation()}>
+            <div className="drawer-header">
+              <div>
+                <h3>{selectedJob.title}</h3>
+                <p className="job-company">{selectedJob.companyId?.name}</p>
+              </div>
+              <button type="button" className="drawer-close-btn" onClick={() => setSelectedJob(null)} aria-label="Close">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="drawer-body">
+              <section className="detail-meta">
+                <div className="meta-item">
+                  <MapPin size={16} />
+                  <span>{selectedJob.location} ({selectedJob.locationType})</span>
+                </div>
+                <div className="meta-item">
+                  <Clock size={16} />
+                  <span>{selectedJob.jobType}</span>
+                </div>
+                {selectedJob.salaryRange && (
+                  <div className="meta-item">
+                    <DollarSign size={16} />
+                    <span>
+                      {selectedJob.salaryRange.min?.toLocaleString()} - {selectedJob.salaryRange.max?.toLocaleString()} {selectedJob.salaryRange.currency}
+                    </span>
+                  </div>
+                )}
+              </section>
+
+              <section className="detail-section">
+                <h4>Job Description</h4>
+                <p className="detail-description">{selectedJob.description}</p>
+              </section>
+
+              {selectedJob.requirements?.length > 0 && (
+                <section className="detail-section">
+                  <h4>Requirements</h4>
+                  <ul>
+                    {selectedJob.requirements.map((req, i) => (
+                      <li key={i}>{req}</li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              <section className="detail-section apply-section">
+                <h4>Apply for this role</h4>
+                {myApps.some(app => (app.jobId?._id || app.jobId) === selectedJob._id) ? (
+                  <div className="already-applied-notice" role="status">
+                    You have already applied for this role. Track its progress from Applications.
+                  </div>
+                ) : profile?.resumeUrl ? (
+                  <form onSubmit={handleApplySubmit}>
+                    <div className="form-group">
+                      <label htmlFor="cover-letter">Cover Letter (Optional)</label>
+                      <textarea
+                        id="cover-letter"
+                        rows={4}
+                        value={coverLetter}
+                        onChange={e => setCoverLetter(e.target.value)}
+                        placeholder="Introduce yourself and explain why you're a good fit for this role..."
+                      />
+                    </div>
+                    <div className="resume-info-pill">
+                      <FileText size={16} />
+                      <span>Resume on file: </span>
+                      <a href={profile.resumeUrl} target="_blank" rel="noreferrer">
+                        View Resume <ExternalLink size={12} />
+                      </a>
+                    </div>
+                    <button
+                      type="submit"
+                      className="btn btn-primary btn-block"
+                      disabled={submittingApplication}
+                    >
+                      {submittingApplication ? 'Submitting Application...' : 'Submit Application'}
+                    </button>
+                  </form>
+                ) : (
+                  <div className="resume-warning">
+                    <CircleAlert size={20} />
+                    <div>
+                      <p>You must upload a resume before you can apply.</p>
+                      <button type="button" onClick={() => { setActiveTab('profile'); setSelectedJob(null); }}>
+                        Go to Profile & Upload Resume
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </section>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
+
 }

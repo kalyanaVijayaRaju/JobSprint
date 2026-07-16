@@ -107,5 +107,8 @@ export const jobQuerySchema = z.object({
   jobType: z.enum(['full-time', 'part-time', 'contract', 'internship']).optional(),
   status: z.enum(['active', 'closed', 'archived']).default('active'),
   sortBy: z.enum(['createdAt', 'title', 'salaryRange.max']).default('createdAt'),
-  sortOrder: z.enum(['asc', 'desc']).default('desc')
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
+  salaryMin: z.coerce.number().nonnegative().optional(),
+  salaryMax: z.coerce.number().nonnegative().optional()
 });
+

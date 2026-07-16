@@ -2733,3 +2733,316 @@ h1 {
 [data-theme="dark"] .notif-item:hover {
   background: var(--color-bg);
 }
+
+/* ---------------------------------------------------------------------------
+   Enhanced 9-Feature Styling Rules
+   --------------------------------------------------------------------------- */
+
+/* Split-screen Authentication Banner */
+.auth-card-wrapper {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  min-height: calc(100vh - 70px);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  gap: 40px;
+  align-items: center;
+}
+
+.auth-banner {
+  position: relative;
+  background: linear-gradient(135deg, #0d5c56 0%, #1e1b4b 100%);
+  color: white;
+  border-radius: 32px;
+  padding: 60px 48px;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  box-shadow: var(--shadow-premium);
+}
+
+.auth-banner-glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: var(--color-primary);
+  filter: blur(120px);
+  opacity: 0.4;
+  top: -50px;
+  left: -50px;
+}
+
+.banner-content {
+  position: relative;
+  z-index: 1;
+}
+
+.banner-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.auth-banner h1 {
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.auth-banner p {
+  font-size: 15px;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.mock-accounts {
+  margin-top: 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 24px;
+}
+
+.mock-accounts .eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 12px;
+}
+
+.mock-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.mock-buttons button {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.mock-buttons button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: white;
+}
+
+@media (max-width: 900px) {
+  .auth-card-wrapper {
+    grid-template-columns: 1fr;
+  }
+  .auth-banner {
+    display: none;
+  }
+}
+
+/* Password strength */
+.password-strength-section {
+  animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Candidate Discover Layout (Sticky Collapsible Filters Bar) */
+.candidate-jobs-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  align-items: start;
+  position: relative;
+}
+
+.filter-pane {
+  position: sticky;
+  top: 90px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.filter-pane-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-pane-header h3 {
+  margin: 0;
+  font-weight: 700;
+}
+
+.close-filters-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.filter-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.filter-actions-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.toggle-filters-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .candidate-jobs-layout {
+    grid-template-columns: 1fr;
+  }
+  .toggle-filters-btn {
+    display: block;
+    align-self: flex-start;
+  }
+  .filter-pane {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 200;
+    border-radius: 0;
+    height: 100vh;
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .filter-pane.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .close-filters-btn {
+    display: block;
+  }
+}
+
+/* Slide-in Details Drawer */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 150;
+  display: flex;
+  justify-content: flex-end;
+  animation: fadeIn 0.25s;
+}
+
+.drawer-container {
+  width: 100%;
+  max-width: 580px;
+  background: var(--color-card);
+  height: 100%;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  animation: slideLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.drawer-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.drawer-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.drawer-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+}
+
+.drawer-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Stepper Stepper and Job wizard details */
+.job-wizard-modal {
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (max-width: 768px) {
+  .wizard-split-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Kanban Board Styling */
+.kanban-column {
+  transition: var(--transition-smooth);
+}
+.kanban-column.drag-over {
+  background: rgba(15, 118, 110, 0.05) !important;
+  transform: translateY(-2px);
+}
+
+/* Keyframes */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideLeft {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
