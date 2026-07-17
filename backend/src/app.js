@@ -19,6 +19,7 @@ import applicationRoutes from './routes/applicationRoutes.js';
 import savedJobRoutes from './routes/savedJobRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import adminUserRoutes from './routes/adminUserRoutes.js';
+import jobAlertRoutes from './routes/jobAlertRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -107,6 +108,7 @@ app.use('/api/v1/applications', applicationRoutes);
 app.use('/api/v1/saved-jobs', savedJobRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/admin', adminUserRoutes);
+app.use('/api/v1/job-alerts', jobAlertRoutes);
 
 // Unhandled HTTP route parser
 app.all('*', (req, res, next) => {
