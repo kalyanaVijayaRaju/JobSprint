@@ -1,6 +1,7 @@
 import Job from '../models/Job.js';
 import RecruiterProfile from '../models/RecruiterProfile.js';
 import ApiError from '../utils/apiError.js';
+import { dispatchJobAlerts } from './jobAlertService.js';
 
 /**
  * Create a new job posting.
@@ -24,6 +25,9 @@ export const createJob = async (recruiterId, data) => {
     recruiterId,
     companyId: recruiterProfile.companyId
   });
+
+  // Trigger matching job alerts asynchronously
+  dispatchJobAlerts(job).catch(err => console.error('Error dispatching job alerts:', err));
 
   return job;
 };
