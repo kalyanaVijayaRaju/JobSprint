@@ -197,3 +197,14 @@ export const notificationsApi = {
   markRead:    (id)          => apiFetch(`/api/v1/notifications/${id}/read`, { method: 'PATCH' }),
   markAllRead: ()            => apiFetch('/api/v1/notifications/mark-all-read', { method: 'PATCH' })
 };
+
+// ---------------------------------------------------------------------------
+// Job Alerts API
+// ---------------------------------------------------------------------------
+
+export const jobAlertsApi = {
+  list:   ()       => apiFetch('/api/v1/job-alerts'),
+  create: (data)   => apiFetch('/api/v1/job-alerts', { method: 'POST', body: data }),
+  delete: (id)     => apiFetch(`/api/v1/job-alerts/${id}`, { method: 'DELETE' })
+};
+

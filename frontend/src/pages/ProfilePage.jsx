@@ -6,6 +6,8 @@ import { profileApi } from '../api/client.js';
 import ProfileSettings from '../components/ProfileSettings.jsx';
 import ChangePassword from '../components/ChangePassword.jsx';
 import SecurityActivity from '../components/SecurityActivity.jsx';
+import JobAlertsSettings from '../components/JobAlertsSettings.jsx';
+
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -141,8 +143,10 @@ export default function ProfilePage() {
       />
       <div className="profile-security-grid" style={{ marginTop: '24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
         <ChangePassword onSuccess={(msg) => triggerAlert(msg, 'success')} />
+        {user.role === 'candidate' && <JobAlertsSettings triggerAlert={triggerAlert} />}
         <SecurityActivity />
       </div>
+
     </div>
   );
 }
