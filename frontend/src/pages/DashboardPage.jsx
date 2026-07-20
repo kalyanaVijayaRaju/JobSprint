@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useApp } from '../context/AppContext.jsx';
@@ -7,16 +7,26 @@ import OverviewTab from '../components/OverviewTab.jsx';
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { triggerAlert } = useApp();
   const { profile } = useOutletContext();
 
   const [jobs, setJobs] = useState([]);
   const [myApps, setMyApps] = useState([]);
   const [savedJobs, setSavedJobs] = useState([]);
   const [recruiterJobs, setRecruiterJobs] = useState([]);
+  const [applicationSummary, setApplicationSummary] = useState(null);
+
+  const loadApplicationSummary = useCallback(() => {
+    applicationsApi.summary()
+      .then((res) => { if (res.success) setApplicationSummary(res.data.summary); })
+      .catch(() => setApplicationSummary(null));
+  }, []);
 
   useEffect(() => {
     if (!user) return;
+
+    if (user.role === 'candidate' || user.role === 'recruiter') {
+      loadApplicationSummary();
+    }
 
     if (user.role === 'candidate') {
       jobsApi.list().then(res => { if (res.success) setJobs(res.data.jobs); }).catch(() => {});
@@ -30,7 +40,7 @@ export default function DashboardPage() {
         }
       }).catch(() => {});
     }
-  }, [user]);
+  }, [user, loadApplicationSummary]);
 
   const { readiness } = useApp();
 
@@ -39,11 +49,12 @@ export default function DashboardPage() {
       user={user}
       profile={profile}
       jobsCount={user.role === 'recruiter' ? recruiterJobs.length : jobs.length}
-      applicantsCount={user.role === 'recruiter' ? recruiterJobs.reduce((acc, j) => acc + (j.applicationsCount || 0), 0) : myApps.length}
+      applicantsCount={applicationSummary?.total ?? (user.role === 'recruiter' ? recruiterJobs.reduce((acc, j) => acc + (j.applicationsCount || 0), 0) : myApps.length)}
       savedCount={savedJobs.length}
       readiness={readiness}
       myApps={myApps}
       recruiterJobs={recruiterJobs}
+      applicationSummary={applicationSummary}
     />
   );
 }

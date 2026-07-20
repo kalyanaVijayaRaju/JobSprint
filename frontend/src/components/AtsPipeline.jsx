@@ -23,7 +23,9 @@ export default function AtsPipeline({
   fetchJobApplicants,
   myApps,
   loadingMyApps,
-  setActiveTab
+  setActiveTab,
+  onWithdraw,
+  withdrawingApplicationId
 }) {
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [recruiterNote, setRecruiterNote] = useState('');
@@ -209,7 +211,7 @@ export default function AtsPipeline({
   }
 
   // Candidate View
-  const [subTab, setSubTab] = useState('all'); // 'all' | 'active' | 'offered' | 'rejected'
+  const [subTab, setSubTab] = useState('all'); // 'all' | 'active' | 'offered' | 'rejected' | 'withdrawn'
 
   const filteredApps = myApps.filter(app => {
     const jobTitle = app.jobId?.title || '';
@@ -224,6 +226,8 @@ export default function AtsPipeline({
       matchesSubTab = app.status === 'offered';
     } else if (subTab === 'rejected') {
       matchesSubTab = app.status === 'rejected';
+    } else if (subTab === 'withdrawn') {
+      matchesSubTab = app.status === 'withdrawn';
     }
 
     return matchesSearch && matchesSubTab;
@@ -235,7 +239,8 @@ export default function AtsPipeline({
     screening: myApps.filter(a => a.status === 'screening').length,
     interviewing: myApps.filter(a => a.status === 'interviewing').length,
     offered: myApps.filter(a => a.status === 'offered').length,
-    rejected: myApps.filter(a => a.status === 'rejected').length
+    rejected: myApps.filter(a => a.status === 'rejected').length,
+    withdrawn: myApps.filter(a => a.status === 'withdrawn').length
   };
 
   return (
@@ -252,7 +257,8 @@ export default function AtsPipeline({
                 { label: 'Screening', count: stats.screening, color: 'var(--color-warning)' },
                 { label: 'Interviewing', count: stats.interviewing, color: 'var(--color-accent)' },
                 { label: 'Offered', count: stats.offered, color: 'var(--color-success)' },
-                { label: 'Rejected', count: stats.rejected, color: 'var(--color-error)' }
+                { label: 'Rejected', count: stats.rejected, color: 'var(--color-error)' },
+                { label: 'Withdrawn', count: stats.withdrawn, color: 'var(--color-text-muted)' }
               ].map(item => (
                 <div key={item.label} style={{ flex: '1', minWidth: '120px', padding: '12px', background: 'var(--color-bg)', borderRadius: '16px', border: '1px solid var(--color-border)', textAlign: 'center' }}>
                   <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--color-text-secondary)', display: 'block', textTransform: 'uppercase' }}>{item.label}</span>
@@ -267,7 +273,7 @@ export default function AtsPipeline({
           
           {/* Sub-tab Filters */}
           <div className="subtabs-bar" style={{ display: 'flex', gap: '4px', background: 'var(--color-border)', padding: '4px', borderRadius: '10px' }}>
-            {['all', 'active', 'offered', 'rejected'].map(tab => (
+            {['all', 'active', 'offered', 'rejected', 'withdrawn'].map(tab => (
               <button
                 key={tab}
                 type="button"
@@ -372,6 +378,17 @@ export default function AtsPipeline({
                         </div>
                       </div>
                     )}
+                    {app.status === 'withdrawn' && (
+                      <div className="timeline-node rejected">
+                        <div className="node-circle"><X size={10} /></div>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          <span className="node-label">withdrawn</span>
+                          <span style={{ fontSize: '9px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                            {new Date(app.updatedAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -381,6 +398,16 @@ export default function AtsPipeline({
                     <a href={app.resumeUrl} target="_blank" rel="noreferrer" className="resume-attachment-link">
                       <FileText size={14} /> Resume snapshot
                     </a>
+                  )}
+                  {!['withdrawn', 'rejected'].includes(app.status) && (
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-sm"
+                      onClick={() => onWithdraw(app)}
+                      disabled={withdrawingApplicationId === app._id}
+                    >
+                      {withdrawingApplicationId === app._id ? 'Withdrawing…' : 'Withdraw application'}
+                    </button>
                   )}
                 </div>
               </div>

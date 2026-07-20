@@ -30,7 +30,9 @@ export default function AppLayout() {
     unreadCount,
     fetchNotifications,
     markNotificationRead,
-    markAllNotificationsRead
+    markAllNotificationsRead,
+    deleteNotification,
+    clearReadNotifications
   } = useApp();
 
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -233,6 +235,8 @@ export default function AppLayout() {
               unreadCount={unreadCount}
               onMarkAllRead={markAllNotificationsRead}
               onMarkRead={markNotificationRead}
+              onDelete={deleteNotification}
+              onClearRead={clearReadNotifications}
             />
 
             <div className={`status-pill ${readiness.ok ? 'ready' : 'not-ready'}`}>

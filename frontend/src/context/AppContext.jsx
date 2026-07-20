@@ -83,6 +83,26 @@ export function AppProvider({ children }) {
     }
   }, [fetchNotifications, triggerAlert]);
 
+  const deleteNotification = useCallback(async (id) => {
+    try {
+      await notificationsApi.delete(id);
+      fetchNotifications();
+      triggerAlert('Notification deleted');
+    } catch (err) {
+      triggerAlert(err.message, 'error');
+    }
+  }, [fetchNotifications, triggerAlert]);
+
+  const clearReadNotifications = useCallback(async () => {
+    try {
+      const res = await notificationsApi.clearRead();
+      fetchNotifications();
+      triggerAlert(res.data?.deletedCount ? 'Read notifications cleared' : 'No read notifications to clear');
+    } catch (err) {
+      triggerAlert(err.message, 'error');
+    }
+  }, [fetchNotifications, triggerAlert]);
+
   const value = {
     darkMode,
     toggleDarkMode,
@@ -94,7 +114,9 @@ export function AppProvider({ children }) {
     unreadCount,
     fetchNotifications,
     markNotificationRead,
-    markAllNotificationsRead
+    markAllNotificationsRead,
+    deleteNotification,
+    clearReadNotifications
   };
 
   return (

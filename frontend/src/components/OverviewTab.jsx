@@ -8,18 +8,22 @@ export default function OverviewTab({
   savedCount,
   readiness,
   myApps = [],
-  recruiterJobs = []
+  recruiterJobs = [],
+  applicationSummary = null
 }) {
   // Candidate Metrics
-  const totalApps = myApps.length;
-  const progressedApps = myApps.filter(a => a.status !== 'applied').length;
+  const statusCounts = applicationSummary?.byStatus || {};
+  const totalApps = applicationSummary?.total ?? myApps.length;
+  const progressedApps = applicationSummary
+    ? totalApps - (statusCounts.applied || 0)
+    : myApps.filter(a => a.status !== 'applied').length;
   const successRate = totalApps > 0 ? Math.round((progressedApps / totalApps) * 100) : 0;
 
-  const appliedCount = myApps.filter(a => a.status === 'applied').length;
-  const screeningCount = myApps.filter(a => a.status === 'screening').length;
-  const interviewingCount = myApps.filter(a => a.status === 'interviewing').length;
-  const offeredCount = myApps.filter(a => a.status === 'offered').length;
-  const rejectedCount = myApps.filter(a => a.status === 'rejected').length;
+  const appliedCount = statusCounts.applied ?? myApps.filter(a => a.status === 'applied').length;
+  const screeningCount = statusCounts.screening ?? myApps.filter(a => a.status === 'screening').length;
+  const interviewingCount = statusCounts.interviewing ?? myApps.filter(a => a.status === 'interviewing').length;
+  const offeredCount = statusCounts.offered ?? myApps.filter(a => a.status === 'offered').length;
+  const rejectedCount = statusCounts.rejected ?? myApps.filter(a => a.status === 'rejected').length;
 
   // Recruiter Metrics
   const activePostings = recruiterJobs.filter(j => j.status === 'active').length;
