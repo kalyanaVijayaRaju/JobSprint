@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, CheckCircle2, AlertTriangle, Briefcase, MessageSquare, Info } from 'lucide-react';
+import { Bell, CheckCircle2, AlertTriangle, Briefcase, MessageSquare, Info, Trash2 } from 'lucide-react';
 
 function timeAgo(dateStr) {
   const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
@@ -32,7 +32,9 @@ export default function NotificationsBell({
   notifications,
   unreadCount,
   onMarkAllRead,
-  onMarkRead
+  onMarkRead,
+  onDelete,
+  onClearRead
 }) {
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const wrapperRef = useRef(null);
@@ -80,11 +82,18 @@ export default function NotificationsBell({
         <div className="notif-dropdown" role="menu">
           <div className="notif-header">
             <h3>Notifications</h3>
-            {unreadCount > 0 && (
-              <button type="button" onClick={() => { onMarkAllRead(); setShowNotifDropdown(false); }}>
-                Mark all read
-              </button>
-            )}
+            <div className="notif-header-actions">
+              {notifications.some(n => n.isRead) && (
+                <button type="button" onClick={() => onClearRead()}>
+                  Clear read
+                </button>
+              )}
+              {unreadCount > 0 && (
+                <button type="button" onClick={() => onMarkAllRead()}>
+                  Mark all read
+                </button>
+              )}
+            </div>
           </div>
           <div className="notif-list">
             {notifications.length === 0 ? (
@@ -118,6 +127,17 @@ export default function NotificationsBell({
                     <p className="notif-msg">{n.message}</p>
                     <span className="notif-time">{timeAgo(n.createdAt)}</span>
                   </div>
+                  <button
+                    type="button"
+                    className="notif-delete-btn"
+                    aria-label="Delete notification"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onDelete(n._id);
+                    }}
+                  >
+                    <Trash2 size={14} />
+                  </button>
                   {!n.isRead && <span className="notif-dot" aria-hidden="true"></span>}
                 </div>
               ))

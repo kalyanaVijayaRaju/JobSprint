@@ -17,6 +17,7 @@ export default function ApplicationsPage() {
   const [selectedJobApplicants, setSelectedJobApplicants] = useState([]);
   const [loadingApplicants, setLoadingApplicants] = useState(false);
   const [submittingNote, setSubmittingNote] = useState(false);
+  const [withdrawingApplicationId, setWithdrawingApplicationId] = useState(null);
 
   const fetchMyApplications = useCallback(() => {
     setLoadingMyApps(true);
@@ -85,6 +86,22 @@ export default function ApplicationsPage() {
     }
   };
 
+  const handleWithdraw = async (application) => {
+    const jobTitle = application.jobId?.title || 'this application';
+    if (!window.confirm(`Withdraw your application for ${jobTitle}? This action cannot be undone.`)) return;
+
+    setWithdrawingApplicationId(application._id);
+    try {
+      await applicationsApi.withdraw(application._id);
+      triggerAlert('Application withdrawn successfully');
+      fetchMyApplications();
+    } catch (err) {
+      triggerAlert(err.message, 'error');
+    } finally {
+      setWithdrawingApplicationId(null);
+    }
+  };
+
   return (
     <AtsPipeline
       user={user}
@@ -99,6 +116,8 @@ export default function ApplicationsPage() {
       fetchJobApplicants={fetchJobApplicants}
       myApps={myApps}
       loadingMyApps={loadingMyApps}
+      onWithdraw={handleWithdraw}
+      withdrawingApplicationId={withdrawingApplicationId}
       setActiveTab={(tab) => navigate(`/${tab === 'jobs' ? 'jobs' : tab}`)}
     />
   );

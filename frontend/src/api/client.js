@@ -164,7 +164,9 @@ export const applicationsApi = {
     return apiFetch(`/api/v1/applications/job/${jobId}${query ? `?${query}` : ''}`);
   },
   updateStatus:    (id, status)        => apiFetch(`/api/v1/applications/${id}/status`, { method: 'PATCH', body: { status } }),
-  addNote:         (id, note)          => apiFetch(`/api/v1/applications/${id}/notes`, { method: 'POST', body: { note } })
+  addNote:         (id, note)          => apiFetch(`/api/v1/applications/${id}/notes`, { method: 'POST', body: { note } }),
+  summary:         ()                  => apiFetch('/api/v1/applications/summary'),
+  withdraw:        (id)                => apiFetch(`/api/v1/applications/${id}/withdraw`, { method: 'PATCH' })
 };
 
 // ---------------------------------------------------------------------------
@@ -195,7 +197,9 @@ export const notificationsApi = {
   },
   unreadCount: ()            => apiFetch('/api/v1/notifications/unread-count'),
   markRead:    (id)          => apiFetch(`/api/v1/notifications/${id}/read`, { method: 'PATCH' }),
-  markAllRead: ()            => apiFetch('/api/v1/notifications/mark-all-read', { method: 'PATCH' })
+  markAllRead: ()            => apiFetch('/api/v1/notifications/mark-all-read', { method: 'PATCH' }),
+  delete:      (id)          => apiFetch(`/api/v1/notifications/${id}`, { method: 'DELETE' }),
+  clearRead:   ()            => apiFetch('/api/v1/notifications/read', { method: 'DELETE' })
 };
 
 // ---------------------------------------------------------------------------

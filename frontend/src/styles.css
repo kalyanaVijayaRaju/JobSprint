@@ -792,6 +792,11 @@ h1 {
   cursor: pointer;
 }
 
+.notif-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
 .notif-list {
   max-height: 280px;
   overflow-y: auto;
@@ -825,6 +830,27 @@ h1 {
 
 .notif-content {
   flex-grow: 1;
+}
+
+.notif-delete-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.notif-delete-btn:hover,
+.notif-delete-btn:focus-visible {
+  background: var(--color-error-light);
+  color: var(--color-error);
 }
 
 .notif-msg {
