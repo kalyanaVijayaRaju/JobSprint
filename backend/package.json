@@ -8,7 +8,13 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "check": "node --check src/server.js && node --check src/app.js",
-    "test": "node --test"
+    "test": "node --test",
+    "seed": "node scripts/seed/index.js",
+    "seed:clear": "node scripts/seed/clear.js",
+    "seed:companies": "node scripts/seed/index.js --only=companies",
+    "seed:candidates": "node scripts/seed/index.js --only=candidates",
+    "seed:jobs": "node scripts/seed/index.js --only=jobs",
+    "seed:applications": "node scripts/seed/index.js --only=applications"
   },
   "engines": {
     "node": ">=22.0.0"
