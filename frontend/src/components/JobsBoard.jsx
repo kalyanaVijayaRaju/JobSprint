@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   BriefcaseBusiness,
   Bookmark,
@@ -36,19 +37,31 @@ export default function JobsBoard({
   setActiveTab,
   setSelectedJobForApplicants,
   fetchJobApplicants,
-  pagination
+  pagination,
+  queryFilters
 }) {
-  const [jobSearch, setJobSearch] = useState('');
-  const [jobTypeFilter, setJobTypeFilter] = useState('');
-  const [locationTypeFilter, setLocationTypeFilter] = useState('');
-  const [salaryMinFilter, setSalaryMinFilter] = useState('');
-  const [salaryMaxFilter, setSalaryMaxFilter] = useState('');
-  const [experienceFilter, setExperienceFilter] = useState('');
+  const navigate = useNavigate();
+  const [jobSearch, setJobSearch] = useState(queryFilters?.search || '');
+  const [jobTypeFilter, setJobTypeFilter] = useState(queryFilters?.jobType || '');
+  const [locationTypeFilter, setLocationTypeFilter] = useState(queryFilters?.locationType || '');
+  const [salaryMinFilter, setSalaryMinFilter] = useState(queryFilters?.salaryMin || '');
+  const [salaryMaxFilter, setSalaryMaxFilter] = useState(queryFilters?.salaryMax || '');
+  const [experienceFilter, setExperienceFilter] = useState(queryFilters?.experience || '');
   const [isFilterPaneOpen, setIsFilterPaneOpen] = useState(true);
-  const [sortBy, setSortBy] = useState('match');
+  const [sortBy, setSortBy] = useState(queryFilters?.sort || 'match');
   const [selectedJob, setSelectedJob] = useState(null);
   const [coverLetter, setCoverLetter] = useState('');
   const [showCreateJob, setShowCreateJob] = useState(false);
+
+  useEffect(() => {
+    setJobSearch(queryFilters?.search || '');
+    setJobTypeFilter(queryFilters?.jobType || '');
+    setLocationTypeFilter(queryFilters?.locationType || '');
+    setSalaryMinFilter(queryFilters?.salaryMin || '');
+    setSalaryMaxFilter(queryFilters?.salaryMax || '');
+    setExperienceFilter(queryFilters?.experience || '');
+    setSortBy(queryFilters?.sort || 'match');
+  }, [queryFilters]);
 
   const [newJobForm, setNewJobForm] = useState({
     title: '',
@@ -72,6 +85,8 @@ export default function JobsBoard({
       locationType: locationTypeFilter || undefined,
       salaryMin: salaryMinFilter ? Number(salaryMinFilter) : undefined,
       salaryMax: salaryMaxFilter ? Number(salaryMaxFilter) : undefined,
+      experience: experienceFilter || undefined,
+      sort: sortBy,
       page: 1
     });
   };
@@ -83,7 +98,7 @@ export default function JobsBoard({
     setSalaryMinFilter('');
     setSalaryMaxFilter('');
     setExperienceFilter('');
-    onSearch({});
+    onSearch({ page: 1 });
   };
 
   const hasActiveFilters = Boolean(
@@ -411,7 +426,17 @@ export default function JobsBoard({
             <label className="sort-control">
               <ArrowUpDown size={14} aria-hidden="true" />
               <span>Sort:</span>
-              <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
+              <select value={sortBy} onChange={e => onSearch({
+                search: jobSearch || undefined,
+                companyId: queryFilters?.companyId || undefined,
+                jobType: jobTypeFilter || undefined,
+                locationType: locationTypeFilter || undefined,
+                salaryMin: salaryMinFilter || undefined,
+                salaryMax: salaryMaxFilter || undefined,
+                experience: experienceFilter || undefined,
+                sort: e.target.value,
+                page: 1
+              })}>
                 <option value="match">Best match</option>
                 <option value="newest">Newest first</option>
                 <option value="salary">Highest salary</option>
@@ -491,7 +516,7 @@ export default function JobsBoard({
                         <button
                           type="button"
                           className="btn btn-outline btn-block"
-                          onClick={() => setSelectedJob(job)}
+                          onClick={() => navigate(`/jobs/${job._id}`)}
                         >
                           {isApplied ? 'View application details' : 'Details & Apply'}
                         </button>
@@ -513,6 +538,8 @@ export default function JobsBoard({
                       locationType: locationTypeFilter || undefined,
                       salaryMin: salaryMinFilter ? Number(salaryMinFilter) : undefined,
                       salaryMax: salaryMaxFilter ? Number(salaryMaxFilter) : undefined,
+                      experience: experienceFilter || undefined,
+                      sort: sortBy,
                       page: pagination.currentPage - 1
                     })}
                     className="btn btn-outline"
@@ -531,6 +558,8 @@ export default function JobsBoard({
                       locationType: locationTypeFilter || undefined,
                       salaryMin: salaryMinFilter ? Number(salaryMinFilter) : undefined,
                       salaryMax: salaryMaxFilter ? Number(salaryMaxFilter) : undefined,
+                      experience: experienceFilter || undefined,
+                      sort: sortBy,
                       page: pagination.currentPage + 1
                     })}
                     className="btn btn-outline"

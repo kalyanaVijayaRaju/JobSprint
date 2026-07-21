@@ -43,6 +43,7 @@ export const getJobs = async (query) => {
     page,
     limit,
     search,
+    companyId,
     location,
     locationType,
     jobType,
@@ -54,6 +55,10 @@ export const getJobs = async (query) => {
   } = query;
 
   const filter = { status };
+
+  if (companyId) {
+    filter.companyId = companyId;
+  }
 
   // Only show non-expired jobs for public listings of active posts
   if (status === 'active') {

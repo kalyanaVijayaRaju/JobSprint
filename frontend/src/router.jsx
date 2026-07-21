@@ -11,6 +11,7 @@ import SavedJobsPage from './pages/SavedJobsPage.jsx';
 import CompaniesPage from './pages/CompaniesPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
+import JobDetailsPage from './pages/JobDetailsPage.jsx';
 
 // Auth Components
 import AuthScreen from './components/AuthScreen.jsx';
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
   {
     path: '/verify-email/:token',
     element: <VerifyEmail />,
+  },
+  {
+    path: '/jobs/:jobId',
+    element: <JobDetailsPage />,
   },
   {
     element: (

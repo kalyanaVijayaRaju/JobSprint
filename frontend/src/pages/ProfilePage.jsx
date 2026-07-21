@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useApp } from '../context/AppContext.jsx';
 import { profileApi } from '../api/client.js';
@@ -13,6 +13,8 @@ export default function ProfilePage() {
   const { user } = useAuth();
   const { triggerAlert } = useApp();
   const { profile, setProfile } = useOutletContext();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
@@ -122,6 +124,9 @@ export default function ProfilePage() {
       triggerAlert('Resume PDF uploaded and saved!');
       setResumeUploadStatus('success');
       fetchProfile();
+      if (typeof location.state?.from === 'string' && location.state.from.startsWith('/jobs/')) {
+        navigate(location.state.from, { replace: true });
+      }
     } catch (err) {
       setResumeUploadStatus('error');
       setResumeUploadError(err.message || 'File upload failed');

@@ -102,6 +102,7 @@ export const jobQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(10),
   search: z.string().trim().optional(),
+  companyId: z.string().regex(/^[a-f\d]{24}$/i, 'Company ID must be a valid MongoDB ObjectId').optional(),
   location: z.string().trim().optional(),
   locationType: z.enum(['remote', 'onsite', 'hybrid']).optional(),
   jobType: z.enum(['full-time', 'part-time', 'contract', 'internship']).optional(),

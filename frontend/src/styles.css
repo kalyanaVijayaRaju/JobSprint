@@ -3051,6 +3051,98 @@ h1 {
   transform: translateY(-2px);
 }
 
+/* ---------------------------------------------------------------------------
+   Shareable Job Details
+   --------------------------------------------------------------------------- */
+.job-details-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+  padding: 40px 24px 64px;
+}
+
+.job-details-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--color-primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.job-details-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  background: var(--color-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.job-details-title h1 {
+  margin: 6px 0 12px;
+  font-size: clamp(28px, 4vw, 42px);
+}
+
+.job-details-title p,
+.job-facts-card p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-secondary);
+}
+
+.job-details-title p span { color: var(--color-text-muted); }
+.job-details-actions { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px; }
+.job-details-actions .bookmark-btn { width: auto; padding: 9px 14px; gap: 7px; border: 1px solid var(--color-border); border-radius: 8px; }
+
+.job-details-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(300px, .85fr);
+  gap: 28px;
+  margin-top: 28px;
+}
+
+.job-details-content,
+.job-facts-card,
+.company-summary-card,
+.application-card {
+  padding: 28px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: var(--color-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.job-details-content section + section { margin-top: 30px; }
+.job-details-content h2,
+.job-facts-card h2,
+.company-summary-card h2,
+.application-card h2 { margin: 0 0 14px; font-size: 18px; }
+.job-description { white-space: pre-wrap; color: var(--color-text-secondary); line-height: 1.75; }
+.job-details-content li { margin: 10px 0; color: var(--color-text-secondary); line-height: 1.55; }
+.job-details-sidebar { display: flex; flex-direction: column; gap: 18px; }
+.job-facts-card p { gap: 12px; margin: 16px 0; }
+.job-facts-card p span { display: grid; gap: 2px; }
+.job-facts-card strong { color: var(--color-text-primary); font-size: 13px; }
+.company-summary-card p { color: var(--color-text-secondary); line-height: 1.55; }
+.company-summary-card a { color: var(--color-primary); font-weight: 700; text-decoration: none; }
+.application-card label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 14px; }
+.application-card label span { color: var(--color-text-muted); font-weight: 400; }
+.application-card textarea { width: 100%; box-sizing: border-box; margin-bottom: 14px; resize: vertical; }
+.closed-job-notice { margin: 0; color: var(--color-text-secondary); }
+
+@media (max-width: 760px) {
+  .job-details-page { padding: 24px 16px 48px; }
+  .job-details-hero { padding: 24px; flex-direction: column; }
+  .job-details-layout { grid-template-columns: 1fr; }
+}
+
 /* Keyframes */
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }

@@ -67,6 +67,10 @@ const CATEGORIES = [
 export default function LandingPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchLocation, setSearchLocation] = useState('');
+  const searchParams = new URLSearchParams();
+  if (searchQuery.trim()) searchParams.set('search', searchQuery.trim());
+  if (searchLocation.trim()) searchParams.set('location', searchLocation.trim());
+  const jobsSearchUrl = `/jobs${searchParams.size ? `?${searchParams}` : ''}`;
 
   return (
     <div className="landing-page">
@@ -128,7 +132,7 @@ export default function LandingPage() {
               />
             </div>
             <Link
-              to={`/login`}
+              to={jobsSearchUrl}
               className="btn btn-primary search-btn"
             >
               <Search size={18} />

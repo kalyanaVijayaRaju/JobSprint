@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useOutletContext, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useApp } from '../context/AppContext.jsx';
 import { jobsApi, applicationsApi, savedJobsApi } from '../api/client.js';
@@ -10,6 +10,7 @@ export default function JobsPage() {
   const { triggerAlert } = useApp();
   const { profile } = useOutletContext();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [jobs, setJobs] = useState([]);
   const [loadingJobs, setLoadingJobs] = useState(false);
@@ -20,6 +21,19 @@ export default function JobsPage() {
   const [submittingJob, setSubmittingJob] = useState(false);
   const [selectedJobForApplicants, setSelectedJobForApplicants] = useState(null);
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalJobs: 0, limit: 10 });
+
+  const queryFilters = useMemo(() => ({
+    search: searchParams.get('search') || '',
+    companyId: searchParams.get('companyId') || '',
+    location: searchParams.get('location') || '',
+    jobType: searchParams.get('jobType') || '',
+    locationType: searchParams.get('locationType') || '',
+    salaryMin: searchParams.get('salaryMin') || '',
+    salaryMax: searchParams.get('salaryMax') || '',
+    experience: searchParams.get('experience') || '',
+    sort: searchParams.get('sort') || 'match',
+    page: Number(searchParams.get('page')) || 1
+  }), [searchParams]);
 
   const fetchJobs = useCallback((filters = {}) => {
     setLoadingJobs(true);
@@ -35,6 +49,16 @@ export default function JobsPage() {
       .catch((err) => triggerAlert(err.message, 'error'))
       .finally(() => setLoadingJobs(false));
   }, [triggerAlert]);
+
+  const updateSearch = useCallback((nextFilters) => {
+    const params = new URLSearchParams();
+    Object.entries(nextFilters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '' && !(key === 'page' && Number(value) === 1) && !(key === 'sort' && value === 'match')) {
+        params.set(key, String(value));
+      }
+    });
+    setSearchParams(params);
+  }, [setSearchParams]);
 
 
   const fetchSavedJobs = useCallback(() => {
@@ -63,13 +87,26 @@ export default function JobsPage() {
   useEffect(() => {
     if (!user) return;
     if (user.role === 'candidate') {
-      fetchJobs();
       fetchSavedJobs();
       fetchMyApplications();
     } else if (user.role === 'recruiter') {
       fetchRecruiterJobs();
     }
-  }, [user, fetchJobs, fetchSavedJobs, fetchMyApplications, fetchRecruiterJobs]);
+  }, [user, fetchSavedJobs, fetchMyApplications, fetchRecruiterJobs]);
+
+  useEffect(() => {
+    if (user?.role !== 'candidate') return;
+    fetchJobs({
+      search: queryFilters.search || undefined,
+      companyId: queryFilters.companyId || undefined,
+      location: queryFilters.location || undefined,
+      jobType: queryFilters.jobType || undefined,
+      locationType: queryFilters.locationType || undefined,
+      salaryMin: queryFilters.salaryMin ? Number(queryFilters.salaryMin) : undefined,
+      salaryMax: queryFilters.salaryMax ? Number(queryFilters.salaryMax) : undefined,
+      page: queryFilters.page
+    });
+  }, [user, fetchJobs, queryFilters]);
 
   const handleToggleSaveJob = async (jobId) => {
     const isSaved = savedJobs.some(s => (s.jobId?._id || s.jobId) === jobId);
@@ -164,7 +201,8 @@ export default function JobsPage() {
       loadingJobs={loadingJobs}
       savedJobs={savedJobs}
       recruiterJobs={recruiterJobs}
-      onSearch={fetchJobs}
+      onSearch={updateSearch}
+      queryFilters={queryFilters}
       onToggleSaveJob={handleToggleSaveJob}
       onApply={handleApplySubmit}
       onPostJob={handleCreateJob}
