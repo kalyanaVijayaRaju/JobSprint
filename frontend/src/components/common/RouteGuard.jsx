@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 
 /**
@@ -11,6 +11,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
  */
 export default function RouteGuard({ children, roles, redirectTo = '/login' }) {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -22,7 +23,7 @@ export default function RouteGuard({ children, roles, redirectTo = '/login' }) {
   }
 
   if (!user) {
-    return <Navigate to={redirectTo} replace />;
+    return <Navigate to={redirectTo} replace state={{ from: `${location.pathname}${location.search}` }} />;
   }
 
   if (roles && !roles.includes(user.role)) {

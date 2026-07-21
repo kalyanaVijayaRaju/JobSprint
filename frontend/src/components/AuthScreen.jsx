@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Activity, Eye, EyeOff, Loader2, KeyRound, Sparkles, Check, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useApp } from '../context/AppContext.jsx';
@@ -8,6 +8,10 @@ export default function AuthScreen({ defaultMode = 'login' }) {
   const { login, register } = useAuth();
   const { readiness, triggerAlert } = useApp();
   const navigate = useNavigate();
+  const location = useLocation();
+  const requestedPath = typeof location.state?.from === 'string' && location.state.from.startsWith('/')
+    ? location.state.from
+    : '/dashboard';
 
   const [isAuthMode, setIsAuthMode] = useState(defaultMode); // 'login' | 'register'
   const [authForm, setAuthForm] = useState({ email: '', password: '', role: 'candidate' });
@@ -55,7 +59,7 @@ export default function AuthScreen({ defaultMode = 'login' }) {
         const res = await login({ email: authForm.email, password: authForm.password });
         if (res.success) {
           triggerAlert('Welcome to JobSprint!');
-          navigate('/dashboard');
+          navigate(requestedPath, { replace: true });
         }
       } else {
         // Enforce password strength before submit
@@ -177,7 +181,7 @@ export default function AuthScreen({ defaultMode = 'login' }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <label htmlFor="auth-password">Password</label>
                 {isAuthMode === 'login' && (
-                  <Link to="/forgot-password" style={{ fontSize: '12px', color: 'var(--color-primary)', textDecoration: 'none', fontWeight: '500' }}>
+                  <Link to="/forgot-password" state={{ from: requestedPath }} style={{ fontSize: '12px', color: 'var(--color-primary)', textDecoration: 'none', fontWeight: '500' }}>
                     Forgot password?
                   </Link>
                 )}

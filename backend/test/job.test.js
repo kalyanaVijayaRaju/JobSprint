@@ -103,6 +103,39 @@ const validJobPayload = {
   expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
 };
 
+test('GET /api/v1/jobs — filters active listings by company', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+  const firstRecruiterId = new mongoose.Types.ObjectId().toString();
+  const secondRecruiterId = new mongoose.Types.ObjectId().toString();
+  const firstToken = await createTestToken({ id: firstRecruiterId, email: 'company-filter-one@test.com' });
+  const secondToken = await createTestToken({ id: secondRecruiterId, email: 'company-filter-two@test.com' });
+  const firstCompany = await seedRecruiterWithCompany(firstRecruiterId);
+  await seedRecruiterWithCompany(secondRecruiterId);
+
+  await Promise.all([
+    fetch(`${baseUrl}/api/v1/jobs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${firstToken}` },
+      body: JSON.stringify(validJobPayload)
+    }),
+    fetch(`${baseUrl}/api/v1/jobs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${secondToken}` },
+      body: JSON.stringify({ ...validJobPayload, title: 'Company Two Platform Engineer' })
+    })
+  ]);
+
+  const response = await fetch(`${baseUrl}/api/v1/jobs?companyId=${firstCompany._id}`);
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(body.data.pagination.totalJobs, 1);
+  assert.equal(body.data.jobs[0].companyId._id, firstCompany._id.toString());
+});
+
 // ============================================================
 // POST /api/v1/jobs — Create Job
 // ============================================================

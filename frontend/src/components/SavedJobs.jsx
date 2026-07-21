@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   BriefcaseBusiness,
   Bookmark,
@@ -253,14 +254,13 @@ export default function SavedJobs({
                         </div>
 
                         <div className="job-card-footer" style={{ display: 'flex', gap: '10px' }}>
-                          <button
-                            type="button"
+                          <Link
                             className="btn btn-outline"
                             style={{ flex: 1, fontSize: '12px', padding: '8px' }}
-                            onClick={() => setSelectedJob(job)}
+                            to={`/jobs/${job._id}`}
                           >
                             Details
-                          </button>
+                          </Link>
                           {isApplied ? (
                             <button type="button" className="btn" style={{ flex: 1, backgroundColor: 'var(--color-border)', color: 'var(--color-text-secondary)', cursor: 'default', fontSize: '12px', padding: '8px' }} disabled>
                               Applied
