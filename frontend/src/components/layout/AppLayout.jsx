@@ -1,24 +1,17 @@
 import { useState, useEffect } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
-import {
-  Activity,
-  BriefcaseBusiness,
-  UsersRound,
-  Bookmark,
-  LogOut,
-  Clock,
-  User,
-  Menu,
-  X,
-  Building2,
-  Moon,
-  Sun
-} from 'lucide-react';
+import { Outlet, useLocation } from 'react-router-dom';
+
+import Sidebar from './Sidebar.jsx';
+import Header from './Header.jsx';
+import Toast from './Toast.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useApp } from '../../context/AppContext.jsx';
-import NotificationsBell from '../NotificationsBell.jsx';
 
+/**
+ * AppLayout orchestrator — sidebar navigation, header topbar, toast alerts, and route outlet wrapper.
+ */
 export default function AppLayout() {
+  const location = useLocation();
   const { user, logout } = useAuth();
   const {
     darkMode,
@@ -32,7 +25,7 @@ export default function AppLayout() {
     markNotificationRead,
     markAllNotificationsRead,
     deleteNotification,
-    clearReadNotifications
+    clearReadNotifications,
   } = useApp();
 
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -50,7 +43,8 @@ export default function AppLayout() {
   useEffect(() => {
     if (!user) return;
     import('../../api/client.js').then(({ profileApi }) => {
-      profileApi.get()
+      profileApi
+        .get()
         .then((res) => {
           if (res.success && res.data.profile) {
             setProfile(res.data.profile);
@@ -60,7 +54,7 @@ export default function AppLayout() {
     });
   }, [user]);
 
-  // Close mobile nav on Escape
+  // Close mobile nav on Escape key
   useEffect(() => {
     if (!isMobileNavOpen) return;
     const handleEscape = (event) => {
@@ -70,20 +64,17 @@ export default function AppLayout() {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isMobileNavOpen]);
 
-  const handleLogout = async () => {
-    await logout();
-  };
-
   const closeMobileNav = () => setIsMobileNavOpen(false);
 
-  // Get page title based on current path
+  // Derive page title and eyebrow
   const getPageTitle = () => {
-    const path = window.location.pathname;
+    const path = location.pathname;
     if (path === '/dashboard') return 'Operations Dashboard';
     if (path === '/admin') return 'System Admin Console';
     if (path === '/jobs') return user?.role === 'recruiter' ? 'Job Listings Board' : 'Discover Careers';
     if (path === '/saved-jobs') return 'Bookmarked Roles';
-    if (path === '/applications') return user?.role === 'recruiter' ? 'ATS Candidate Pipelines' : 'Applied Jobs Tracker';
+    if (path === '/applications')
+      return user?.role === 'recruiter' ? 'ATS Candidate Pipelines' : 'Applied Jobs Tracker';
     if (path === '/companies') return 'Company Directory';
     if (path === '/profile') return 'Professional Profile';
     return 'Dashboard';
@@ -97,19 +88,7 @@ export default function AppLayout() {
 
   return (
     <div className="app-shell">
-      {successMsg && <div className="alert success-toast" role="status">{successMsg}</div>}
-      {errorMsg && <div className="alert error-toast" role="alert">{errorMsg}</div>}
-
-      <button
-        type="button"
-        className="mobile-menu-btn"
-        onClick={() => setIsMobileNavOpen(true)}
-        aria-label="Open navigation menu"
-        aria-expanded={isMobileNavOpen}
-        aria-controls="primary-sidebar"
-      >
-        <Menu size={22} />
-      </button>
+      <Toast successMsg={successMsg} errorMsg={errorMsg} />
 
       {isMobileNavOpen && (
         <button
@@ -120,133 +99,31 @@ export default function AppLayout() {
         />
       )}
 
-      {/* Sidebar Navigation */}
-      <aside id="primary-sidebar" className={`sidebar ${isMobileNavOpen ? 'mobile-open' : ''}`} aria-label="Primary navigation">
-        <div className="brand">
-          <span className="brand-mark">JS</span>
-          <span>JobSprint</span>
-          <button type="button" className="mobile-menu-close" onClick={closeMobileNav} aria-label="Close navigation menu">
-            <X size={20} />
-          </button>
-        </div>
+      <Sidebar
+        user={user}
+        profile={profile}
+        isMobileNavOpen={isMobileNavOpen}
+        closeMobileNav={closeMobileNav}
+        darkMode={darkMode}
+        toggleDarkMode={toggleDarkMode}
+        onLogout={logout}
+      />
 
-        <div className="user-context">
-          <div className="user-avatar">
-            {profile?.firstName ? `${profile.firstName[0]}${profile.lastName[0]}` : user?.email[0].toUpperCase()}
-          </div>
-          <div className="user-info">
-            <span className="user-name">
-              {profile?.firstName ? `${profile.firstName} ${profile.lastName}` : user?.email.split('@')[0]}
-            </span>
-            <span className="user-role">{user?.role}</span>
-          </div>
-        </div>
-
-        <nav className="nav-list">
-          <NavLink
-            to="/dashboard"
-            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-            onClick={closeMobileNav}
-          >
-            <Activity size={18} /> Overview
-          </NavLink>
-
-          {user?.role === 'admin' && (
-            <NavLink
-              to="/admin"
-              className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-              onClick={closeMobileNav}
-            >
-              <UsersRound size={18} /> Admin Console
-            </NavLink>
-          )}
-
-          {user?.role !== 'admin' && (
-            <>
-              <NavLink
-                to="/jobs"
-                className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-                onClick={closeMobileNav}
-              >
-                <BriefcaseBusiness size={18} /> {user?.role === 'recruiter' ? 'My Job Posts' : 'Find Jobs'}
-              </NavLink>
-              <NavLink
-                to="/applications"
-                className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-                onClick={closeMobileNav}
-              >
-                <Clock size={18} /> {user?.role === 'recruiter' ? 'ATS Pipelines' : 'Applications'}
-              </NavLink>
-            </>
-          )}
-
-          <NavLink
-            to="/companies"
-            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-            onClick={closeMobileNav}
-          >
-            <Building2 size={18} /> Companies
-          </NavLink>
-
-          {user?.role === 'candidate' && (
-            <NavLink
-              to="/saved-jobs"
-              className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-              onClick={closeMobileNav}
-            >
-              <Bookmark size={18} /> Saved Jobs
-            </NavLink>
-          )}
-
-          <NavLink
-            to="/profile"
-            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-            onClick={closeMobileNav}
-          >
-            <User size={18} /> Profile Settings
-          </NavLink>
-        </nav>
-
-        <button
-          type="button"
-          className="btn btn-outline dark-mode-btn"
-          onClick={toggleDarkMode}
-          aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-        >
-          {darkMode ? <Sun size={16} /> : <Moon size={16} />}
-          {darkMode ? 'Light Mode' : 'Dark Mode'}
-        </button>
-        <button type="button" className="btn btn-outline logout-btn" onClick={handleLogout}>
-          <LogOut size={16} /> Log Out
-        </button>
-      </aside>
-
-      {/* Workspace Area */}
       <section className="workspace">
-        <header className="topbar">
-          <div>
-            <p className="eyebrow">{getEyebrow()}</p>
-            <h1>{getPageTitle()}</h1>
-          </div>
+        <Header
+          user={user}
+          title={getPageTitle()}
+          eyebrow={getEyebrow()}
+          readiness={readiness}
+          notifications={notifications}
+          unreadCount={unreadCount}
+          onMarkAllRead={markAllNotificationsRead}
+          onMarkRead={markNotificationRead}
+          onDeleteNotification={deleteNotification}
+          onClearReadNotifications={clearReadNotifications}
+          onOpenMobileNav={() => setIsMobileNavOpen(true)}
+        />
 
-          <div className="header-actions">
-            <NotificationsBell
-              notifications={notifications}
-              unreadCount={unreadCount}
-              onMarkAllRead={markAllNotificationsRead}
-              onMarkRead={markNotificationRead}
-              onDelete={deleteNotification}
-              onClearRead={clearReadNotifications}
-            />
-
-            <div className={`status-pill ${readiness.ok ? 'ready' : 'not-ready'}`}>
-              <Activity size={18} aria-hidden="true" />
-              <span>{readiness.loading ? 'Checking API' : readiness.status}</span>
-            </div>
-          </div>
-        </header>
-
-        {/* Route content renders here */}
         <Outlet context={{ profile, setProfile }} />
       </section>
     </div>
