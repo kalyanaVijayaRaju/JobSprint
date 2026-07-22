@@ -1,6 +1,6 @@
 import { useAuth } from '../context/AuthContext.jsx';
 import { useApp } from '../context/AppContext.jsx';
-import CompanyDirectory from '../components/CompanyDirectory.jsx';
+import CompanyDirectory from '../components/companies/CompanyDirectory.jsx';
 
 export default function CompaniesPage() {
   const { user } = useAuth();

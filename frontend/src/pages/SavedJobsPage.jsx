@@ -3,7 +3,7 @@ import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useApp } from '../context/AppContext.jsx';
 import { savedJobsApi, applicationsApi } from '../api/client.js';
-import SavedJobs from '../components/SavedJobs.jsx';
+import SavedJobs from '../components/saved/SavedJobs.jsx';
 
 export default function SavedJobsPage() {
   const { user } = useAuth();
