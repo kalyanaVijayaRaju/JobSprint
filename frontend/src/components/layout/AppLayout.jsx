@@ -4,6 +4,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar.jsx';
 import Header from './Header.jsx';
 import Toast from './Toast.jsx';
+import { ErrorBoundary } from '../ui';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useApp } from '../../context/AppContext.jsx';
 
@@ -124,7 +125,9 @@ export default function AppLayout() {
           onOpenMobileNav={() => setIsMobileNavOpen(true)}
         />
 
-        <Outlet context={{ profile, setProfile }} />
+        <ErrorBoundary>
+          <Outlet context={{ profile, setProfile }} />
+        </ErrorBoundary>
       </section>
     </div>
   );
