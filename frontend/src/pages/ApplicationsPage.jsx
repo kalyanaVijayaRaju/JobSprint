@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useApp } from '../context/AppContext.jsx';
 import { jobsApi, applicationsApi } from '../api/client.js';
-import AtsPipeline from '../components/AtsPipeline.jsx';
+import AtsPipeline from '../components/applications/AtsPipeline.jsx';
 
 export default function ApplicationsPage() {
   const { user } = useAuth();

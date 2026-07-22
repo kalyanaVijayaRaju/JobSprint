@@ -3,7 +3,7 @@ import { useOutletContext, useNavigate, useSearchParams } from 'react-router-dom
 import { useAuth } from '../context/AuthContext.jsx';
 import { useApp } from '../context/AppContext.jsx';
 import { jobsApi, applicationsApi, savedJobsApi } from '../api/client.js';
-import JobsBoard from '../components/JobsBoard.jsx';
+import JobsBoard from '../components/jobs/JobsBoard.jsx';
 
 export default function JobsPage() {
   const { user } = useAuth();

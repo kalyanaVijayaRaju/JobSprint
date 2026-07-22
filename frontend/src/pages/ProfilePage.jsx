@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useApp } from '../context/AppContext.jsx';
 import { profileApi } from '../api/client.js';
-import ProfileSettings from '../components/ProfileSettings.jsx';
+import ProfileSettings from '../components/profile/ProfileSettings.jsx';
 import ChangePassword from '../components/ChangePassword.jsx';
 import SecurityActivity from '../components/SecurityActivity.jsx';
 import JobAlertsSettings from '../components/JobAlertsSettings.jsx';
