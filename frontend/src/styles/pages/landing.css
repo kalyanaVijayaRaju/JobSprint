@@ -1,4 +1,6 @@
-/* Landing Page CSS styling */
+/* ---------------------------------------------------------------------------
+   Landing Page Styling
+   --------------------------------------------------------------------------- */
 .landing-page {
   font-family: var(--font-sans);
   background-color: var(--color-bg);
@@ -10,7 +12,6 @@
   transition: var(--transition-smooth);
 }
 
-/* Nav Styles */
 .landing-nav {
   position: sticky;
   top: 0;
@@ -47,14 +48,6 @@
   gap: 16px;
 }
 
-.landing-cta-btn {
-  padding: 8px 18px;
-  font-weight: 500;
-  border-radius: 99px;
-  font-size: 14px;
-}
-
-/* Hero Section */
 .landing-hero {
   position: relative;
   padding: 80px 24px 100px 24px;
@@ -100,15 +93,6 @@
   background-color: var(--color-accent);
   bottom: -150px;
   right: 10%;
-}
-
-.hero-orb-3 {
-  width: 300px;
-  height: 300px;
-  background-color: #ec4899;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 }
 
 .hero-content {
@@ -162,7 +146,6 @@
   margin-bottom: 40px;
 }
 
-/* Glassmorphic Search Bar */
 .hero-search-bar {
   display: flex;
   align-items: center;
@@ -275,7 +258,6 @@
   color: var(--color-primary);
 }
 
-/* Stats Section */
 .landing-stats {
   padding: 40px 24px;
   background-color: var(--color-card);
@@ -325,7 +307,6 @@
   font-weight: 500;
 }
 
-/* Categories Section */
 .landing-categories {
   padding: 100px 24px;
 }
@@ -415,7 +396,6 @@
   color: var(--color-primary);
 }
 
-/* How It Works Section */
 .landing-how-it-works {
   padding: 100px 24px;
   background-color: var(--color-card);
@@ -496,7 +476,6 @@
   justify-content: center;
 }
 
-/* CTA Section */
 .landing-cta {
   padding: 100px 24px;
 }
@@ -590,7 +569,6 @@
   border-color: white;
 }
 
-/* Footer Section */
 .landing-footer {
   padding: 40px 24px;
   border-top: 1px solid var(--color-border);

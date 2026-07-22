@@ -1,28 +1,53 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { createBrowserRouter } from 'react-router-dom';
 import RouteGuard from './components/common/RouteGuard.jsx';
 import AppLayout from './components/layout/AppLayout.jsx';
+import { Spinner } from './components/ui';
 
-// Pages
-import LandingPage from './pages/LandingPage.jsx';
-import DashboardPage from './pages/DashboardPage.jsx';
-import JobsPage from './pages/JobsPage.jsx';
-import ApplicationsPage from './pages/ApplicationsPage.jsx';
-import SavedJobsPage from './pages/SavedJobsPage.jsx';
-import CompaniesPage from './pages/CompaniesPage.jsx';
-import ProfilePage from './pages/ProfilePage.jsx';
-import AdminPage from './pages/AdminPage.jsx';
-import JobDetailsPage from './pages/JobDetailsPage.jsx';
+// Lazy-loaded page components for route-level code splitting
+const LandingPage = lazy(() => import('./pages/LandingPage.jsx'));
+const DashboardPage = lazy(() => import('./pages/DashboardPage.jsx'));
+const JobsPage = lazy(() => import('./pages/JobsPage.jsx'));
+const ApplicationsPage = lazy(() => import('./pages/ApplicationsPage.jsx'));
+const SavedJobsPage = lazy(() => import('./pages/SavedJobsPage.jsx'));
+const CompaniesPage = lazy(() => import('./pages/CompaniesPage.jsx'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage.jsx'));
+const AdminPage = lazy(() => import('./pages/AdminPage.jsx'));
+const JobDetailsPage = lazy(() => import('./pages/JobDetailsPage.jsx'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'));
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail.jsx'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'));
 
-// Auth Components
+// Auth Screen (static import for fast initial auth rendering)
 import AuthScreen from './components/AuthScreen.jsx';
-import ForgotPassword from './pages/ForgotPassword.jsx';
-import ResetPassword from './pages/ResetPassword.jsx';
-import VerifyEmail from './pages/VerifyEmail.jsx';
+
+/**
+ * Suspense fallback wrapper for page route chunks.
+ */
+function PageLoader() {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '300px',
+      }}
+    >
+      <Spinner size="lg" label="Loading page..." />
+    </div>
+  );
+}
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <LandingPage />,
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <LandingPage />
+      </Suspense>
+    ),
   },
   {
     path: '/login',
@@ -34,19 +59,35 @@ export const router = createBrowserRouter([
   },
   {
     path: '/forgot-password',
-    element: <ForgotPassword />,
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <ForgotPassword />
+      </Suspense>
+    ),
   },
   {
     path: '/reset-password/:token',
-    element: <ResetPassword />,
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <ResetPassword />
+      </Suspense>
+    ),
   },
   {
     path: '/verify-email/:token',
-    element: <VerifyEmail />,
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <VerifyEmail />
+      </Suspense>
+    ),
   },
   {
     path: '/jobs/:jobId',
-    element: <JobDetailsPage />,
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <JobDetailsPage />
+      </Suspense>
+    ),
   },
   {
     element: (
@@ -57,37 +98,61 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/dashboard',
-        element: <DashboardPage />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <DashboardPage />
+          </Suspense>
+        ),
       },
       {
         path: '/jobs',
-        element: <JobsPage />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <JobsPage />
+          </Suspense>
+        ),
       },
       {
         path: '/applications',
-        element: <ApplicationsPage />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ApplicationsPage />
+          </Suspense>
+        ),
       },
       {
         path: '/saved-jobs',
         element: (
           <RouteGuard roles={['candidate']}>
-            <SavedJobsPage />
+            <Suspense fallback={<PageLoader />}>
+              <SavedJobsPage />
+            </Suspense>
           </RouteGuard>
         ),
       },
       {
         path: '/companies',
-        element: <CompaniesPage />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <CompaniesPage />
+          </Suspense>
+        ),
       },
       {
         path: '/profile',
-        element: <ProfilePage />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ProfilePage />
+          </Suspense>
+        ),
       },
       {
         path: '/admin',
         element: (
           <RouteGuard roles={['admin']}>
-            <AdminPage />
+            <Suspense fallback={<PageLoader />}>
+              <AdminPage />
+            </Suspense>
           </RouteGuard>
         ),
       },
@@ -95,6 +160,10 @@ export const router = createBrowserRouter([
   },
   {
     path: '*',
-    element: <Navigate to="/" replace />,
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <NotFoundPage />
+      </Suspense>
+    ),
   },
 ]);

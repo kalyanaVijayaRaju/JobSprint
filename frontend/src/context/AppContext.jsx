@@ -1,33 +1,31 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getReadiness, notificationsApi } from '../api/client.js';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { getReadiness } from '../api/client.js';
+import { ThemeProvider, useTheme } from './ThemeContext.jsx';
+import { ToastProvider, useToast } from './ToastContext.jsx';
+import { NotificationProvider, useNotifications } from './NotificationContext.jsx';
 
 const AppContext = createContext(null);
 
-export function AppProvider({ children }) {
-  // Dark mode
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('jobsprint-theme') === 'dark');
-
-  // Toast alerts
-  const [successMsg, setSuccessMsg] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
+function AppContextInner({ children }) {
+  const { darkMode, toggleDarkMode } = useTheme();
+  const { successMsg, errorMsg, triggerAlert } = useToast();
+  const {
+    notifications,
+    unreadCount,
+    fetchNotifications,
+    markNotificationRead,
+    markAllNotificationsRead,
+    deleteNotification,
+    clearReadNotifications,
+  } = useNotifications();
 
   // API readiness
   const [readiness, setReadiness] = useState({
     loading: true,
     ok: false,
     status: 'CHECKING',
-    timestamp: null
+    timestamp: null,
   });
-
-  // Notifications
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  // Persist dark mode
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-    localStorage.setItem('jobsprint-theme', darkMode ? 'dark' : 'light');
-  }, [darkMode]);
 
   // Check API readiness on mount
   useEffect(() => {
@@ -35,73 +33,6 @@ export function AppProvider({ children }) {
       .then((res) => setReadiness({ loading: false, ...res }))
       .catch(() => setReadiness({ loading: false, ok: false, status: 'OFFLINE', timestamp: null }));
   }, []);
-
-  const triggerAlert = useCallback((msg, type = 'success') => {
-    if (type === 'success') {
-      setSuccessMsg(msg);
-      setTimeout(() => setSuccessMsg(null), 4000);
-    } else {
-      setErrorMsg(msg);
-      setTimeout(() => setErrorMsg(null), 4000);
-    }
-  }, []);
-
-  const toggleDarkMode = useCallback(() => {
-    setDarkMode(prev => !prev);
-  }, []);
-
-  const fetchNotifications = useCallback(() => {
-    notificationsApi.list({ limit: 10 })
-      .then((res) => {
-        if (res.success) setNotifications(res.data.notifications);
-      })
-      .catch(() => {});
-
-    notificationsApi.unreadCount()
-      .then((res) => {
-        if (res.success) setUnreadCount(res.data.count);
-      })
-      .catch(() => {});
-  }, []);
-
-  const markNotificationRead = useCallback(async (id) => {
-    try {
-      await notificationsApi.markRead(id);
-      fetchNotifications();
-    } catch (err) {
-      triggerAlert(err.message, 'error');
-    }
-  }, [fetchNotifications, triggerAlert]);
-
-  const markAllNotificationsRead = useCallback(async () => {
-    try {
-      await notificationsApi.markAllRead();
-      fetchNotifications();
-      triggerAlert('All notifications marked as read');
-    } catch (err) {
-      triggerAlert(err.message, 'error');
-    }
-  }, [fetchNotifications, triggerAlert]);
-
-  const deleteNotification = useCallback(async (id) => {
-    try {
-      await notificationsApi.delete(id);
-      fetchNotifications();
-      triggerAlert('Notification deleted');
-    } catch (err) {
-      triggerAlert(err.message, 'error');
-    }
-  }, [fetchNotifications, triggerAlert]);
-
-  const clearReadNotifications = useCallback(async () => {
-    try {
-      const res = await notificationsApi.clearRead();
-      fetchNotifications();
-      triggerAlert(res.data?.deletedCount ? 'Read notifications cleared' : 'No read notifications to clear');
-    } catch (err) {
-      triggerAlert(err.message, 'error');
-    }
-  }, [fetchNotifications, triggerAlert]);
 
   const value = {
     darkMode,
@@ -116,14 +47,31 @@ export function AppProvider({ children }) {
     markNotificationRead,
     markAllNotificationsRead,
     deleteNotification,
-    clearReadNotifications
+    clearReadNotifications,
   };
 
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+}
+
+export function AppProvider({ children }) {
   return (
-    <AppContext.Provider value={value}>
-      {children}
-    </AppContext.Provider>
+    <ThemeProvider>
+      <ToastProvider>
+        <ToastContextConsumer>
+          {({ triggerAlert }) => (
+            <NotificationProvider triggerAlert={triggerAlert}>
+              <AppContextInner>{children}</AppContextInner>
+            </NotificationProvider>
+          )}
+        </ToastContextConsumer>
+      </ToastProvider>
+    </ThemeProvider>
   );
+}
+
+function ToastContextConsumer({ children }) {
+  const { triggerAlert } = useToast();
+  return children({ triggerAlert });
 }
 
 export function useApp() {
