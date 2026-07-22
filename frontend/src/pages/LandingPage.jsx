@@ -21,7 +21,7 @@ import {
   GraduationCap,
   ChevronRight
 } from 'lucide-react';
-import './LandingPage.css';
+import '../styles/pages/landing.css';
 
 function AnimatedCounter({ target, duration = 2000, suffix = '' }) {
   const [count, setCount] = useState(0);
