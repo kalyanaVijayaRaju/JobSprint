@@ -1,5 +1,5 @@
 import { X, MapPin, Clock, DollarSign, FileText, ExternalLink, CircleAlert } from 'lucide-react';
-import { Button } from '../ui';
+import { Button, CompanyLogo } from '../ui';
 
 /**
  * Slide-in detail drawer for viewing full job details and applying.
@@ -17,13 +17,19 @@ export default function JobDetailDrawer({
 }) {
   if (!selectedJob) return null;
 
+  const companyName = selectedJob.companyId?.name || selectedJob.companyName || 'Company Details';
+  const companyLogo = selectedJob.companyId?.logo || selectedJob.companyLogo;
+
   return (
     <div className="drawer-overlay" onClick={onClose}>
       <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
         <div className="drawer-header">
-          <div>
-            <h3>{selectedJob.title}</h3>
-            <p className="job-company">{selectedJob.companyId?.name}</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <CompanyLogo logo={companyLogo} name={companyName} size={44} />
+            <div>
+              <h3>{selectedJob.title}</h3>
+              <p className="job-company">{companyName}</p>
+            </div>
           </div>
           <button
             type="button"

@@ -17,3 +17,4 @@ export { default as Tabs } from './Tabs.jsx';
 export { default as ProgressBar } from './ProgressBar.jsx';
 export { default as ConfirmDialog } from './ConfirmDialog.jsx';
 export { default as ErrorBoundary } from './ErrorBoundary.jsx';
+export { default as CompanyLogo } from './CompanyLogo.jsx';

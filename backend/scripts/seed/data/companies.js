@@ -17,7 +17,7 @@ const companies = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'Google',
-    logo: 'https://logo.clearbit.com/google.com',
+    logo: 'https://unavatar.io/google.com',
     website: 'https://www.google.com',
     description: 'Google is a global technology leader specializing in internet-related services and products, including search, cloud computing, software, and hardware. With a mission to organize the world\'s information and make it universally accessible, Google drives innovation across AI, machine learning, and quantum computing.',
     industry: 'Technology',
@@ -28,7 +28,7 @@ const companies = [
   },
   {
     name: 'Microsoft',
-    logo: 'https://logo.clearbit.com/microsoft.com',
+    logo: 'https://unavatar.io/microsoft.com',
     website: 'https://www.microsoft.com',
     description: 'Microsoft Corporation develops, licenses, and supports a wide range of software products, services, and devices worldwide. From Azure cloud platform to Microsoft 365 and LinkedIn, the company empowers every person and organization on the planet to achieve more.',
     industry: 'Technology',
@@ -39,7 +39,7 @@ const companies = [
   },
   {
     name: 'Amazon',
-    logo: 'https://logo.clearbit.com/amazon.com',
+    logo: 'https://unavatar.io/amazon.com',
     website: 'https://www.amazon.com',
     description: 'Amazon is a multinational technology company focusing on e-commerce, cloud computing (AWS), artificial intelligence, and digital streaming. Known for customer obsession and innovation, Amazon\'s India operations span retail, logistics, payments, and enterprise cloud services.',
     industry: 'Technology',
@@ -50,7 +50,7 @@ const companies = [
   },
   {
     name: 'Apple',
-    logo: 'https://logo.clearbit.com/apple.com',
+    logo: 'https://unavatar.io/apple.com',
     website: 'https://www.apple.com',
     description: 'Apple designs, manufactures, and markets consumer electronics, software, and online services. With iconic products like the iPhone, iPad, Mac, and Apple Watch, the company is synonymous with innovation, quality, and a seamless ecosystem experience. Apple\'s India presence focuses on engineering and retail.',
     industry: 'Technology',
@@ -61,7 +61,7 @@ const companies = [
   },
   {
     name: 'Netflix',
-    logo: 'https://logo.clearbit.com/netflix.com',
+    logo: 'https://unavatar.io/netflix.com',
     website: 'https://www.netflix.com',
     description: 'Netflix is the world\'s leading streaming entertainment service with over 260 million paid memberships across 190+ countries. The company invests heavily in original content, AI-driven recommendations, and a global engineering platform built for scale and resilience.',
     industry: 'Entertainment',
@@ -72,7 +72,7 @@ const companies = [
   },
   {
     name: 'Meta',
-    logo: 'https://logo.clearbit.com/meta.com',
+    logo: 'https://unavatar.io/meta.com',
     website: 'https://www.meta.com',
     description: 'Meta Platforms builds technologies that help people connect, find communities, and grow businesses. The company operates Facebook, Instagram, WhatsApp, and is investing heavily in augmented and virtual reality to build the metaverse. Its India engineering centers focus on core infrastructure.',
     industry: 'Technology',
@@ -83,7 +83,7 @@ const companies = [
   },
   {
     name: 'Adobe',
-    logo: 'https://logo.clearbit.com/adobe.com',
+    logo: 'https://unavatar.io/adobe.com',
     website: 'https://www.adobe.com',
     description: 'Adobe is a global leader in digital media and digital marketing solutions. Its creative, document, and experience cloud offerings empower millions of creators and enterprises. Adobe\'s India center is one of its largest R&D hubs, driving innovations in AI-powered creative tools.',
     industry: 'Technology',
@@ -94,7 +94,7 @@ const companies = [
   },
   {
     name: 'Oracle',
-    logo: 'https://logo.clearbit.com/oracle.com',
+    logo: 'https://unavatar.io/oracle.com',
     website: 'https://www.oracle.com',
     description: 'Oracle Corporation is a multinational computer technology company that provides cloud infrastructure, autonomous database, enterprise software, and hardware products. With a strong India development center, Oracle drives cloud innovation across SaaS, PaaS, and IaaS.',
     industry: 'Technology',
@@ -105,7 +105,7 @@ const companies = [
   },
   {
     name: 'IBM',
-    logo: 'https://logo.clearbit.com/ibm.com',
+    logo: 'https://unavatar.io/ibm.com',
     website: 'https://www.ibm.com',
     description: 'IBM is a global technology and consulting company offering hybrid cloud, AI, and enterprise solutions. With a legacy spanning over a century, IBM continues to drive innovation in quantum computing, blockchain, and artificial intelligence through its India research labs.',
     industry: 'Technology',
@@ -116,7 +116,7 @@ const companies = [
   },
   {
     name: 'Intel',
-    logo: 'https://logo.clearbit.com/intel.com',
+    logo: 'https://unavatar.io/intel.com',
     website: 'https://www.intel.com',
     description: 'Intel Corporation is the world\'s leading semiconductor chip manufacturer, designing and building technologies that power the global cloud, smart devices, and IoT. Intel\'s India Design Center in Bangalore is one of its largest outside the US.',
     industry: 'Semiconductors',
@@ -127,7 +127,7 @@ const companies = [
   },
   {
     name: 'Cisco',
-    logo: 'https://logo.clearbit.com/cisco.com',
+    logo: 'https://unavatar.io/cisco.com',
     website: 'https://www.cisco.com',
     description: 'Cisco Systems is a worldwide leader in IT, networking, and cybersecurity solutions. The company designs, manufactures, and sells networking hardware, software, and services that enable the internet and digital transformation across enterprises.',
     industry: 'Networking',
@@ -138,7 +138,7 @@ const companies = [
   },
   {
     name: 'Salesforce',
-    logo: 'https://logo.clearbit.com/salesforce.com',
+    logo: 'https://unavatar.io/salesforce.com',
     website: 'https://www.salesforce.com',
     description: 'Salesforce is the global leader in CRM, offering cloud-based solutions for sales, service, marketing, and commerce. The company pioneered the SaaS model and continues to expand its platform with AI-driven insights through Einstein and Tableau integration.',
     industry: 'Cloud Computing',
@@ -149,7 +149,7 @@ const companies = [
   },
   {
     name: 'SAP',
-    logo: 'https://logo.clearbit.com/sap.com',
+    logo: 'https://unavatar.io/sap.com',
     website: 'https://www.sap.com',
     description: 'SAP is a European multinational specializing in enterprise application software and database management. SAP Labs India is the company\'s largest R&D center outside Germany, driving innovation in S/4HANA, Business Technology Platform, and intelligent enterprise solutions.',
     industry: 'Enterprise Software',
@@ -160,7 +160,7 @@ const companies = [
   },
   {
     name: 'VMware',
-    logo: 'https://logo.clearbit.com/vmware.com',
+    logo: 'https://unavatar.io/vmware.com',
     website: 'https://www.vmware.com',
     description: 'VMware is a leading provider of multi-cloud services for all apps, enabling digital innovation with enterprise control. From virtualization to modern applications and networking, VMware helps organizations build, run, and manage their cloud infrastructure.',
     industry: 'Cloud Computing',
@@ -171,7 +171,7 @@ const companies = [
   },
   {
     name: 'Uber',
-    logo: 'https://logo.clearbit.com/uber.com',
+    logo: 'https://unavatar.io/uber.com',
     website: 'https://www.uber.com',
     description: 'Uber Technologies operates a global ride-hailing, food delivery (Uber Eats), and freight technology platform. The Hyderabad engineering center drives core platform engineering, real-time mapping, and machine learning at massive scale.',
     industry: 'Transportation',
@@ -182,7 +182,7 @@ const companies = [
   },
   {
     name: 'Stripe',
-    logo: 'https://logo.clearbit.com/stripe.com',
+    logo: 'https://unavatar.io/stripe.com',
     website: 'https://www.stripe.com',
     description: 'Stripe is a financial infrastructure platform for the internet, providing APIs that power online payment processing and commerce solutions for millions of companies worldwide. Known for developer-first design and robust financial tooling.',
     industry: 'Fintech',
@@ -193,7 +193,7 @@ const companies = [
   },
   {
     name: 'Atlassian',
-    logo: 'https://logo.clearbit.com/atlassian.com',
+    logo: 'https://unavatar.io/atlassian.com',
     website: 'https://www.atlassian.com',
     description: 'Atlassian develops team collaboration and productivity software including Jira, Confluence, Trello, and Bitbucket. The company empowers teams of all sizes to plan, track, and release software with agile methodologies at its core.',
     industry: 'Software',
@@ -204,7 +204,7 @@ const companies = [
   },
   {
     name: 'Qualcomm',
-    logo: 'https://logo.clearbit.com/qualcomm.com',
+    logo: 'https://unavatar.io/qualcomm.com',
     website: 'https://www.qualcomm.com',
     description: 'Qualcomm is a semiconductor and telecommunications equipment company that designs and markets wireless telecommunications products and services. Its Snapdragon processors power billions of mobile devices, and its India R&D center is critical to 5G innovation.',
     industry: 'Semiconductors',
@@ -215,7 +215,7 @@ const companies = [
   },
   {
     name: 'NVIDIA',
-    logo: 'https://logo.clearbit.com/nvidia.com',
+    logo: 'https://unavatar.io/nvidia.com',
     website: 'https://www.nvidia.com',
     description: 'NVIDIA is a global leader in AI computing, GPU design, and accelerated computing platforms. From gaming GPUs to data center AI infrastructure, NVIDIA\'s technology powers the most advanced AI systems, autonomous vehicles, and scientific computing.',
     industry: 'Semiconductors',
@@ -226,7 +226,7 @@ const companies = [
   },
   {
     name: 'Goldman Sachs',
-    logo: 'https://logo.clearbit.com/goldmansachs.com',
+    logo: 'https://unavatar.io/goldmansachs.com',
     website: 'https://www.goldmansachs.com',
     description: 'Goldman Sachs is a leading global investment banking, securities, and investment management firm. Its Bangalore Engineering Center is one of the firm\'s largest technology hubs, building trading platforms, risk systems, and data analytics tools.',
     industry: 'Financial Services',
@@ -237,7 +237,7 @@ const companies = [
   },
   {
     name: 'Morgan Stanley',
-    logo: 'https://logo.clearbit.com/morganstanley.com',
+    logo: 'https://unavatar.io/morganstanley.com',
     website: 'https://www.morganstanley.com',
     description: 'Morgan Stanley is a global financial services firm providing investment banking, wealth management, and institutional securities. The Mumbai Technology Center drives critical financial infrastructure, algorithmic trading, and risk management systems.',
     industry: 'Financial Services',
@@ -248,7 +248,7 @@ const companies = [
   },
   {
     name: 'JPMorgan Chase',
-    logo: 'https://logo.clearbit.com/jpmorganchase.com',
+    logo: 'https://unavatar.io/jpmorganchase.com',
     website: 'https://www.jpmorganchase.com',
     description: 'JPMorgan Chase is one of the oldest and largest financial institutions in the world. Its India technology centers build critical banking infrastructure, payment systems, and enterprise platforms supporting global operations across consumer and investment banking.',
     industry: 'Financial Services',
@@ -263,7 +263,7 @@ const companies = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'Flipkart',
-    logo: 'https://logo.clearbit.com/flipkart.com',
+    logo: 'https://unavatar.io/flipkart.com',
     website: 'https://www.flipkart.com',
     description: 'Flipkart is India\'s leading e-commerce marketplace, offering a wide range of products across categories. Acquired by Walmart, Flipkart continues to drive innovation in supply chain, payments (PhonePe), and fashion e-commerce across India.',
     industry: 'E-Commerce',
@@ -274,7 +274,7 @@ const companies = [
   },
   {
     name: 'PhonePe',
-    logo: 'https://logo.clearbit.com/phonepe.com',
+    logo: 'https://unavatar.io/phonepe.com',
     website: 'https://www.phonepe.com',
     description: 'PhonePe is India\'s leading digital payments platform built on UPI, serving over 500 million users. The company offers payments, insurance, mutual funds, and lending products, making financial services accessible to millions of Indians.',
     industry: 'Fintech',
@@ -285,7 +285,7 @@ const companies = [
   },
   {
     name: 'Paytm',
-    logo: 'https://logo.clearbit.com/paytm.com',
+    logo: 'https://unavatar.io/paytm.com',
     website: 'https://www.paytm.com',
     description: 'Paytm is India\'s leading digital ecosystem for consumers and merchants. From UPI payments and banking to commerce and financial services, Paytm enables digital transactions for millions across urban and rural India.',
     industry: 'Fintech',
@@ -296,7 +296,7 @@ const companies = [
   },
   {
     name: 'Razorpay',
-    logo: 'https://logo.clearbit.com/razorpay.com',
+    logo: 'https://unavatar.io/razorpay.com',
     website: 'https://www.razorpay.com',
     description: 'Razorpay is India\'s leading full-stack payments and business banking platform. The company serves millions of businesses with payment gateway, neo-banking, lending, and payroll solutions, enabling seamless digital commerce across the country.',
     industry: 'Fintech',
@@ -307,7 +307,7 @@ const companies = [
   },
   {
     name: 'Meesho',
-    logo: 'https://logo.clearbit.com/meesho.com',
+    logo: 'https://unavatar.io/meesho.com',
     website: 'https://www.meesho.com',
     description: 'Meesho is India\'s fastest-growing e-commerce platform democratizing internet commerce for everyone. With a focus on tier-2 and tier-3 cities, Meesho enables small businesses and individuals to start their online stores with zero investment.',
     industry: 'E-Commerce',
@@ -318,7 +318,7 @@ const companies = [
   },
   {
     name: 'Swiggy',
-    logo: 'https://logo.clearbit.com/swiggy.com',
+    logo: 'https://unavatar.io/swiggy.com',
     website: 'https://www.swiggy.com',
     description: 'Swiggy is India\'s leading on-demand delivery platform offering food delivery, grocery (Instamart), and package delivery services. The company leverages AI-driven logistics optimization and a vast delivery network to serve millions of customers daily.',
     industry: 'Food Tech',
@@ -329,7 +329,7 @@ const companies = [
   },
   {
     name: 'Zomato',
-    logo: 'https://logo.clearbit.com/zomato.com',
+    logo: 'https://unavatar.io/zomato.com',
     website: 'https://www.zomato.com',
     description: 'Zomato is a leading food technology company offering restaurant discovery, food delivery, and dining-out experiences. Operating in India and internationally, Zomato connects millions of users with restaurants through its platform and Blinkit quick commerce service.',
     industry: 'Food Tech',
@@ -340,7 +340,7 @@ const companies = [
   },
   {
     name: 'Groww',
-    logo: 'https://logo.clearbit.com/groww.in',
+    logo: 'https://unavatar.io/groww.in',
     website: 'https://www.groww.in',
     description: 'Groww is India\'s fastest-growing investment platform making mutual funds, stocks, and digital gold accessible to new-age investors. With a user-friendly interface and educational content, Groww has democratized investing for millions of Indians.',
     industry: 'Fintech',
@@ -351,7 +351,7 @@ const companies = [
   },
   {
     name: 'Upstox',
-    logo: 'https://logo.clearbit.com/upstox.com',
+    logo: 'https://unavatar.io/upstox.com',
     website: 'https://www.upstox.com',
     description: 'Upstox is a leading discount stock broker in India backed by Ratan Tata and Tiger Global. The platform offers trading in stocks, derivatives, commodities, and mutual funds with advanced charting tools and low-cost brokerage.',
     industry: 'Fintech',
@@ -362,7 +362,7 @@ const companies = [
   },
   {
     name: 'Zerodha',
-    logo: 'https://logo.clearbit.com/zerodha.com',
+    logo: 'https://unavatar.io/zerodha.com',
     website: 'https://www.zerodha.com',
     description: 'Zerodha is India\'s largest retail stock broker, pioneering the discount brokerage model. The company serves over 10 million clients with Kite trading platform, Coin for mutual funds, and Varsity for financial education.',
     industry: 'Fintech',
@@ -373,7 +373,7 @@ const companies = [
   },
   {
     name: 'CRED',
-    logo: 'https://logo.clearbit.com/cred.club',
+    logo: 'https://unavatar.io/cred.club',
     website: 'https://www.cred.club',
     description: 'CRED is a fintech platform that rewards creditworthy individuals for paying credit card bills. The company offers exclusive rewards, cashback, and financial products to a curated community of high-trust members across India.',
     industry: 'Fintech',
@@ -384,7 +384,7 @@ const companies = [
   },
   {
     name: 'Dream11',
-    logo: 'https://logo.clearbit.com/dream11.com',
+    logo: 'https://unavatar.io/dream11.com',
     website: 'https://www.dream11.com',
     description: 'Dream11 is India\'s biggest fantasy sports platform with over 200 million users. The company offers fantasy cricket, football, kabaddi, and other sports, combining sports analytics with gamification to create engaging user experiences.',
     industry: 'Gaming',
@@ -395,7 +395,7 @@ const companies = [
   },
   {
     name: 'Ola',
-    logo: 'https://logo.clearbit.com/olacabs.com',
+    logo: 'https://unavatar.io/olacabs.com',
     website: 'https://www.olacabs.com',
     description: 'Ola is India\'s leading ride-hailing and mobility platform. Beyond ride services, Ola has expanded into electric vehicles through Ola Electric, building India\'s largest EV manufacturing facility and a network of charging infrastructure.',
     industry: 'Transportation',
@@ -406,7 +406,7 @@ const companies = [
   },
   {
     name: 'Myntra',
-    logo: 'https://logo.clearbit.com/myntra.com',
+    logo: 'https://unavatar.io/myntra.com',
     website: 'https://www.myntra.com',
     description: 'Myntra is India\'s leading fashion and lifestyle e-commerce platform, offering products from over 6000+ brands. Part of the Flipkart Group, Myntra leverages AI for personalized styling, virtual try-on, and trend forecasting.',
     industry: 'E-Commerce',
@@ -417,7 +417,7 @@ const companies = [
   },
   {
     name: 'ShareChat',
-    logo: 'https://logo.clearbit.com/sharechat.com',
+    logo: 'https://unavatar.io/sharechat.com',
     website: 'https://www.sharechat.com',
     description: 'ShareChat is India\'s largest homegrown social media platform, serving users in 15 Indian languages. Along with its short video platform Moj, ShareChat enables content creation and community building for Bharat\'s diverse linguistic landscape.',
     industry: 'Social Media',
@@ -428,7 +428,7 @@ const companies = [
   },
   {
     name: 'Zoho',
-    logo: 'https://logo.clearbit.com/zoho.com',
+    logo: 'https://unavatar.io/zoho.com',
     website: 'https://www.zoho.com',
     description: 'Zoho Corporation is a global technology company offering a comprehensive suite of 55+ business applications spanning CRM, project management, accounting, HR, and collaboration. Bootstrapped and profitable, Zoho serves 100+ million users worldwide.',
     industry: 'Software',
@@ -439,7 +439,7 @@ const companies = [
   },
   {
     name: 'Freshworks',
-    logo: 'https://logo.clearbit.com/freshworks.com',
+    logo: 'https://unavatar.io/freshworks.com',
     website: 'https://www.freshworks.com',
     description: 'Freshworks is a SaaS company providing business software for customer support, IT service management, and CRM. Founded in Chennai and listed on NASDAQ, Freshworks delivers AI-powered solutions to over 67,000 companies worldwide.',
     industry: 'Software',
@@ -450,7 +450,7 @@ const companies = [
   },
   {
     name: 'Postman',
-    logo: 'https://logo.clearbit.com/postman.com',
+    logo: 'https://unavatar.io/postman.com',
     website: 'https://www.postman.com',
     description: 'Postman is the world\'s leading API platform used by 30+ million developers for building, testing, and documenting APIs. Founded in Bangalore, Postman has become an essential tool in modern software development workflows.',
     industry: 'Developer Tools',
@@ -461,7 +461,7 @@ const companies = [
   },
   {
     name: 'BrowserStack',
-    logo: 'https://logo.clearbit.com/browserstack.com',
+    logo: 'https://unavatar.io/browserstack.com',
     website: 'https://www.browserstack.com',
     description: 'BrowserStack is the leading software testing platform providing instant access to 3000+ real browsers and devices. Used by 50,000+ companies including Google and Microsoft, BrowserStack enables comprehensive automated and manual testing.',
     industry: 'Developer Tools',
@@ -472,7 +472,7 @@ const companies = [
   },
   {
     name: 'Lenskart',
-    logo: 'https://logo.clearbit.com/lenskart.com',
+    logo: 'https://unavatar.io/lenskart.com',
     website: 'https://www.lenskart.com',
     description: 'Lenskart is Asia\'s largest eyewear company, combining technology with fashion to make premium eyewear accessible. The company uses 3D try-on technology, robotics-powered manufacturing, and an omnichannel approach across 2000+ stores.',
     industry: 'E-Commerce',
@@ -483,7 +483,7 @@ const companies = [
   },
   {
     name: 'Nykaa',
-    logo: 'https://logo.clearbit.com/nykaa.com',
+    logo: 'https://unavatar.io/nykaa.com',
     website: 'https://www.nykaa.com',
     description: 'Nykaa is India\'s leading lifestyle and beauty e-commerce platform offering cosmetics, skincare, and fashion. With a strong omnichannel presence and content-driven commerce, Nykaa has become the go-to destination for beauty enthusiasts.',
     industry: 'E-Commerce',
@@ -494,7 +494,7 @@ const companies = [
   },
   {
     name: 'Cure.fit',
-    logo: 'https://logo.clearbit.com/cult.fit',
+    logo: 'https://unavatar.io/cult.fit',
     website: 'https://www.cult.fit',
     description: 'Cure.fit (cult.fit) is a health and fitness platform offering gym memberships, yoga classes, healthy food delivery, and mental wellness services. The company blends technology with health to make fitness accessible and engaging.',
     industry: 'Health Tech',
@@ -505,7 +505,7 @@ const companies = [
   },
   {
     name: 'Dunzo',
-    logo: 'https://logo.clearbit.com/dunzo.com',
+    logo: 'https://unavatar.io/dunzo.com',
     website: 'https://www.dunzo.com',
     description: 'Dunzo is a quick commerce and hyperlocal delivery platform enabling delivery of groceries, food, and packages within minutes. The company leverages AI-powered logistics to optimize last-mile delivery across major Indian cities.',
     industry: 'Logistics',
@@ -516,7 +516,7 @@ const companies = [
   },
   {
     name: 'Pine Labs',
-    logo: 'https://logo.clearbit.com/pinelabs.com',
+    logo: 'https://unavatar.io/pinelabs.com',
     website: 'https://www.pinelabs.com',
     description: 'Pine Labs is a leading merchant commerce platform providing payment acceptance, issuer solutions, and lending services. Processing over $30 billion in annualized payment volume, Pine Labs powers digital commerce for enterprises and SMBs.',
     industry: 'Fintech',
@@ -527,7 +527,7 @@ const companies = [
   },
   {
     name: 'Chargebee',
-    logo: 'https://logo.clearbit.com/chargebee.com',
+    logo: 'https://unavatar.io/chargebee.com',
     website: 'https://www.chargebee.com',
     description: 'Chargebee is a subscription billing and revenue management platform for SaaS and subscription businesses. The platform automates recurring billing, invoicing, and revenue recognition, serving 6500+ businesses globally.',
     industry: 'Software',
@@ -538,7 +538,7 @@ const companies = [
   },
   {
     name: 'Hasura',
-    logo: 'https://logo.clearbit.com/hasura.io',
+    logo: 'https://unavatar.io/hasura.io',
     website: 'https://www.hasura.io',
     description: 'Hasura provides an open-source engine that instantly generates GraphQL and REST APIs over new and existing databases. The platform accelerates API development and is used by enterprises and startups to build data-driven applications.',
     industry: 'Developer Tools',
@@ -553,7 +553,7 @@ const companies = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'Tata Consultancy Services',
-    logo: 'https://logo.clearbit.com/tcs.com',
+    logo: 'https://unavatar.io/tcs.com',
     website: 'https://www.tcs.com',
     description: 'TCS is India\'s largest IT services company and a global leader in consulting, technology, and digital transformation. With operations in 55+ countries and 600,000+ employees, TCS delivers solutions across industries including banking, retail, manufacturing, and healthcare.',
     industry: 'IT Services',
@@ -564,7 +564,7 @@ const companies = [
   },
   {
     name: 'Infosys',
-    logo: 'https://logo.clearbit.com/infosys.com',
+    logo: 'https://unavatar.io/infosys.com',
     website: 'https://www.infosys.com',
     description: 'Infosys is a global leader in next-generation digital services and consulting. With a workforce of 300,000+ professionals, Infosys enables clients in 56 countries to navigate digital transformation through AI, cloud, and engineering services.',
     industry: 'IT Services',
@@ -575,7 +575,7 @@ const companies = [
   },
   {
     name: 'Wipro',
-    logo: 'https://logo.clearbit.com/wipro.com',
+    logo: 'https://unavatar.io/wipro.com',
     website: 'https://www.wipro.com',
     description: 'Wipro Limited is a leading global information technology, consulting, and business process services company. Wipro harnesses the power of cognitive computing, hyper-automation, robotics, cloud, and emerging technologies to help clients adapt to the digital world.',
     industry: 'IT Services',
@@ -586,7 +586,7 @@ const companies = [
   },
   {
     name: 'HCLTech',
-    logo: 'https://logo.clearbit.com/hcltech.com',
+    logo: 'https://unavatar.io/hcltech.com',
     website: 'https://www.hcltech.com',
     description: 'HCLTech is a global technology company offering digital, engineering, cloud, and AI solutions. With 225,000+ employees across 60 countries, HCL drives digital transformation for Fortune 500 companies through its supercharged delivery model.',
     industry: 'IT Services',
@@ -597,7 +597,7 @@ const companies = [
   },
   {
     name: 'Tech Mahindra',
-    logo: 'https://logo.clearbit.com/techmahindra.com',
+    logo: 'https://unavatar.io/techmahindra.com',
     website: 'https://www.techmahindra.com',
     description: 'Tech Mahindra is a leading provider of digital transformation, consulting, and business re-engineering services and solutions. A part of the Mahindra Group, the company specializes in telecom, media, entertainment, and enterprise technology services.',
     industry: 'IT Services',
@@ -608,7 +608,7 @@ const companies = [
   },
   {
     name: 'Capgemini',
-    logo: 'https://logo.clearbit.com/capgemini.com',
+    logo: 'https://unavatar.io/capgemini.com',
     website: 'https://www.capgemini.com',
     description: 'Capgemini is a global leader in consulting, technology services, and digital transformation. With 350,000+ employees, the company helps organizations transform their business by leveraging cloud, data, AI, and connected engineering capabilities.',
     industry: 'IT Services',
@@ -619,7 +619,7 @@ const companies = [
   },
   {
     name: 'Accenture',
-    logo: 'https://logo.clearbit.com/accenture.com',
+    logo: 'https://unavatar.io/accenture.com',
     website: 'https://www.accenture.com',
     description: 'Accenture is a global professional services company with leading capabilities in digital, cloud, and security. With 738,000+ employees, Accenture serves clients in over 120 countries, combining deep industry expertise with technology innovation.',
     industry: 'IT Services',
@@ -630,7 +630,7 @@ const companies = [
   },
   {
     name: 'Cognizant',
-    logo: 'https://logo.clearbit.com/cognizant.com',
+    logo: 'https://unavatar.io/cognizant.com',
     website: 'https://www.cognizant.com',
     description: 'Cognizant is one of the world\'s leading professional services companies, transforming clients\' business, operating, and technology models for the digital era. India is the company\'s largest delivery center with engineering teams across major cities.',
     industry: 'IT Services',
@@ -641,7 +641,7 @@ const companies = [
   },
   {
     name: 'LTIMindtree',
-    logo: 'https://logo.clearbit.com/ltimindtree.com',
+    logo: 'https://unavatar.io/ltimindtree.com',
     website: 'https://www.ltimindtree.com',
     description: 'LTIMindtree is a global technology consulting and digital solutions company, formed by the merger of Larsen & Toubro Infotech and Mindtree. The company helps enterprises across industries leverage cloud, analytics, IoT, and digital engineering.',
     industry: 'IT Services',
@@ -652,7 +652,7 @@ const companies = [
   },
   {
     name: 'Persistent Systems',
-    logo: 'https://logo.clearbit.com/persistent.com',
+    logo: 'https://unavatar.io/persistent.com',
     website: 'https://www.persistent.com',
     description: 'Persistent Systems is a global solutions engineering company specializing in software product development, digital transformation, and enterprise modernization. The company partners with Fortune 500 companies to build solutions that drive competitive advantage.',
     industry: 'IT Services',
@@ -663,7 +663,7 @@ const companies = [
   },
   {
     name: 'KPIT Technologies',
-    logo: 'https://logo.clearbit.com/kpit.com',
+    logo: 'https://unavatar.io/kpit.com',
     website: 'https://www.kpit.com',
     description: 'KPIT Technologies is a global technology company specializing in automotive software and embedded systems. The company helps leading automakers and mobility companies build software-defined vehicles with expertise in autonomous driving, electric vehicles, and ADAS.',
     industry: 'Automotive Tech',
@@ -674,7 +674,7 @@ const companies = [
   },
   {
     name: 'Mphasis',
-    logo: 'https://logo.clearbit.com/mphasis.com',
+    logo: 'https://unavatar.io/mphasis.com',
     website: 'https://www.mphasis.com',
     description: 'Mphasis is an IT solutions provider focused on cloud and cognitive services. The company applies next-generation design, architecture, and engineering to deliver scalable, secure digital transformation solutions for banking, insurance, and logistics.',
     industry: 'IT Services',
@@ -685,7 +685,7 @@ const companies = [
   },
   {
     name: 'Coforge',
-    logo: 'https://logo.clearbit.com/coforge.com',
+    logo: 'https://unavatar.io/coforge.com',
     website: 'https://www.coforge.com',
     description: 'Coforge (formerly NIIT Technologies) is a global digital services and solutions provider specializing in travel, insurance, and banking domains. The company delivers domain-specific digital transformation through BPM, cloud, and data engineering.',
     industry: 'IT Services',
@@ -696,7 +696,7 @@ const companies = [
   },
   {
     name: 'Hexaware Technologies',
-    logo: 'https://logo.clearbit.com/hexaware.com',
+    logo: 'https://unavatar.io/hexaware.com',
     website: 'https://www.hexaware.com',
     description: 'Hexaware is a global IT services company enabling digital transformation through automation, cloud, and AI. The company focuses on rapid and quality delivery, helping enterprises modernize legacy systems and build next-generation platforms.',
     industry: 'IT Services',
@@ -707,7 +707,7 @@ const companies = [
   },
   {
     name: 'Zensar Technologies',
-    logo: 'https://logo.clearbit.com/zensar.com',
+    logo: 'https://unavatar.io/zensar.com',
     website: 'https://www.zensar.com',
     description: 'Zensar Technologies is a digital solutions and technology services company partnering with global organizations across industries. A part of the RPG Group, Zensar offers experience, advanced engineering, data, and cloud services.',
     industry: 'IT Services',
@@ -718,7 +718,7 @@ const companies = [
   },
   {
     name: 'Cyient',
-    logo: 'https://logo.clearbit.com/cyient.com',
+    logo: 'https://unavatar.io/cyient.com',
     website: 'https://www.cyient.com',
     description: 'Cyient is a global engineering and technology solutions company providing digital, engineering, and geospatial services. The company serves aerospace, defense, healthcare, mining, and utilities sectors with deep domain expertise.',
     industry: 'Engineering Services',
@@ -733,7 +733,7 @@ const companies = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'Deloitte',
-    logo: 'https://logo.clearbit.com/deloitte.com',
+    logo: 'https://unavatar.io/deloitte.com',
     website: 'https://www.deloitte.com',
     description: 'Deloitte is one of the "Big Four" professional services firms offering audit, consulting, financial advisory, risk advisory, and tax services. Deloitte\'s India offices serve as major delivery centers for global consulting engagements and technology solutions.',
     industry: 'Consulting',
@@ -744,7 +744,7 @@ const companies = [
   },
   {
     name: 'Ernst & Young',
-    logo: 'https://logo.clearbit.com/ey.com',
+    logo: 'https://unavatar.io/ey.com',
     website: 'https://www.ey.com',
     description: 'EY (Ernst & Young) is a global leader in assurance, tax, transaction, and advisory services. With a purpose of building a better working world, EY\'s India practice spans technology consulting, cybersecurity, AI strategy, and digital transformation.',
     industry: 'Consulting',
@@ -755,7 +755,7 @@ const companies = [
   },
   {
     name: 'PricewaterhouseCoopers',
-    logo: 'https://logo.clearbit.com/pwc.com',
+    logo: 'https://unavatar.io/pwc.com',
     website: 'https://www.pwc.com',
     description: 'PwC is a global network of professional services firms providing industry-focused assurance, tax, and advisory services. PwC India delivers technology consulting, digital trust, and workforce transformation for leading Indian and global enterprises.',
     industry: 'Consulting',
@@ -766,7 +766,7 @@ const companies = [
   },
   {
     name: 'KPMG',
-    logo: 'https://logo.clearbit.com/kpmg.com',
+    logo: 'https://unavatar.io/kpmg.com',
     website: 'https://www.kpmg.com',
     description: 'KPMG is a global network of professional firms providing audit, tax, and advisory services. KPMG India\'s technology and digital practice helps organizations navigate cloud transformation, data governance, and enterprise risk management.',
     industry: 'Consulting',
@@ -777,7 +777,7 @@ const companies = [
   },
   {
     name: 'McKinsey & Company',
-    logo: 'https://logo.clearbit.com/mckinsey.com',
+    logo: 'https://unavatar.io/mckinsey.com',
     website: 'https://www.mckinsey.com',
     description: 'McKinsey is a global management consulting firm serving leading businesses, governments, and institutions. The firm\'s India office provides strategic advisory across sectors including technology, financial services, healthcare, and public policy.',
     industry: 'Consulting',
@@ -792,7 +792,7 @@ const companies = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'Druva',
-    logo: 'https://logo.clearbit.com/druva.com',
+    logo: 'https://unavatar.io/druva.com',
     website: 'https://www.druva.com',
     description: 'Druva is a cloud-native data protection and management platform. The company provides SaaS-based backup, disaster recovery, and data governance solutions that simplify enterprise data resilience across cloud, SaaS, and endpoint environments.',
     industry: 'Cloud Security',
@@ -803,7 +803,7 @@ const companies = [
   },
   {
     name: 'Icertis',
-    logo: 'https://logo.clearbit.com/icertis.com',
+    logo: 'https://unavatar.io/icertis.com',
     website: 'https://www.icertis.com',
     description: 'Icertis is the global leader in AI-powered contract intelligence. The company\'s platform manages millions of contracts across 90+ countries, turning contracts from static documents into strategic assets that drive enterprise growth.',
     industry: 'Enterprise Software',
@@ -814,7 +814,7 @@ const companies = [
   },
   {
     name: 'CleverTap',
-    logo: 'https://logo.clearbit.com/clevertap.com',
+    logo: 'https://unavatar.io/clevertap.com',
     website: 'https://www.clevertap.com',
     description: 'CleverTap is an all-in-one customer engagement and retention platform that helps brands personalize and optimize user experiences. Powered by AI, CleverTap serves 2000+ global brands including Dominos, Vodafone, and Star Sports.',
     industry: 'MarTech',
@@ -825,7 +825,7 @@ const companies = [
   },
   {
     name: 'Whatfix',
-    logo: 'https://logo.clearbit.com/whatfix.com',
+    logo: 'https://unavatar.io/whatfix.com',
     website: 'https://www.whatfix.com',
     description: 'Whatfix is a leading digital adoption platform that enables organizations to drive product adoption and user engagement through in-app guidance, analytics, and AI-powered content creation for enterprise software.',
     industry: 'Software',
@@ -836,7 +836,7 @@ const companies = [
   },
   {
     name: 'Darwinbox',
-    logo: 'https://logo.clearbit.com/darwinbox.com',
+    logo: 'https://unavatar.io/darwinbox.com',
     website: 'https://www.darwinbox.com',
     description: 'Darwinbox is a cloud-based HRMS platform that provides end-to-end HR solutions covering recruitment, onboarding, payroll, performance, and talent management. Trusted by 900+ enterprises across Asia, Darwinbox is transforming HR technology.',
     industry: 'HR Tech',
@@ -847,7 +847,7 @@ const companies = [
   },
   {
     name: 'MoEngage',
-    logo: 'https://logo.clearbit.com/moengage.com',
+    logo: 'https://unavatar.io/moengage.com',
     website: 'https://www.moengage.com',
     description: 'MoEngage is an insights-led customer engagement platform trusted by 1200+ global consumer brands. The platform combines AI-powered analytics, omnichannel messaging, and personalization to deliver connected customer experiences.',
     industry: 'MarTech',
@@ -858,7 +858,7 @@ const companies = [
   },
   {
     name: 'Leena AI',
-    logo: 'https://logo.clearbit.com/leena.ai',
+    logo: 'https://unavatar.io/leena.ai',
     website: 'https://www.leena.ai',
     description: 'Leena AI is an autonomous AI agent platform that helps enterprises transform employee experience. Using generative AI, Leena AI automates IT support, HR queries, and procurement tasks for Fortune 500 companies worldwide.',
     industry: 'AI',
@@ -869,7 +869,7 @@ const companies = [
   },
   {
     name: 'Haptik',
-    logo: 'https://logo.clearbit.com/haptik.ai',
+    logo: 'https://unavatar.io/haptik.ai',
     website: 'https://www.haptik.ai',
     description: 'Haptik is one of the world\'s largest conversational AI platforms, a Reliance Jio company. The platform powers intelligent virtual assistants for enterprises across e-commerce, fintech, telecom, and healthcare verticals.',
     industry: 'AI',
@@ -880,7 +880,7 @@ const companies = [
   },
   {
     name: 'Yellow.ai',
-    logo: 'https://logo.clearbit.com/yellow.ai',
+    logo: 'https://unavatar.io/yellow.ai',
     website: 'https://www.yellow.ai',
     description: 'Yellow.ai is a global leader in AI-first customer service automation. The company\'s Dynamic Automation Platform (DAP) uses multi-LLM architecture to deliver human-like conversational experiences across voice and chat channels.',
     industry: 'AI',
@@ -895,7 +895,7 @@ const companies = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'Unacademy',
-    logo: 'https://logo.clearbit.com/unacademy.com',
+    logo: 'https://unavatar.io/unacademy.com',
     website: 'https://www.unacademy.com',
     description: 'Unacademy is India\'s largest learning platform offering courses for competitive exams, skill development, and professional upskilling. With a network of top educators and a gamified learning approach, Unacademy serves millions of learners.',
     industry: 'EdTech',
@@ -906,7 +906,7 @@ const companies = [
   },
   {
     name: 'upGrad',
-    logo: 'https://logo.clearbit.com/upgrad.com',
+    logo: 'https://unavatar.io/upgrad.com',
     website: 'https://www.upgrad.com',
     description: 'upGrad is Asia\'s largest higher education platform offering MBA, data science, AI, and technology programs in collaboration with top universities. The platform enables working professionals to upskill through industry-relevant online degrees.',
     industry: 'EdTech',
@@ -917,7 +917,7 @@ const companies = [
   },
   {
     name: 'Scaler',
-    logo: 'https://logo.clearbit.com/scaler.com',
+    logo: 'https://unavatar.io/scaler.com',
     website: 'https://www.scaler.com',
     description: 'Scaler Academy (by InterviewBit) is an online tech education platform offering structured programs in software engineering, data science, and machine learning. Known for rigorous curriculum and strong placement track record.',
     industry: 'EdTech',
@@ -932,7 +932,7 @@ const companies = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'Practo',
-    logo: 'https://logo.clearbit.com/practo.com',
+    logo: 'https://unavatar.io/practo.com',
     website: 'https://www.practo.com',
     description: 'Practo is India\'s leading digital health platform connecting patients with doctors, enabling online consultations, medicine delivery, and health records management. The platform serves millions of patients across India and Southeast Asia.',
     industry: 'Health Tech',
@@ -943,7 +943,7 @@ const companies = [
   },
   {
     name: 'PharmEasy',
-    logo: 'https://logo.clearbit.com/pharmeasy.in',
+    logo: 'https://unavatar.io/pharmeasy.in',
     website: 'https://www.pharmeasy.in',
     description: 'PharmEasy is India\'s leading digital healthcare platform offering medicine delivery, diagnostic tests, and teleconsultation services. The company leverages technology to make healthcare accessible and affordable across India.',
     industry: 'Health Tech',
@@ -958,7 +958,7 @@ const companies = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'Delhivery',
-    logo: 'https://logo.clearbit.com/delhivery.com',
+    logo: 'https://unavatar.io/delhivery.com',
     website: 'https://www.delhivery.com',
     description: 'Delhivery is India\'s largest fully-integrated logistics services company offering express parcel delivery, warehousing, freight, and supply chain services. The company uses proprietary technology and a pan-India network to enable e-commerce and enterprise logistics.',
     industry: 'Logistics',
@@ -969,7 +969,7 @@ const companies = [
   },
   {
     name: 'Shiprocket',
-    logo: 'https://logo.clearbit.com/shiprocket.in',
+    logo: 'https://unavatar.io/shiprocket.in',
     website: 'https://www.shiprocket.in',
     description: 'Shiprocket is India\'s leading e-commerce shipping and logistics platform enabling businesses to ship across 24,000+ pin codes. The platform aggregates multiple courier partners and provides automated order management for D2C brands.',
     industry: 'Logistics',
@@ -984,7 +984,7 @@ const companies = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'Hotstar',
-    logo: 'https://logo.clearbit.com/hotstar.com',
+    logo: 'https://unavatar.io/hotstar.com',
     website: 'https://www.hotstar.com',
     description: 'Disney+ Hotstar is India\'s leading streaming platform offering movies, TV shows, live sports (including IPL cricket), and original content. The platform combines Disney\'s global content with local Indian programming for 300+ million users.',
     industry: 'Entertainment',
@@ -995,7 +995,7 @@ const companies = [
   },
   {
     name: 'InMobi',
-    logo: 'https://logo.clearbit.com/inmobi.com',
+    logo: 'https://unavatar.io/inmobi.com',
     website: 'https://www.inmobi.com',
     description: 'InMobi is a global mobile advertising and marketing platform that enables brands to reach and engage consumers through mobile advertising, content monetization, and in-app commerce. The company serves 1.6 billion unique mobile users.',
     industry: 'AdTech',
@@ -1010,7 +1010,7 @@ const companies = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'Palo Alto Networks',
-    logo: 'https://logo.clearbit.com/paloaltonetworks.com',
+    logo: 'https://unavatar.io/paloaltonetworks.com',
     website: 'https://www.paloaltonetworks.com',
     description: 'Palo Alto Networks is a global cybersecurity leader providing advanced firewalls, cloud security, and AI-driven threat intelligence. The company protects tens of thousands of enterprise, government, and service provider networks worldwide.',
     industry: 'Cybersecurity',
@@ -1021,7 +1021,7 @@ const companies = [
   },
   {
     name: 'CrowdStrike',
-    logo: 'https://logo.clearbit.com/crowdstrike.com',
+    logo: 'https://unavatar.io/crowdstrike.com',
     website: 'https://www.crowdstrike.com',
     description: 'CrowdStrike is a cloud-native cybersecurity company providing endpoint protection, threat intelligence, and incident response through its Falcon platform. The company uses AI to stop breaches with unmatched speed and accuracy.',
     industry: 'Cybersecurity',
@@ -1032,7 +1032,7 @@ const companies = [
   },
   {
     name: 'Zscaler',
-    logo: 'https://logo.clearbit.com/zscaler.com',
+    logo: 'https://unavatar.io/zscaler.com',
     website: 'https://www.zscaler.com',
     description: 'Zscaler is the leader in cloud security, operating the world\'s largest inline security cloud. The company\'s Zero Trust Exchange platform enables secure digital transformation by connecting users, devices, and applications anywhere.',
     industry: 'Cybersecurity',
@@ -1047,7 +1047,7 @@ const companies = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'DigitalOcean',
-    logo: 'https://logo.clearbit.com/digitalocean.com',
+    logo: 'https://unavatar.io/digitalocean.com',
     website: 'https://www.digitalocean.com',
     description: 'DigitalOcean is a cloud infrastructure provider designed for developers and small-to-medium businesses. The company offers simple, predictable pricing for compute, storage, databases, and Kubernetes services with an India data center in Bangalore.',
     industry: 'Cloud Computing',
@@ -1058,7 +1058,7 @@ const companies = [
   },
   {
     name: 'HashiCorp',
-    logo: 'https://logo.clearbit.com/hashicorp.com',
+    logo: 'https://unavatar.io/hashicorp.com',
     website: 'https://www.hashicorp.com',
     description: 'HashiCorp provides multi-cloud infrastructure automation software including Terraform, Vault, Consul, and Nomad. The company helps enterprises adopt a consistent cloud operating model across any infrastructure provider.',
     industry: 'Cloud Computing',
@@ -1069,7 +1069,7 @@ const companies = [
   },
   {
     name: 'Elastic',
-    logo: 'https://logo.clearbit.com/elastic.co',
+    logo: 'https://unavatar.io/elastic.co',
     website: 'https://www.elastic.co',
     description: 'Elastic is the company behind Elasticsearch, Kibana, and the Elastic Stack. The company provides search, observability, and security solutions built on a foundation of free and open technology used by organizations worldwide.',
     industry: 'Software',
@@ -1080,7 +1080,7 @@ const companies = [
   },
   {
     name: 'Confluent',
-    logo: 'https://logo.clearbit.com/confluent.io',
+    logo: 'https://unavatar.io/confluent.io',
     website: 'https://www.confluent.io',
     description: 'Confluent is the data streaming platform company, built by the original creators of Apache Kafka. The company helps organizations harness real-time data streams across cloud, on-premises, and serverless environments.',
     industry: 'Data Infrastructure',
@@ -1091,7 +1091,7 @@ const companies = [
   },
   {
     name: 'MongoDB',
-    logo: 'https://logo.clearbit.com/mongodb.com',
+    logo: 'https://unavatar.io/mongodb.com',
     website: 'https://www.mongodb.com',
     description: 'MongoDB is the leading developer data platform, offering a flexible, scalable document database with Atlas cloud services. The company empowers developers to build modern applications with an intuitive data model and powerful query language.',
     industry: 'Database',
@@ -1102,7 +1102,7 @@ const companies = [
   },
   {
     name: 'Redis',
-    logo: 'https://logo.clearbit.com/redis.io',
+    logo: 'https://unavatar.io/redis.io',
     website: 'https://www.redis.io',
     description: 'Redis is the open-source, in-memory data store company powering real-time applications for millions of developers. Redis provides high-performance caching, session management, message brokering, and real-time analytics at scale.',
     industry: 'Database',
@@ -1113,7 +1113,7 @@ const companies = [
   },
   {
     name: 'Snowflake',
-    logo: 'https://logo.clearbit.com/snowflake.com',
+    logo: 'https://unavatar.io/snowflake.com',
     website: 'https://www.snowflake.com',
     description: 'Snowflake is the AI Data Cloud company offering a cloud-based data warehousing platform. Snowflake enables data storage, processing, and analytics solutions across multiple public clouds with near-infinite scalability.',
     industry: 'Data Infrastructure',
@@ -1124,7 +1124,7 @@ const companies = [
   },
   {
     name: 'Databricks',
-    logo: 'https://logo.clearbit.com/databricks.com',
+    logo: 'https://unavatar.io/databricks.com',
     website: 'https://www.databricks.com',
     description: 'Databricks is the data and AI company founded by the creators of Apache Spark. The company provides a Lakehouse Platform that unifies data engineering, data science, and business analytics on one collaborative platform.',
     industry: 'Data Infrastructure',
@@ -1139,7 +1139,7 @@ const companies = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'Games24x7',
-    logo: 'https://logo.clearbit.com/games24x7.com',
+    logo: 'https://unavatar.io/games24x7.com',
     website: 'https://www.games24x7.com',
     description: 'Games24x7 is India\'s leading online gaming company operating RummyCircle and My11Circle platforms. The company uses AI, ML, and behavioral science to create engaging gaming experiences for millions of users.',
     industry: 'Gaming',
@@ -1150,7 +1150,7 @@ const companies = [
   },
   {
     name: 'MPL',
-    logo: 'https://logo.clearbit.com/mpl.live',
+    logo: 'https://unavatar.io/mpl.live',
     website: 'https://www.mpl.live',
     description: 'Mobile Premier League (MPL) is one of Asia\'s largest mobile gaming and esports platforms, offering 70+ games across categories including fantasy sports, casual games, and esports tournaments.',
     industry: 'Gaming',
@@ -1165,7 +1165,7 @@ const companies = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'PolicyBazaar',
-    logo: 'https://logo.clearbit.com/policybazaar.com',
+    logo: 'https://unavatar.io/policybazaar.com',
     website: 'https://www.policybazaar.com',
     description: 'PolicyBazaar is India\'s largest insurance aggregation and distribution platform. The company helps consumers compare and purchase insurance products across life, health, motor, and travel categories with transparent pricing.',
     industry: 'InsurTech',
@@ -1176,7 +1176,7 @@ const companies = [
   },
   {
     name: 'BharatPe',
-    logo: 'https://logo.clearbit.com/bharatpe.com',
+    logo: 'https://unavatar.io/bharatpe.com',
     website: 'https://www.bharatpe.com',
     description: 'BharatPe is a fintech company serving merchants with interoperable UPI QR code payments, Postpe (buy now pay later), and small business lending products. The platform enables digital payments for millions of offline merchants.',
     industry: 'Fintech',
@@ -1187,7 +1187,7 @@ const companies = [
   },
   {
     name: 'Slice',
-    logo: 'https://logo.clearbit.com/sliceit.com',
+    logo: 'https://unavatar.io/sliceit.com',
     website: 'https://www.sliceit.com',
     description: 'Slice is a fintech company offering payment products for young Indians including credit cards and UPI payments. The company combines modern UX design with innovative credit models to serve the underserved young demographic.',
     industry: 'Fintech',
@@ -1202,7 +1202,7 @@ const companies = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'Nutanix',
-    logo: 'https://logo.clearbit.com/nutanix.com',
+    logo: 'https://unavatar.io/nutanix.com',
     website: 'https://www.nutanix.com',
     description: 'Nutanix is a cloud computing company providing hyperconverged infrastructure, hybrid multicloud, and private cloud solutions. The company simplifies IT infrastructure management and enables organizations to run applications anywhere.',
     industry: 'Cloud Computing',
@@ -1213,7 +1213,7 @@ const companies = [
   },
   {
     name: 'ServiceNow',
-    logo: 'https://logo.clearbit.com/servicenow.com',
+    logo: 'https://unavatar.io/servicenow.com',
     website: 'https://www.servicenow.com',
     description: 'ServiceNow is the leading digital workflow company, making work better for people with modern digital workflows. The Now Platform enables enterprise-wide process automation across IT, HR, customer service, and security operations.',
     industry: 'Enterprise Software',
@@ -1224,7 +1224,7 @@ const companies = [
   },
   {
     name: 'Workday',
-    logo: 'https://logo.clearbit.com/workday.com',
+    logo: 'https://unavatar.io/workday.com',
     website: 'https://www.workday.com',
     description: 'Workday is a leading provider of enterprise cloud applications for finance and human resources. The company helps organizations manage their most important assets — their people and money — with AI-powered, cloud-native solutions.',
     industry: 'Enterprise Software',
@@ -1235,7 +1235,7 @@ const companies = [
   },
   {
     name: 'Twilio',
-    logo: 'https://logo.clearbit.com/twilio.com',
+    logo: 'https://unavatar.io/twilio.com',
     website: 'https://www.twilio.com',
     description: 'Twilio is a cloud communications platform that enables businesses to build custom communication experiences through APIs for SMS, voice, video, and email. The company powers customer engagement for over 300,000 businesses.',
     industry: 'Cloud Computing',
@@ -1246,7 +1246,7 @@ const companies = [
   },
   {
     name: 'DataDog',
-    logo: 'https://logo.clearbit.com/datadoghq.com',
+    logo: 'https://unavatar.io/datadoghq.com',
     website: 'https://www.datadoghq.com',
     description: 'Datadog is a monitoring and analytics platform for cloud-scale applications, providing full-stack observability including infrastructure monitoring, APM, log management, and security. Used by thousands of enterprises globally.',
     industry: 'Cloud Computing',
@@ -1257,7 +1257,7 @@ const companies = [
   },
   {
     name: 'Sprinklr',
-    logo: 'https://logo.clearbit.com/sprinklr.com',
+    logo: 'https://unavatar.io/sprinklr.com',
     website: 'https://www.sprinklr.com',
     description: 'Sprinklr is a unified customer experience management platform that helps enterprises manage customer engagement across 30+ digital channels. The company serves the world\'s largest brands with AI-powered social media management.',
     industry: 'MarTech',
@@ -1268,7 +1268,7 @@ const companies = [
   },
   {
     name: 'Thoughtspot',
-    logo: 'https://logo.clearbit.com/thoughtspot.com',
+    logo: 'https://unavatar.io/thoughtspot.com',
     website: 'https://www.thoughtspot.com',
     description: 'ThoughtSpot is the AI-powered analytics company enabling everyone to find insights in data. With a search-driven interface and AI capabilities, ThoughtSpot makes complex data analysis as simple as asking a question.',
     industry: 'Data Analytics',
@@ -1279,7 +1279,7 @@ const companies = [
   },
   {
     name: 'Commvault',
-    logo: 'https://logo.clearbit.com/commvault.com',
+    logo: 'https://unavatar.io/commvault.com',
     website: 'https://www.commvault.com',
     description: 'Commvault is a global leader in data protection and management, offering backup, recovery, and cloud data management solutions. The company helps enterprises protect, manage, and use their data across on-premises, cloud, and SaaS environments.',
     industry: 'Data Management',
@@ -1290,7 +1290,7 @@ const companies = [
   },
   {
     name: 'Cohesity',
-    logo: 'https://logo.clearbit.com/cohesity.com',
+    logo: 'https://unavatar.io/cohesity.com',
     website: 'https://www.cohesity.com',
     description: 'Cohesity is a data management company that simplifies backup, data governance, and data management at scale. The company consolidates secondary data silos with a single, web-scale platform for enterprise data protection.',
     industry: 'Data Management',
@@ -1301,7 +1301,7 @@ const companies = [
   },
   {
     name: 'Turing',
-    logo: 'https://logo.clearbit.com/turing.com',
+    logo: 'https://unavatar.io/turing.com',
     website: 'https://www.turing.com',
     description: 'Turing is an AI-powered platform that helps companies hire, build, and manage remote engineering teams. The platform uses AI to match developers with companies, enabling global organizations to access top tech talent.',
     industry: 'HR Tech',
@@ -1312,7 +1312,7 @@ const companies = [
   },
   {
     name: 'Tekion',
-    logo: 'https://logo.clearbit.com/tekion.com',
+    logo: 'https://unavatar.io/tekion.com',
     website: 'https://www.tekion.com',
     description: 'Tekion is an automotive retail cloud platform that is transforming the automotive retail ecosystem. Built natively on AWS, Tekion provides a modern DMS (Dealer Management System) with AI-driven insights and seamless customer experience.',
     industry: 'Automotive Tech',
@@ -1323,7 +1323,7 @@ const companies = [
   },
   {
     name: 'Mindtickle',
-    logo: 'https://logo.clearbit.com/mindtickle.com',
+    logo: 'https://unavatar.io/mindtickle.com',
     website: 'https://www.mindtickle.com',
     description: 'Mindtickle is the market-leading sales readiness and enablement platform. The company helps revenue leaders build winning behaviors with content management, training, coaching, and real-world performance intelligence.',
     industry: 'Software',
@@ -1334,7 +1334,7 @@ const companies = [
   },
   {
     name: 'Zetwerk',
-    logo: 'https://logo.clearbit.com/zetwerk.com',
+    logo: 'https://unavatar.io/zetwerk.com',
     website: 'https://www.zetwerk.com',
     description: 'Zetwerk is a global manufacturing network platform that connects enterprises with manufacturing partners. The company offers precision engineering, electronics manufacturing, and industrial fabrication through its technology-driven supply chain.',
     industry: 'Manufacturing Tech',
@@ -1345,7 +1345,7 @@ const companies = [
   },
   {
     name: 'Cars24',
-    logo: 'https://logo.clearbit.com/cars24.com',
+    logo: 'https://unavatar.io/cars24.com',
     website: 'https://www.cars24.com',
     description: 'Cars24 is a leading e-commerce platform for buying and selling pre-owned cars. The company offers a seamless digital-first car buying experience with certified cars, easy financing, and doorstep delivery across India.',
     industry: 'E-Commerce',
@@ -1356,7 +1356,7 @@ const companies = [
   },
   {
     name: 'BigBasket',
-    logo: 'https://logo.clearbit.com/bigbasket.com',
+    logo: 'https://unavatar.io/bigbasket.com',
     website: 'https://www.bigbasket.com',
     description: 'BigBasket is India\'s largest online grocery store, now part of the Tata Group. The company offers a wide selection of groceries, fresh produce, and household items with same-day and express delivery across 30+ Indian cities.',
     industry: 'E-Commerce',
@@ -1367,7 +1367,7 @@ const companies = [
   },
   {
     name: 'Urban Company',
-    logo: 'https://logo.clearbit.com/urbancompany.com',
+    logo: 'https://unavatar.io/urbancompany.com',
     website: 'https://www.urbancompany.com',
     description: 'Urban Company is Asia\'s largest home services marketplace connecting consumers with trained professionals for beauty, cleaning, repairs, and wellness services. The platform standardizes quality and pricing for 50+ services.',
     industry: 'Services Tech',
@@ -1378,7 +1378,7 @@ const companies = [
   },
   {
     name: 'OYO',
-    logo: 'https://logo.clearbit.com/oyorooms.com',
+    logo: 'https://unavatar.io/oyorooms.com',
     website: 'https://www.oyorooms.com',
     description: 'OYO is a global hospitality technology company that transforms fragmented real estate into standardized accommodations. Operating in 35+ countries, OYO provides affordable, quality stays through its tech-enabled franchise model.',
     industry: 'Hospitality',
@@ -1389,7 +1389,7 @@ const companies = [
   },
   {
     name: 'MakeMyTrip',
-    logo: 'https://logo.clearbit.com/makemytrip.com',
+    logo: 'https://unavatar.io/makemytrip.com',
     website: 'https://www.makemytrip.com',
     description: 'MakeMyTrip is India\'s leading online travel company offering flights, hotels, holiday packages, train tickets, and bus booking. The platform serves millions of travelers with competitive pricing and comprehensive travel solutions.',
     industry: 'Travel',
@@ -1400,7 +1400,7 @@ const companies = [
   },
   {
     name: 'Rapido',
-    logo: 'https://logo.clearbit.com/rapido.bike',
+    logo: 'https://unavatar.io/rapido.bike',
     website: 'https://www.rapido.bike',
     description: 'Rapido is India\'s largest bike taxi and auto service platform, offering affordable and convenient last-mile connectivity. The company operates in 100+ cities, using technology to optimize routes and reduce commute costs.',
     industry: 'Transportation',
@@ -1411,7 +1411,7 @@ const companies = [
   },
   {
     name: 'Spinny',
-    logo: 'https://logo.clearbit.com/spinny.com',
+    logo: 'https://unavatar.io/spinny.com',
     website: 'https://www.spinny.com',
     description: 'Spinny is a full-stack used car platform offering a transparent and delightful car buying and selling experience. Every car on Spinny goes through a 200-point inspection with a 5-day money-back guarantee.',
     industry: 'E-Commerce',
@@ -1422,7 +1422,7 @@ const companies = [
   },
   {
     name: 'Jupiter',
-    logo: 'https://logo.clearbit.com/jupiter.money',
+    logo: 'https://unavatar.io/jupiter.money',
     website: 'https://www.jupiter.money',
     description: 'Jupiter is a digital banking platform that makes money management simple and rewarding. With features like expense tracking, smart savings pots, and UPI payments, Jupiter caters to young, digitally-native Indians.',
     industry: 'Fintech',
@@ -1433,7 +1433,7 @@ const companies = [
   },
   {
     name: 'Open Financial',
-    logo: 'https://logo.clearbit.com/open.money',
+    logo: 'https://unavatar.io/open.money',
     website: 'https://www.open.money',
     description: 'Open is a leading neo-banking platform for SMEs, offering business bank accounts, payment acceptance, payroll, and bookkeeping in one integrated platform. The company serves 3.5 million+ businesses across India.',
     industry: 'Fintech',
@@ -1444,7 +1444,7 @@ const companies = [
   },
   {
     name: 'Vedantu',
-    logo: 'https://logo.clearbit.com/vedantu.com',
+    logo: 'https://unavatar.io/vedantu.com',
     website: 'https://www.vedantu.com',
     description: 'Vedantu is a leading online tutoring platform offering live interactive classes for K-12 students and competitive exam preparation. With innovative WAVE technology and personalized learning, Vedantu makes quality education accessible.',
     industry: 'EdTech',
@@ -1455,13 +1455,13 @@ const companies = [
   },
   {
     name: 'Razorpay Software',
-    logo: 'https://logo.clearbit.com/razorpay.com',
+    logo: 'https://unavatar.io/razorpay.com',
     website: 'https://www.razorpay.com',
     industry: 'Fintech',
     // Duplicate — skip this. Razorpay already exists above.
     // Using a different name to avoid conflict
     name: 'Juspay',
-    logo: 'https://logo.clearbit.com/juspay.in',
+    logo: 'https://unavatar.io/juspay.in',
     website: 'https://www.juspay.in',
     description: 'Juspay is a payment orchestration company powering seamless payments for leading enterprises including Amazon, Flipkart, and Swiggy. The company processes billions of transactions through its unified payment infrastructure.',
     industry: 'Fintech',
@@ -1472,7 +1472,7 @@ const companies = [
   },
   {
     name: 'Digit Insurance',
-    logo: 'https://logo.clearbit.com/godigit.com',
+    logo: 'https://unavatar.io/godigit.com',
     website: 'https://www.godigit.com',
     description: 'Digit Insurance is a technology-driven insurance company simplifying insurance for Indian consumers. With transparent policies, quick claims processing, and digital-first approach, Digit has become one of India\'s fastest-growing insurers.',
     industry: 'InsurTech',
@@ -1483,7 +1483,7 @@ const companies = [
   },
   {
     name: 'Apna',
-    logo: 'https://logo.clearbit.com/apna.co',
+    logo: 'https://unavatar.io/apna.co',
     website: 'https://www.apna.co',
     description: 'Apna is India\'s largest jobs and professional networking platform for the rising workforce. The platform connects millions of job seekers with opportunities across 73 cities, enabling career growth for the next billion users.',
     industry: 'HR Tech',
@@ -1494,7 +1494,7 @@ const companies = [
   },
   {
     name: 'NoBroker',
-    logo: 'https://logo.clearbit.com/nobroker.in',
+    logo: 'https://unavatar.io/nobroker.in',
     website: 'https://www.nobroker.in',
     description: 'NoBroker is India\'s first proptech unicorn, offering a brokerage-free real estate platform for buying, selling, and renting properties. The company uses AI to match property requirements and eliminates middlemen from real estate transactions.',
     industry: 'PropTech',
@@ -1505,7 +1505,7 @@ const companies = [
   },
   {
     name: 'Simplilearn',
-    logo: 'https://logo.clearbit.com/simplilearn.com',
+    logo: 'https://unavatar.io/simplilearn.com',
     website: 'https://www.simplilearn.com',
     description: 'Simplilearn is the world\'s leading online bootcamp for digital skills training, offering professional certification programs in data science, AI, cloud computing, cybersecurity, and project management with university partnerships.',
     industry: 'EdTech',
@@ -1516,7 +1516,7 @@ const companies = [
   },
   {
     name: 'Fractal Analytics',
-    logo: 'https://logo.clearbit.com/fractal.ai',
+    logo: 'https://unavatar.io/fractal.ai',
     website: 'https://www.fractal.ai',
     description: 'Fractal is a leading AI company providing AI, engineering, and design services to Fortune 500 companies. The company helps organizations leverage data science, machine learning, and analytics to drive business outcomes.',
     industry: 'AI',
@@ -1527,7 +1527,7 @@ const companies = [
   },
   {
     name: 'Mu Sigma',
-    logo: 'https://logo.clearbit.com/mu-sigma.com',
+    logo: 'https://unavatar.io/mu-sigma.com',
     website: 'https://www.mu-sigma.com',
     description: 'Mu Sigma is a data analytics and decision sciences company that helps enterprises institutionalize data-driven decision making. The company serves Fortune 500 clients with AI-powered analytics and problem-solving frameworks.',
     industry: 'Data Analytics',
@@ -1538,7 +1538,7 @@ const companies = [
   },
   {
     name: 'ThoughtWorks',
-    logo: 'https://logo.clearbit.com/thoughtworks.com',
+    logo: 'https://unavatar.io/thoughtworks.com',
     website: 'https://www.thoughtworks.com',
     description: 'ThoughtWorks is a global technology consultancy that integrates strategy, design, and engineering to drive digital innovation. Known for championing agile, open-source, and XP practices, ThoughtWorks partners with organizations to create extraordinary impact.',
     industry: 'IT Services',
@@ -1549,7 +1549,7 @@ const companies = [
   },
   {
     name: 'Tiger Analytics',
-    logo: 'https://logo.clearbit.com/tigeranalytics.com',
+    logo: 'https://unavatar.io/tigeranalytics.com',
     website: 'https://www.tigeranalytics.com',
     description: 'Tiger Analytics is a global AI and analytics consulting firm that helps enterprises drive AI-led transformation. The company specializes in machine learning, computer vision, NLP, and data engineering for Fortune 100 clients.',
     industry: 'Data Analytics',
@@ -1560,7 +1560,7 @@ const companies = [
   },
   {
     name: 'Sigmoid',
-    logo: 'https://logo.clearbit.com/sigmoid.com',
+    logo: 'https://unavatar.io/sigmoid.com',
     website: 'https://www.sigmoid.com',
     description: 'Sigmoid is a data engineering and AI company helping enterprises build scalable data platforms and AI solutions. The company serves Fortune 500 clients in CPG, retail, financial services, and manufacturing with modern data architecture.',
     industry: 'Data Analytics',
@@ -1571,7 +1571,7 @@ const companies = [
   },
   {
     name: 'Gupshup',
-    logo: 'https://logo.clearbit.com/gupshup.io',
+    logo: 'https://unavatar.io/gupshup.io',
     website: 'https://www.gupshup.io',
     description: 'Gupshup is a leading conversational messaging platform enabling businesses to build chatbots and conversational experiences on 30+ messaging channels including WhatsApp, SMS, and RCS. The platform processes 10 billion+ messages monthly.',
     industry: 'AI',
@@ -1582,7 +1582,7 @@ const companies = [
   },
   {
     name: 'Media.net',
-    logo: 'https://logo.clearbit.com/media.net',
+    logo: 'https://unavatar.io/media.net',
     website: 'https://www.media.net',
     description: 'Media.net is a global advertising technology company operating one of the largest contextual advertising businesses worldwide. The company powers premium publisher monetization through its AI-driven ad platform.',
     industry: 'AdTech',
@@ -1593,7 +1593,7 @@ const companies = [
   },
   {
     name: 'MapmyIndia',
-    logo: 'https://logo.clearbit.com/mapmyindia.com',
+    logo: 'https://unavatar.io/mapmyindia.com',
     website: 'https://www.mapmyindia.com',
     description: 'MapmyIndia (CE Info Systems) is India\'s leading digital mapping and geospatial technology company. The company provides maps, navigation, IoT, and location-based AI solutions as an alternative to Google Maps for Indian enterprises.',
     industry: 'GeoTech',

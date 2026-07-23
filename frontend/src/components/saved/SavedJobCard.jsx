@@ -1,5 +1,5 @@
 import { Bookmark, MapPin, DollarSign, Clock } from 'lucide-react';
-import { Badge, Button } from '../ui';
+import { Badge, Button, CompanyLogo } from '../ui';
 
 /**
  * Single saved job item card with bookmark toggle, status badges, and apply details action.
@@ -11,14 +11,18 @@ export default function SavedJobCard({
   onSelectJob,
 }) {
   const job = savedItem.jobId || savedItem;
-  const company = job.companyId?.name || 'Company Details';
+  const companyName = job.companyId?.name || 'Company Details';
+  const companyLogo = job.companyId?.logo;
 
   return (
     <article className="job-card">
       <div className="job-card-header">
-        <div>
-          <h3>{job.title}</h3>
-          <p className="job-company">{company}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <CompanyLogo logo={companyLogo} name={companyName} size={40} />
+          <div>
+            <h3>{job.title}</h3>
+            <p className="job-company">{companyName}</p>
+          </div>
         </div>
         <button
           type="button"

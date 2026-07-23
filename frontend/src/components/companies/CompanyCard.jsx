@@ -1,5 +1,5 @@
 import { Building2, Globe, MapPin, Users, Calendar, Edit3, Trash2 } from 'lucide-react';
-import { Badge, Button, Card } from '../ui';
+import { Badge, Button, Card, CompanyLogo } from '../ui';
 
 /**
  * Single company directory card component.
@@ -18,28 +18,7 @@ export default function CompanyCard({
       style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '16px' }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-        {company.logo ? (
-          <img
-            src={company.logo}
-            alt={company.name}
-            style={{ width: '48px', height: '48px', borderRadius: '12px', objectFit: 'contain' }}
-          />
-        ) : (
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              background: 'var(--color-primary-light)',
-              color: 'var(--color-primary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Building2 size={24} />
-          </div>
-        )}
+        <CompanyLogo logo={company.logo} name={company.name} size={48} />
 
         <div style={{ flex: 1 }}>
           <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>{company.name}</h3>

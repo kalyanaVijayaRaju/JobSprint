@@ -1,5 +1,5 @@
 import { Bookmark, MapPin, DollarSign, Sparkles } from 'lucide-react';
-import { Badge, Button } from '../ui';
+import { Badge, Button, CompanyLogo } from '../ui';
 
 /**
  * Single job card item displaying metadata, skill match score, bookmark action, and details CTA.
@@ -14,12 +14,18 @@ export default function JobCard({
   onToggleSave,
   onViewDetails,
 }) {
+  const companyName = job.companyId?.name || job.companyName || 'Company Details';
+  const companyLogo = job.companyId?.logo || job.companyLogo;
+
   return (
     <article className="job-card">
       <div className="job-card-header">
-        <div>
-          <h3>{job.title}</h3>
-          <p className="job-company">{job.companyId?.name || 'Company Details'}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <CompanyLogo logo={companyLogo} name={companyName} size={40} />
+          <div>
+            <h3>{job.title}</h3>
+            <p className="job-company">{companyName}</p>
+          </div>
         </div>
         <button
           type="button"
