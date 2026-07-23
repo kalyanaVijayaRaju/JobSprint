@@ -149,3 +149,18 @@ export const addRecruiterNote = asyncHandler(async (req, res) => {
     }
   });
 });
+
+export const scheduleInterview = asyncHandler(async (req, res) => {
+  const { interview } = await applicationService.scheduleInterview(req.params.id, req.user.id, req.user.role, req.body);
+  res.status(201).json({ success: true, message: 'Interview scheduled successfully', data: { interview } });
+});
+
+export const updateInterview = asyncHandler(async (req, res) => {
+  const interview = await applicationService.updateInterview(req.params.id, req.params.interviewId, req.user.id, req.user.role, req.body);
+  res.status(200).json({ success: true, message: 'Interview updated successfully', data: { interview } });
+});
+
+export const getApplicationInterviews = asyncHandler(async (req, res) => {
+  const interviews = await applicationService.getApplicationInterviews(req.params.id, req.user.id, req.user.role);
+  res.status(200).json({ success: true, data: { interviews } });
+});

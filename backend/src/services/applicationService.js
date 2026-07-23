@@ -329,3 +329,102 @@ export const addRecruiterNote = async (applicationId, recruiterId, noteText) => 
 
   return application;
 };
+
+const getRecruiterApplication = async (applicationId, actorId, actorRole) => {
+  const application = await Application.findById(applicationId);
+
+  if (!application) {
+    throw new ApiError(404, 'Application not found');
+  }
+
+  const job = await Job.findById(application.jobId);
+  if (!job || (actorRole !== 'admin' && job.recruiterId.toString() !== actorId)) {
+    throw new ApiError(403, 'You can only manage interviews for your own job postings');
+  }
+
+  return { application, job };
+};
+
+/**
+ * Schedule an interview and move an eligible application into the
+ * interviewing pipeline stage. Candidates receive an in-app notification.
+ */
+export const scheduleInterview = async (applicationId, actorId, actorRole, data) => {
+  const { application, job } = await getRecruiterApplication(applicationId, actorId, actorRole);
+
+  if (['withdrawn', 'rejected', 'offered'].includes(application.status)) {
+    throw new ApiError(400, `Cannot schedule an interview for a ${application.status} application`);
+  }
+
+  if (application.status !== 'interviewing') {
+    await application.updateStatus('interviewing', actorId);
+  }
+
+  application.interviews.push({
+    ...data,
+    scheduledAt: new Date(data.scheduledAt),
+    createdBy: actorId,
+    updatedBy: actorId
+  });
+  await application.save();
+
+  const interview = application.interviews.at(-1);
+  try {
+    await notificationService.createNotification(
+      application.candidateId,
+      'Interview Scheduled',
+      `An interview for "${job.title}" is scheduled for ${interview.scheduledAt.toISOString()}.`,
+      'application_status'
+    );
+  } catch (err) {
+    logger.error(`Failed to create interview notification for user ${application.candidateId}: ${err.message}`);
+  }
+
+  return { application, interview };
+};
+
+/** Update, reschedule, complete, or cancel an existing interview. */
+export const updateInterview = async (applicationId, interviewId, actorId, actorRole, data) => {
+  const { application, job } = await getRecruiterApplication(applicationId, actorId, actorRole);
+  const interview = application.interviews.id(interviewId);
+
+  if (!interview) {
+    throw new ApiError(404, 'Interview not found');
+  }
+
+  if (['completed', 'cancelled'].includes(interview.status)) {
+    throw new ApiError(400, `A ${interview.status} interview cannot be changed`);
+  }
+
+  Object.assign(interview, data.scheduledAt ? { ...data, scheduledAt: new Date(data.scheduledAt) } : data, { updatedBy: actorId });
+  await application.save();
+
+  const action = interview.status === 'cancelled' ? 'cancelled' : interview.status === 'completed' ? 'completed' : 'updated';
+  try {
+    await notificationService.createNotification(
+      application.candidateId,
+      `Interview ${action.charAt(0).toUpperCase()}${action.slice(1)}`,
+      `Your interview for "${job.title}" has been ${action}.${interview.status === 'scheduled' ? ` Scheduled for ${interview.scheduledAt.toISOString()}.` : ''}`,
+      'application_status'
+    );
+  } catch (err) {
+    logger.error(`Failed to create interview notification for user ${application.candidateId}: ${err.message}`);
+  }
+
+  return interview;
+};
+
+/** Return interviews only to the application candidate or the job owner. */
+export const getApplicationInterviews = async (applicationId, actorId, actorRole) => {
+  const application = await Application.findById(applicationId).lean();
+  if (!application) throw new ApiError(404, 'Application not found');
+
+  if (actorRole === 'candidate') {
+    if (application.candidateId.toString() !== actorId) throw new ApiError(403, 'You can only view your own interviews');
+  } else if (actorRole !== 'admin') {
+    const job = await Job.findById(application.jobId).select('recruiterId').lean();
+    if (!job || job.recruiterId.toString() !== actorId) throw new ApiError(403, 'You can only view interviews for your own job postings');
+  }
+
+  return application.interviews.sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt));
+};
