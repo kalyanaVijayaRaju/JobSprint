@@ -1,9 +1,10 @@
-import { BriefcaseBusiness, Clock, FileText, ExternalLink, AlertTriangle } from 'lucide-react';
+import { BriefcaseBusiness, Clock, FileText, ExternalLink, AlertTriangle, Calendar } from 'lucide-react';
 import { Button, Badge, EmptyState, ConfirmDialog } from '../ui';
 import { useState } from 'react';
+import InterviewList from './InterviewList.jsx';
 
 /**
- * Candidate view listing submitted applications with timeline status progression and withdraw options.
+ * Candidate view listing submitted applications with timeline status progression, interview invitations, and withdraw options.
  */
 export default function CandidateTimeline({
   myApps = [],
@@ -11,6 +12,8 @@ export default function CandidateTimeline({
   onWithdraw,
   withdrawingApplicationId,
   onBrowseJobs,
+  onRespondToInterview,
+  submittingResponseId = null
 }) {
   const [withdrawDialog, setWithdrawDialog] = useState({ open: false, appId: null });
 
@@ -114,6 +117,41 @@ export default function CandidateTimeline({
               </a>
             )}
           </div>
+
+          {/* Scheduled Interviews Section */}
+          {app.interviews?.length > 0 && (
+            <div
+              style={{
+                marginTop: '16px',
+                paddingTop: '16px',
+                borderTop: '1px solid var(--color-border)',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  color: 'var(--color-primary)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  marginBottom: '12px',
+                }}
+              >
+                <Calendar size={14} /> Scheduled Interviews
+              </span>
+              <InterviewList
+                interviews={app.interviews}
+                userRole="candidate"
+                onRespond={(interviewId, response, notes) =>
+                  onRespondToInterview && onRespondToInterview(app._id, interviewId, response, notes)
+                }
+                submittingResponseId={submittingResponseId}
+              />
+            </div>
+          )}
 
           {/* Status Timeline History */}
           {app.statusTimeline?.length > 0 && (

@@ -15,10 +15,18 @@ export default function DashboardPage() {
   const [recruiterJobs, setRecruiterJobs] = useState([]);
   const [applicationSummary, setApplicationSummary] = useState(null);
 
+  const [upcomingInterviews, setUpcomingInterviews] = useState([]);
+
   const loadApplicationSummary = useCallback(() => {
     applicationsApi.summary()
       .then((res) => { if (res.success) setApplicationSummary(res.data.summary); })
       .catch(() => setApplicationSummary(null));
+  }, []);
+
+  const loadUpcomingInterviews = useCallback(() => {
+    applicationsApi.upcomingInterviews()
+      .then((res) => { if (res.success) setUpcomingInterviews(res.data.interviews || []); })
+      .catch(() => setUpcomingInterviews([]));
   }, []);
 
   useEffect(() => {
@@ -26,6 +34,7 @@ export default function DashboardPage() {
 
     if (user.role === 'candidate' || user.role === 'recruiter') {
       loadApplicationSummary();
+      loadUpcomingInterviews();
     }
 
     if (user.role === 'candidate') {
@@ -40,7 +49,7 @@ export default function DashboardPage() {
         }
       }).catch(() => {});
     }
-  }, [user, loadApplicationSummary]);
+  }, [user, loadApplicationSummary, loadUpcomingInterviews]);
 
   const { readiness } = useApp();
 
@@ -55,6 +64,7 @@ export default function DashboardPage() {
       myApps={myApps}
       recruiterJobs={recruiterJobs}
       applicationSummary={applicationSummary}
+      upcomingInterviews={upcomingInterviews}
     />
   );
 }

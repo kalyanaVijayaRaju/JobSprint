@@ -248,6 +248,59 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="landing-testimonials">
+        <div className="section-container">
+          <div className="section-header-center">
+            <h2>Trusted by Candidates & Recruiters</h2>
+            <p>See why top professionals and hiring teams choose JobSprint</p>
+          </div>
+          <div className="testimonials-grid">
+            <div className="testimonial-card">
+              <div className="testimonial-stars">★★★★★</div>
+              <p className="testimonial-quote">
+                "JobSprint made applying effortless. I tracked my application through every stage and landed a Senior Frontend Engineer offer within 2 weeks!"
+              </p>
+              <div className="testimonial-author">
+                <div className="author-avatar" style={{ background: 'var(--color-primary)' }}>AP</div>
+                <div>
+                  <strong>Aditya Patel</strong>
+                  <span>Senior Frontend Engineer at TechCorp</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="testimonial-card">
+              <div className="testimonial-stars">★★★★★</div>
+              <p className="testimonial-quote">
+                "As a recruiter, the Kanban ATS pipeline and interview scheduler saved our team hours of manual email exchanges. Highly recommended."
+              </p>
+              <div className="testimonial-author">
+                <div className="author-avatar" style={{ background: 'var(--color-accent)' }}>SS</div>
+                <div>
+                  <strong>Sneha Sharma</strong>
+                  <span>Head of Talent Acquisition at Innovate Labs</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="testimonial-card">
+              <div className="testimonial-stars">★★★★★</div>
+              <p className="testimonial-quote">
+                "The match percentage and automated notifications gave me total visibility over my job search. No more black-hole applications!"
+              </p>
+              <div className="testimonial-author">
+                <div className="author-avatar" style={{ background: '#10b981' }}>RK</div>
+                <div>
+                  <strong>Rajesh Kumar</strong>
+                  <span>Full Stack Developer</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="landing-cta">
         <div className="cta-container">
@@ -274,12 +327,43 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="landing-footer">
-        <div className="footer-inner">
-          <div className="footer-brand">
-            <span className="brand-mark">JS</span>
-            <span>JobSprint</span>
+        <div className="section-container">
+          <div className="footer-columns">
+            <div className="footer-brand-col">
+              <div className="brand" style={{ marginBottom: '12px' }}>
+                <span className="brand-mark">JS</span>
+                <span className="brand-name">JobSprint</span>
+              </div>
+              <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', lineHeight: '1.6' }}>
+                Empowering candidates and recruiters with modern application tracking, real-time status updates, and automated interview workflows.
+              </p>
+            </div>
+
+            <div className="footer-col">
+              <h4>Candidates</h4>
+              <Link to="/jobs">Browse Jobs</Link>
+              <Link to="/saved-jobs">Saved Roles</Link>
+              <Link to="/register">Create Account</Link>
+            </div>
+
+            <div className="footer-col">
+              <h4>Recruiters</h4>
+              <Link to="/register">Post a Job</Link>
+              <Link to="/companies">Company Directory</Link>
+              <Link to="/login">ATS Login</Link>
+            </div>
+
+            <div className="footer-col">
+              <h4>Platform</h4>
+              <a href="#privacy">Privacy Policy</a>
+              <a href="#terms">Terms of Service</a>
+              <a href="#security">Security Compliance</a>
+            </div>
           </div>
-          <p className="footer-copy">© {new Date().getFullYear()} JobSprint. Built for the future of hiring.</p>
+
+          <div className="footer-bottom">
+            <p>© {new Date().getFullYear()} JobSprint Inc. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>
