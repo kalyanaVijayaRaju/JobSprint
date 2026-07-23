@@ -3,6 +3,8 @@ import * as jobService from '../services/jobService.js';
 import { jobQuerySchema } from '../validations/jobValidation.js';
 import ApiError from '../utils/apiError.js';
 
+const getRequestContext = (req) => ({ ipAddress: req.ip, userAgent: req.get('user-agent') || '' });
+
 /**
  * @route   POST /api/v1/jobs
  * @access  Authenticated (Recruiter)
@@ -76,4 +78,14 @@ export const deleteJob = asyncHandler(async (req, res) => {
     success: true,
     message: 'Job archived successfully'
   });
+});
+
+export const closeJob = asyncHandler(async (req, res) => {
+  const job = await jobService.closeJob(req.params.id, req.user.id, req.user.role, getRequestContext(req));
+  res.status(200).json({ success: true, message: 'Job posting closed successfully', data: { job } });
+});
+
+export const reopenJob = asyncHandler(async (req, res) => {
+  const job = await jobService.reopenJob(req.params.id, req.user.id, req.user.role, req.body, getRequestContext(req));
+  res.status(200).json({ success: true, message: 'Job posting reopened successfully', data: { job } });
 });

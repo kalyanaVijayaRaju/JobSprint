@@ -25,7 +25,7 @@ const setupDatabase = async () => {
     await mongoose.connect(process.env.MONGODB_URI);
   }
   // Clean up test collections
-  const collectionNames = ['users', 'jobs', 'companies', 'recruiterprofiles'];
+  const collectionNames = ['users', 'jobs', 'companies', 'recruiterprofiles', 'auditlogs'];
   for (const name of collectionNames) {
     const collections = await mongoose.connection.db.listCollections({ name }).toArray();
     if (collections.length > 0) {
@@ -440,4 +440,75 @@ test('DELETE /api/v1/jobs/:id — owner can archive their job', async (t) => {
   const listRes = await fetch(`${baseUrl}/api/v1/jobs`);
   const listBody = await listRes.json();
   assert.equal(listBody.data.jobs.length, 0);
+});
+
+// ============================================================
+// Explicit job lifecycle and expiration maintenance
+// ============================================================
+
+test('PATCH lifecycle endpoints - owner closes and reopens with a future expiry audit trail', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+  const recruiterId = new mongoose.Types.ObjectId().toString();
+  const token = await createTestToken({ id: recruiterId });
+  await seedRecruiterWithCompany(recruiterId);
+
+  const createResponse = await fetch(`${baseUrl}/api/v1/jobs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(validJobPayload)
+  });
+  const job = (await createResponse.json()).data.job;
+
+  const closeResponse = await fetch(`${baseUrl}/api/v1/jobs/${job._id}/close`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const closeBody = await closeResponse.json();
+  assert.equal(closeResponse.status, 200);
+  assert.equal(closeBody.data.job.status, 'closed');
+
+  const reopenResponse = await fetch(`${baseUrl}/api/v1/jobs/${job._id}/reopen`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString() })
+  });
+  const reopenBody = await reopenResponse.json();
+  assert.equal(reopenResponse.status, 200);
+  assert.equal(reopenBody.data.job.status, 'active');
+
+  const AuditLog = (await import('../src/models/AuditLog.js')).default;
+  const actions = await AuditLog.find({ 'details.jobId': new mongoose.Types.ObjectId(job._id) }).sort({ createdAt: 1 }).lean();
+  assert.deepEqual(actions.map((entry) => entry.action), ['job.closed', 'job.reopened']);
+});
+
+test('expireOverdueJobs - closes expired active jobs once and writes an automated audit event', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const recruiterId = new mongoose.Types.ObjectId().toString();
+  await createTestToken({ id: recruiterId });
+  const company = await seedRecruiterWithCompany(recruiterId);
+  const Job = (await import('../src/models/Job.js')).default;
+  const expiredJob = await Job.create({
+    ...validJobPayload,
+    title: 'Overdue Data Engineer',
+    recruiterId,
+    companyId: company._id,
+    expiresAt: new Date(Date.now() - 60 * 1000)
+  });
+
+  const { expireOverdueJobs } = await import('../src/services/jobService.js');
+  const firstRun = await expireOverdueJobs();
+  const secondRun = await expireOverdueJobs();
+  assert.equal(firstRun.expiredCount, 1);
+  assert.equal(secondRun.expiredCount, 0);
+
+  const storedJob = await Job.findById(expiredJob._id).lean();
+  assert.equal(storedJob.status, 'closed');
+  const AuditLog = (await import('../src/models/AuditLog.js')).default;
+  const auditEntry = await AuditLog.findOne({ action: 'job.auto_closed', 'details.jobId': expiredJob._id }).lean();
+  assert.ok(auditEntry);
 });

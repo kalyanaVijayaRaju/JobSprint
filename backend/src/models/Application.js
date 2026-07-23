@@ -35,6 +35,71 @@ const recruiterNoteSchema = new mongoose.Schema({
   }
 });
 
+const interviewSchema = new mongoose.Schema({
+  scheduledAt: {
+    type: Date,
+    required: [true, 'Interview time is required']
+  },
+  durationMinutes: {
+    type: Number,
+    required: true,
+    min: [15, 'Interview duration must be at least 15 minutes'],
+    max: [480, 'Interview duration cannot exceed 480 minutes']
+  },
+  meetingType: {
+    type: String,
+    enum: ['video', 'phone', 'onsite'],
+    required: true
+  },
+  location: {
+    type: String,
+    trim: true,
+    maxlength: [300, 'Interview location cannot exceed 300 characters']
+  },
+  meetingUrl: {
+    type: String,
+    trim: true,
+    maxlength: [2000, 'Meeting URL cannot exceed 2000 characters']
+  },
+  timezone: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: [80, 'Timezone cannot exceed 80 characters']
+  },
+  instructions: {
+    type: String,
+    trim: true,
+    maxlength: [2000, 'Interview instructions cannot exceed 2000 characters']
+  },
+  status: {
+    type: String,
+    enum: ['scheduled', 'completed', 'cancelled'],
+    default: 'scheduled'
+  },
+  candidateResponse: {
+    type: String,
+    enum: ['pending', 'accepted', 'declined'],
+    default: 'pending'
+  },
+  candidateResponseNote: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Interview response note cannot exceed 500 characters']
+  },
+  respondedAt: Date,
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  updatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
+}, { timestamps: true });
+
 const applicationSchema = new mongoose.Schema({
   jobId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -61,7 +126,8 @@ const applicationSchema = new mongoose.Schema({
     default: 'applied'
   },
   statusTimeline: [statusHistorySchema],
-  recruiterNotes: [recruiterNoteSchema]
+  recruiterNotes: [recruiterNoteSchema],
+  interviews: [interviewSchema]
 }, {
   timestamps: true,
   toJSON: { virtuals: true },
@@ -74,6 +140,7 @@ applicationSchema.index({ jobId: 1, candidateId: 1 }, { unique: true });
 // Core querying indexes
 applicationSchema.index({ candidateId: 1, createdAt: -1 }); // Candidate application history
 applicationSchema.index({ jobId: 1, status: 1 });           // Recruiter ATS dashboard pipeline
+applicationSchema.index({ 'interviews.scheduledAt': 1 });   // Upcoming interview calendar queries
 
 // Pre-save middleware to automatically log status changes in the timeline
 applicationSchema.pre('save', function (next) {

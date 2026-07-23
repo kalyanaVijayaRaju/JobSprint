@@ -132,6 +132,35 @@ const createJobViaApi = async (baseUrl, token) => {
   return body.data.job;
 };
 
+const applyToJobViaApi = async (baseUrl, jobId, candidateToken) => {
+  const response = await fetch(`${baseUrl}/api/v1/applications/${jobId}/apply`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${candidateToken}`
+    },
+    body: JSON.stringify({})
+  });
+  const body = await response.json();
+  return body.data.application;
+};
+
+const scheduleInterviewViaApi = async (baseUrl, applicationId, recruiterToken, overrides = {}) => {
+  const response = await fetch(`${baseUrl}/api/v1/applications/${applicationId}/interviews`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${recruiterToken}` },
+    body: JSON.stringify({
+      scheduledAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+      durationMinutes: 45,
+      meetingType: 'video',
+      meetingUrl: 'https://meet.example.com/jobsprint-interview',
+      timezone: 'UTC',
+      ...overrides
+    })
+  });
+  return { response, body: await response.json() };
+};
+
 // ============================================================
 // GET /api/v1/applications/summary — Role-aware dashboard totals
 // ============================================================
@@ -696,4 +725,231 @@ test('PATCH /:id/withdraw - candidate cannot withdraw another candidate applicat
   });
 
   assert.equal(response.status, 404);
+});
+
+// ============================================================
+// Interview scheduling lifecycle
+// ============================================================
+
+test('POST /:id/interviews — recruiter schedules an interview and candidate can view it', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+  const recruiterId = new mongoose.Types.ObjectId().toString();
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter' });
+  await seedRecruiterWithCompany(recruiterId);
+  const job = await createJobViaApi(baseUrl, recruiterToken);
+
+  const candidateId = new mongoose.Types.ObjectId().toString();
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
+  await seedCandidateProfile(candidateId);
+  const application = await applyToJobViaApi(baseUrl, job._id, candidateToken);
+  const scheduledAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const scheduleResponse = await fetch(`${baseUrl}/api/v1/applications/${application._id}/interviews`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${recruiterToken}` },
+    body: JSON.stringify({
+      scheduledAt,
+      durationMinutes: 60,
+      meetingType: 'video',
+      meetingUrl: 'https://meet.example.com/jobsprint-interview',
+      timezone: 'Asia/Kolkata',
+      instructions: 'Please join five minutes early.'
+    })
+  });
+  const scheduleBody = await scheduleResponse.json();
+
+  assert.equal(scheduleResponse.status, 201);
+  assert.equal(scheduleBody.data.interview.status, 'scheduled');
+  assert.equal(scheduleBody.data.interview.meetingType, 'video');
+
+  const Application = (await import('../src/models/Application.js')).default;
+  const storedApplication = await Application.findById(application._id).lean();
+  assert.equal(storedApplication.status, 'interviewing');
+  assert.equal(storedApplication.statusTimeline.at(-1).status, 'interviewing');
+  assert.equal(storedApplication.interviews.length, 1);
+
+  const candidateView = await fetch(`${baseUrl}/api/v1/applications/${application._id}/interviews`, {
+    headers: { Authorization: `Bearer ${candidateToken}` }
+  });
+  const candidateBody = await candidateView.json();
+  assert.equal(candidateView.status, 200);
+  assert.equal(candidateBody.data.interviews.length, 1);
+  assert.equal(candidateBody.data.interviews[0].instructions, 'Please join five minutes early.');
+
+  const Notification = (await import('../src/models/Notification.js')).default;
+  const notification = await Notification.findOne({ userId: candidateId, title: 'Interview Scheduled' }).lean();
+  assert.ok(notification);
+  assert.ok(notification.message.includes(job.title));
+});
+
+test('PATCH /:id/interviews/:interviewId — recruiter reschedules then cancels an interview', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+  const recruiterId = new mongoose.Types.ObjectId().toString();
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter' });
+  await seedRecruiterWithCompany(recruiterId);
+  const job = await createJobViaApi(baseUrl, recruiterToken);
+  const candidateId = new mongoose.Types.ObjectId().toString();
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
+  await seedCandidateProfile(candidateId);
+  const application = await applyToJobViaApi(baseUrl, job._id, candidateToken);
+
+  const scheduleResponse = await fetch(`${baseUrl}/api/v1/applications/${application._id}/interviews`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${recruiterToken}` },
+    body: JSON.stringify({
+      scheduledAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+      durationMinutes: 30,
+      meetingType: 'phone',
+      timezone: 'UTC'
+    })
+  });
+  const interviewId = (await scheduleResponse.json()).data.interview._id;
+  const rescheduledAt = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString();
+
+  const rescheduleResponse = await fetch(`${baseUrl}/api/v1/applications/${application._id}/interviews/${interviewId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${recruiterToken}` },
+    body: JSON.stringify({ scheduledAt: rescheduledAt, durationMinutes: 45 })
+  });
+  const rescheduleBody = await rescheduleResponse.json();
+  assert.equal(rescheduleResponse.status, 200);
+  assert.equal(rescheduleBody.data.interview.durationMinutes, 45);
+  assert.equal(new Date(rescheduleBody.data.interview.scheduledAt).toISOString(), rescheduledAt);
+
+  const cancelResponse = await fetch(`${baseUrl}/api/v1/applications/${application._id}/interviews/${interviewId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${recruiterToken}` },
+    body: JSON.stringify({ status: 'cancelled' })
+  });
+  const cancelBody = await cancelResponse.json();
+  assert.equal(cancelResponse.status, 200);
+  assert.equal(cancelBody.data.interview.status, 'cancelled');
+
+  const afterCancellation = await fetch(`${baseUrl}/api/v1/applications/${application._id}/interviews/${interviewId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${recruiterToken}` },
+    body: JSON.stringify({ status: 'completed' })
+  });
+  assert.equal(afterCancellation.status, 400);
+});
+
+test('interview endpoints enforce recruiter ownership and scheduling validation', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+  const ownerId = new mongoose.Types.ObjectId().toString();
+  const ownerToken = await createTestToken({ id: ownerId, role: 'recruiter' });
+  await seedRecruiterWithCompany(ownerId);
+  const job = await createJobViaApi(baseUrl, ownerToken);
+  const candidateId = new mongoose.Types.ObjectId().toString();
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
+  await seedCandidateProfile(candidateId);
+  const application = await applyToJobViaApi(baseUrl, job._id, candidateToken);
+
+  const otherRecruiterId = new mongoose.Types.ObjectId().toString();
+  const otherRecruiterToken = await createTestToken({ id: otherRecruiterId, role: 'recruiter' });
+  const forbiddenResponse = await fetch(`${baseUrl}/api/v1/applications/${application._id}/interviews`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${otherRecruiterToken}` },
+    body: JSON.stringify({
+      scheduledAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+      durationMinutes: 60,
+      meetingType: 'onsite',
+      location: 'JobSprint HQ',
+      timezone: 'UTC'
+    })
+  });
+  assert.equal(forbiddenResponse.status, 403);
+
+  const invalidResponse = await fetch(`${baseUrl}/api/v1/applications/${application._id}/interviews`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${ownerToken}` },
+    body: JSON.stringify({
+      scheduledAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+      durationMinutes: 5,
+      meetingType: 'video',
+      timezone: 'UTC'
+    })
+  });
+  assert.equal(invalidResponse.status, 400);
+});
+
+test('PATCH /:id/interviews/:interviewId/response — candidate accepts once and recruiter is notified', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+  const recruiterId = new mongoose.Types.ObjectId().toString();
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter' });
+  await seedRecruiterWithCompany(recruiterId);
+  const job = await createJobViaApi(baseUrl, recruiterToken);
+  const candidateId = new mongoose.Types.ObjectId().toString();
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
+  await seedCandidateProfile(candidateId);
+  const application = await applyToJobViaApi(baseUrl, job._id, candidateToken);
+  const { body: scheduleBody } = await scheduleInterviewViaApi(baseUrl, application._id, recruiterToken);
+
+  const response = await fetch(`${baseUrl}/api/v1/applications/${application._id}/interviews/${scheduleBody.data.interview._id}/response`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${candidateToken}` },
+    body: JSON.stringify({ response: 'accepted', note: 'Looking forward to meeting the team.' })
+  });
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.data.interview.candidateResponse, 'accepted');
+  assert.equal(body.data.interview.candidateResponseNote, 'Looking forward to meeting the team.');
+  assert.ok(body.data.interview.respondedAt);
+
+  const duplicateResponse = await fetch(`${baseUrl}/api/v1/applications/${application._id}/interviews/${scheduleBody.data.interview._id}/response`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${candidateToken}` },
+    body: JSON.stringify({ response: 'accepted' })
+  });
+  assert.equal(duplicateResponse.status, 400);
+
+  const Notification = (await import('../src/models/Notification.js')).default;
+  const notification = await Notification.findOne({ userId: recruiterId, title: 'Interview Accepted' }).lean();
+  assert.ok(notification);
+  assert.ok(notification.message.includes(job.title));
+});
+
+test('GET /interviews/upcoming — returns role-scoped calendar entries with filters', async (t) => {
+  await setupDatabase();
+  t.after(teardownDatabase);
+
+  const baseUrl = await startTestServer(t);
+  const recruiterId = new mongoose.Types.ObjectId().toString();
+  const recruiterToken = await createTestToken({ id: recruiterId, role: 'recruiter' });
+  await seedRecruiterWithCompany(recruiterId);
+  const job = await createJobViaApi(baseUrl, recruiterToken);
+  const candidateId = new mongoose.Types.ObjectId().toString();
+  const candidateToken = await createTestToken({ id: candidateId, role: 'candidate' });
+  await seedCandidateProfile(candidateId);
+  const application = await applyToJobViaApi(baseUrl, job._id, candidateToken);
+  await scheduleInterviewViaApi(baseUrl, application._id, recruiterToken, { meetingType: 'phone' });
+
+  const recruiterCalendar = await fetch(`${baseUrl}/api/v1/applications/interviews/upcoming?meetingType=phone`, {
+    headers: { Authorization: `Bearer ${recruiterToken}` }
+  });
+  const recruiterBody = await recruiterCalendar.json();
+  assert.equal(recruiterCalendar.status, 200);
+  assert.equal(recruiterBody.data.interviews.length, 1);
+  assert.equal(recruiterBody.data.interviews[0].candidate.email, `candidate-${candidateId}@test.com`);
+  assert.equal(recruiterBody.data.interviews[0].job.title, job.title);
+
+  const candidateCalendar = await fetch(`${baseUrl}/api/v1/applications/interviews/upcoming`, {
+    headers: { Authorization: `Bearer ${candidateToken}` }
+  });
+  const candidateBody = await candidateCalendar.json();
+  assert.equal(candidateCalendar.status, 200);
+  assert.equal(candidateBody.data.interviews.length, 1);
+  assert.equal(candidateBody.data.interviews[0].candidate, undefined);
+  assert.equal(candidateBody.data.interviews[0].job.company.name.startsWith('TestCorp-'), true);
 });
