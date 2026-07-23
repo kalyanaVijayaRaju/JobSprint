@@ -6,7 +6,8 @@ import {
   updateStatusSchema,
   addNoteSchema,
   scheduleInterviewSchema,
-  updateInterviewSchema
+  updateInterviewSchema,
+  respondToInterviewSchema
 } from '../validations/applicationValidation.js';
 import {
   applyToJob,
@@ -18,7 +19,9 @@ import {
   addRecruiterNote,
   scheduleInterview,
   updateInterview,
-  getApplicationInterviews
+  getApplicationInterviews,
+  respondToInterview,
+  getUpcomingInterviews
 } from '../controllers/applicationController.js';
 
 const router = express.Router();
@@ -58,6 +61,13 @@ router.patch(
   withdrawApplication
 );
 
+router.get(
+  '/interviews/upcoming',
+  protect,
+  authorizeRoles('candidate', 'recruiter'),
+  getUpcomingInterviews
+);
+
 // Candidates can view only their own interviews; recruiters view interviews
 // for jobs they own. The service enforces ownership for both roles.
 router.get(
@@ -65,6 +75,14 @@ router.get(
   protect,
   authorizeRoles('candidate', 'recruiter', 'admin'),
   getApplicationInterviews
+);
+
+router.patch(
+  '/:id/interviews/:interviewId/response',
+  protect,
+  authorizeRoles('candidate'),
+  validate(respondToInterviewSchema),
+  respondToInterview
 );
 
 // --- Recruiter routes ---

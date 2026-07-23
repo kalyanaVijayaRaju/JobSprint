@@ -68,6 +68,27 @@ export const updateInterviewSchema = z.object({
   message: 'At least one interview field must be provided'
 });
 
+/** Validates the candidate's response to a scheduled interview. */
+export const respondToInterviewSchema = z.object({
+  response: z.enum(['accepted', 'declined'], {
+    required_error: 'Interview response is required'
+  }),
+  note: z.string().trim().max(500, 'Response note cannot exceed 500 characters').optional()
+});
+
+/** Shared pagination and filtering contract for upcoming interview calendars. */
+export const interviewCalendarQuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(50).default(20),
+  from: z.string().datetime('from must be a valid ISO 8601 date').optional(),
+  to: z.string().datetime('to must be a valid ISO 8601 date').optional(),
+  meetingType: z.enum(['video', 'phone', 'onsite']).optional(),
+  status: z.enum(['scheduled', 'completed', 'cancelled']).default('scheduled')
+}).refine((data) => !data.from || !data.to || new Date(data.from) <= new Date(data.to), {
+  message: 'from must be before to',
+  path: ['from']
+});
+
 /**
  * Validates and coerces pagination/filter query params for the candidate's
  * "my applications" listing.  Falls back to sensible defaults.

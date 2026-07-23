@@ -428,3 +428,114 @@ export const getApplicationInterviews = async (applicationId, actorId, actorRole
 
   return application.interviews.sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt));
 };
+
+/** Candidate accepts or declines their own scheduled interview. */
+export const respondToInterview = async (applicationId, interviewId, candidateId, data) => {
+  const application = await Application.findOne({ _id: applicationId, candidateId });
+  if (!application) throw new ApiError(404, 'Application not found');
+
+  const interview = application.interviews.id(interviewId);
+  if (!interview) throw new ApiError(404, 'Interview not found');
+  if (interview.status !== 'scheduled') throw new ApiError(400, 'Only scheduled interviews can be answered');
+  if (interview.candidateResponse !== 'pending') throw new ApiError(400, 'Interview has already been answered');
+
+  interview.candidateResponse = data.response;
+  interview.candidateResponseNote = data.note;
+  interview.respondedAt = new Date();
+  interview.updatedBy = candidateId;
+  await application.save();
+
+  const job = await Job.findById(application.jobId).select('title recruiterId').lean();
+  try {
+    await notificationService.createNotification(
+      job.recruiterId,
+      `Interview ${data.response === 'accepted' ? 'Accepted' : 'Declined'}`,
+      `The candidate ${data.response} the interview for "${job.title}".${data.note ? ` Note: ${data.note}` : ''}`,
+      'application_status'
+    );
+  } catch (err) {
+    logger.error(`Failed to create recruiter interview-response notification for job ${application.jobId}: ${err.message}`);
+  }
+
+  return interview;
+};
+
+const toCalendarItem = (application, interview, includeCandidate) => ({
+  interviewId: interview._id,
+  applicationId: application._id,
+  scheduledAt: interview.scheduledAt,
+  durationMinutes: interview.durationMinutes,
+  meetingType: interview.meetingType,
+  location: interview.location,
+  meetingUrl: interview.meetingUrl,
+  timezone: interview.timezone,
+  instructions: interview.instructions,
+  status: interview.status,
+  candidateResponse: interview.candidateResponse,
+  candidateResponseNote: interview.candidateResponseNote,
+  respondedAt: interview.respondedAt,
+  job: {
+    id: application.jobId._id,
+    title: application.jobId.title,
+    company: application.jobId.companyId ? {
+      id: application.jobId.companyId._id,
+      name: application.jobId.companyId.name,
+      logo: application.jobId.companyId.logo
+    } : null
+  },
+  ...(includeCandidate && {
+    candidate: { id: application.candidateId._id, email: application.candidateId.email }
+  })
+});
+
+const listInterviewCalendar = async (applicationFilter, query, includeCandidate) => {
+  const from = query.from ? new Date(query.from) : new Date();
+  const to = query.to ? new Date(query.to) : null;
+  const interviewFilter = {
+    status: query.status,
+    scheduledAt: { $gte: from, ...(to && { $lte: to }) },
+    ...(query.meetingType && { meetingType: query.meetingType })
+  };
+  const applications = await Application.find({
+    ...applicationFilter,
+    interviews: { $elemMatch: interviewFilter }
+  })
+    .populate({
+      path: 'jobId',
+      select: 'title companyId',
+      populate: { path: 'companyId', select: 'name logo' }
+    })
+    .populate('candidateId', 'email')
+    .lean();
+
+  const interviews = applications
+    .flatMap((application) => application.interviews
+      .filter((interview) => interview.status === query.status
+        && new Date(interview.scheduledAt) >= from
+        && (!to || new Date(interview.scheduledAt) <= to)
+        && (!query.meetingType || interview.meetingType === query.meetingType))
+      .map((interview) => toCalendarItem(application, interview, includeCandidate)))
+    .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt));
+
+  const start = (query.page - 1) * query.limit;
+  return {
+    interviews: interviews.slice(start, start + query.limit),
+    pagination: {
+      currentPage: query.page,
+      totalPages: Math.ceil(interviews.length / query.limit),
+      totalInterviews: interviews.length,
+      limit: query.limit
+    }
+  };
+};
+
+/** Calendar feed containing interviews for a recruiter's own postings. */
+export const getRecruiterInterviewCalendar = async (recruiterId, query) => {
+  const jobs = await Job.find({ recruiterId }).select('_id').lean();
+  return listInterviewCalendar({ jobId: { $in: jobs.map((job) => job._id) } }, query, true);
+};
+
+/** Candidate-safe calendar feed containing only the user's own interviews. */
+export const getCandidateInterviewCalendar = async (candidateId, query) => {
+  return listInterviewCalendar({ candidateId }, query, false);
+};

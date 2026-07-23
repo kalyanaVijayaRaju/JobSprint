@@ -77,6 +77,17 @@ const interviewSchema = new mongoose.Schema({
     enum: ['scheduled', 'completed', 'cancelled'],
     default: 'scheduled'
   },
+  candidateResponse: {
+    type: String,
+    enum: ['pending', 'accepted', 'declined'],
+    default: 'pending'
+  },
+  candidateResponseNote: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Interview response note cannot exceed 500 characters']
+  },
+  respondedAt: Date,
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -129,6 +140,7 @@ applicationSchema.index({ jobId: 1, candidateId: 1 }, { unique: true });
 // Core querying indexes
 applicationSchema.index({ candidateId: 1, createdAt: -1 }); // Candidate application history
 applicationSchema.index({ jobId: 1, status: 1 });           // Recruiter ATS dashboard pipeline
+applicationSchema.index({ 'interviews.scheduledAt': 1 });   // Upcoming interview calendar queries
 
 // Pre-save middleware to automatically log status changes in the timeline
 applicationSchema.pre('save', function (next) {

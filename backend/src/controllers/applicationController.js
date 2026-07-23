@@ -2,7 +2,8 @@ import asyncHandler from '../utils/asyncHandler.js';
 import * as applicationService from '../services/applicationService.js';
 import {
   applicationQuerySchema,
-  jobApplicationsQuerySchema
+  jobApplicationsQuerySchema,
+  interviewCalendarQuerySchema
 } from '../validations/applicationValidation.js';
 import ApiError from '../utils/apiError.js';
 
@@ -163,4 +164,23 @@ export const updateInterview = asyncHandler(async (req, res) => {
 export const getApplicationInterviews = asyncHandler(async (req, res) => {
   const interviews = await applicationService.getApplicationInterviews(req.params.id, req.user.id, req.user.role);
   res.status(200).json({ success: true, data: { interviews } });
+});
+
+export const respondToInterview = asyncHandler(async (req, res) => {
+  const interview = await applicationService.respondToInterview(req.params.id, req.params.interviewId, req.user.id, req.body);
+  res.status(200).json({ success: true, message: 'Interview response recorded', data: { interview } });
+});
+
+export const getUpcomingInterviews = asyncHandler(async (req, res) => {
+  const result = interviewCalendarQuerySchema.safeParse(req.query);
+  if (!result.success) {
+    const error = new ApiError(400, 'Invalid query parameters', true);
+    error.details = result.error.issues.map((issue) => issue.message);
+    throw error;
+  }
+
+  const calendar = req.user.role === 'candidate'
+    ? await applicationService.getCandidateInterviewCalendar(req.user.id, result.data)
+    : await applicationService.getRecruiterInterviewCalendar(req.user.id, result.data);
+  res.status(200).json({ success: true, data: calendar });
 });
