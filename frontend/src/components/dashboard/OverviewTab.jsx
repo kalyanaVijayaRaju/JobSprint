@@ -1,4 +1,4 @@
-import { useNavigate } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Clock, User } from 'lucide-react';
 import StatsGrid from './StatsGrid.jsx';
 import ApplicationFunnel from './ApplicationFunnel.jsx';
