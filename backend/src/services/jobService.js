@@ -1,5 +1,6 @@
 import Job from '../models/Job.js';
 import RecruiterProfile from '../models/RecruiterProfile.js';
+import AuditLog from '../models/AuditLog.js';
 import ApiError from '../utils/apiError.js';
 import { dispatchJobAlerts } from './jobAlertService.js';
 
@@ -187,4 +188,81 @@ export const deleteJob = async (jobId, recruiterId) => {
   await job.save();
 
   return job;
+};
+
+const ensureJobManager = (job, actorId, actorRole) => {
+  if (actorRole !== 'admin' && job.recruiterId.toString() !== actorId) {
+    throw new ApiError(403, 'You can only manage your own job postings');
+  }
+};
+
+const logJobLifecycleEvent = (job, actorId, action, requestContext = {}) => AuditLog.logEvent({
+  userId: actorId,
+  action,
+  severity: 'info',
+  details: {
+    jobId: job._id,
+    title: job.title,
+    companyId: job.companyId,
+    status: job.status,
+    expiresAt: job.expiresAt
+  },
+  ...requestContext
+});
+
+/** Explicitly close an active job and retain it for recruiter records. */
+export const closeJob = async (jobId, actorId, actorRole, requestContext = {}) => {
+  const job = await Job.findById(jobId);
+  if (!job) throw new ApiError(404, 'Job not found');
+  ensureJobManager(job, actorId, actorRole);
+  if (job.status !== 'active') throw new ApiError(400, `Only active jobs can be closed (current status: ${job.status})`);
+
+  job.status = 'closed';
+  await job.save();
+  await logJobLifecycleEvent(job, actorId, 'job.closed', requestContext);
+  return job;
+};
+
+/** Reopen a closed job with an explicitly supplied future expiration date. */
+export const reopenJob = async (jobId, actorId, actorRole, { expiresAt }, requestContext = {}) => {
+  const job = await Job.findById(jobId);
+  if (!job) throw new ApiError(404, 'Job not found');
+  ensureJobManager(job, actorId, actorRole);
+  if (job.status !== 'closed') throw new ApiError(400, 'Only closed jobs can be reopened');
+
+  job.status = 'active';
+  job.expiresAt = new Date(expiresAt);
+  await job.save();
+  await logJobLifecycleEvent(job, actorId, 'job.reopened', requestContext);
+  return job;
+};
+
+/**
+ * Idempotently close active postings whose expiry date has passed. This is
+ * designed for a scheduler or cron runner and is safe to call repeatedly.
+ */
+export const expireOverdueJobs = async (now = new Date()) => {
+  const overdueJobs = await Job.find({ status: 'active', expiresAt: { $lte: now } })
+    .select('_id title companyId expiresAt')
+    .lean();
+  if (overdueJobs.length === 0) return { expiredCount: 0 };
+
+  await Job.updateMany(
+    { _id: { $in: overdueJobs.map((job) => job._id) }, status: 'active' },
+    { $set: { status: 'closed' } }
+  );
+
+  await AuditLog.insertMany(overdueJobs.map((job) => ({
+    userId: null,
+    action: 'job.auto_closed',
+    severity: 'info',
+    details: {
+      jobId: job._id,
+      title: job.title,
+      companyId: job.companyId,
+      expiresAt: job.expiresAt
+    }
+  })));
+
+  return { expiredCount: overdueJobs.length };
 };

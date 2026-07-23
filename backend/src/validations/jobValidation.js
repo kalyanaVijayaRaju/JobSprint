@@ -94,6 +94,15 @@ export const updateJobSchema = z.object({
   message: 'At least one field must be provided for update'
 });
 
+/** Reopening a job always requires a new future expiry date. */
+export const reopenJobSchema = z.object({
+  expiresAt: z.string({ required_error: 'A new expiration date is required to reopen a job' })
+    .datetime('Expiration date must be a valid ISO 8601 date')
+    .refine((date) => new Date(date) > new Date(), {
+      message: 'Expiration date must be in the future'
+    })
+});
+
 /**
  * Validates and coerces pagination/filter query params for the job listing
  * endpoint.  Falls back to sensible defaults so callers can omit everything.

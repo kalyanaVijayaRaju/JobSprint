@@ -1,13 +1,15 @@
 import express from 'express';
 import { protect, authorizeRoles } from '../middlewares/authMiddleware.js';
 import { validate } from '../validations/authValidation.js';
-import { createJobSchema, updateJobSchema } from '../validations/jobValidation.js';
+import { createJobSchema, updateJobSchema, reopenJobSchema } from '../validations/jobValidation.js';
 import {
   createJob,
   getJobs,
   getJob,
   updateJob,
-  deleteJob
+  deleteJob,
+  closeJob,
+  reopenJob
 } from '../controllers/jobController.js';
 
 const router = express.Router();
@@ -18,6 +20,8 @@ router.get('/:id', getJob);
 
 // Protected routes — only authenticated recruiters can manage jobs
 router.post('/', protect, authorizeRoles('recruiter', 'admin'), validate(createJobSchema), createJob);
+router.patch('/:id/close', protect, authorizeRoles('recruiter', 'admin'), closeJob);
+router.patch('/:id/reopen', protect, authorizeRoles('recruiter', 'admin'), validate(reopenJobSchema), reopenJob);
 router.put('/:id', protect, authorizeRoles('recruiter', 'admin'), validate(updateJobSchema), updateJob);
 router.delete('/:id', protect, authorizeRoles('recruiter', 'admin'), deleteJob);
 

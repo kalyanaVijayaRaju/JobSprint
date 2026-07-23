@@ -352,6 +352,10 @@ const getRecruiterApplication = async (applicationId, actorId, actorRole) => {
 export const scheduleInterview = async (applicationId, actorId, actorRole, data) => {
   const { application, job } = await getRecruiterApplication(applicationId, actorId, actorRole);
 
+  if (job.status !== 'active' || new Date(job.expiresAt) <= new Date()) {
+    throw new ApiError(400, 'Cannot schedule an interview for an inactive or expired job posting');
+  }
+
   if (['withdrawn', 'rejected', 'offered'].includes(application.status)) {
     throw new ApiError(400, `Cannot schedule an interview for a ${application.status} application`);
   }

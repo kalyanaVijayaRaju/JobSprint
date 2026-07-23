@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "check": "node --check src/server.js && node --check src/app.js",
+    "expire-jobs": "node src/tasks/expireOverdueJobs.js",
     "test": "node --test",
     "seed": "node scripts/seed/index.js",
     "seed:clear": "node scripts/seed/clear.js",
