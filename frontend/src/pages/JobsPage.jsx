@@ -192,6 +192,26 @@ export default function JobsPage() {
     }
   };
 
+  const handleCloseJob = async (jobId) => {
+    try {
+      await jobsApi.close(jobId);
+      triggerAlert('Job posting closed');
+      fetchRecruiterJobs();
+    } catch (err) {
+      triggerAlert(err.message, 'error');
+    }
+  };
+
+  const handleReopenJob = async (jobId, expiresAt) => {
+    try {
+      await jobsApi.reopen(jobId, { expiresAt });
+      triggerAlert('Job posting reopened successfully');
+      fetchRecruiterJobs();
+    } catch (err) {
+      triggerAlert(err.message, 'error');
+    }
+  };
+
   return (
     <JobsBoard
       user={user}
@@ -208,6 +228,8 @@ export default function JobsPage() {
       onPostJob={handleCreateJob}
       onUpdateJob={handleUpdateJob}
       onDeleteJob={handleDeleteJob}
+      onCloseJob={handleCloseJob}
+      onReopenJob={handleReopenJob}
       submittingApplication={submittingApplication}
       submittingJob={submittingJob}
       setActiveTab={(tab) => navigate(`/${tab === 'profile' ? 'profile' : tab}`)}

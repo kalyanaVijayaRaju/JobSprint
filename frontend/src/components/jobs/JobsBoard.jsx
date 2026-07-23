@@ -26,6 +26,8 @@ export default function JobsBoard({
   onPostJob,
   onUpdateJob,
   onDeleteJob,
+  onCloseJob,
+  onReopenJob,
   submittingApplication,
   submittingJob,
   setActiveTab,
@@ -156,6 +158,8 @@ export default function JobsBoard({
           setActiveTab('applications');
         }}
         onUpdateJobStatus={(jobId, status) => onUpdateJob(jobId, { status })}
+        onCloseJob={onCloseJob}
+        onReopenJob={onReopenJob}
         onArchiveJob={(jobId) => {
           if (window.confirm('Are you sure you want to archive this job posting?')) {
             onDeleteJob(jobId);
