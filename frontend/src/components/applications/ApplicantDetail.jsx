@@ -1,8 +1,9 @@
-import { X, FileText, ExternalLink, Clock } from 'lucide-react';
+import { X, FileText, ExternalLink, Clock, Calendar, Video } from 'lucide-react';
 import { Button, Badge } from '../ui';
+import InterviewList from './InterviewList.jsx';
 
 /**
- * Slide-in detail drawer for viewing full applicant details, updating status, and adding recruiter notes.
+ * Slide-in detail drawer for viewing full applicant details, updating status, adding recruiter notes, and scheduling interviews.
  */
 export default function ApplicantDetail({
   application,
@@ -12,6 +13,9 @@ export default function ApplicantDetail({
   setRecruiterNote,
   onAddNoteSubmit,
   submittingNote,
+  onOpenScheduleModal,
+  interviews = [],
+  onEditInterview
 }) {
   if (!application) return null;
 
@@ -43,8 +47,20 @@ export default function ApplicantDetail({
         <div className="drawer-body">
           {/* Status changer */}
           <section className="detail-section">
-            <h4>Application Stage</h4>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+              <h4 style={{ margin: 0 }}>Application Stage</h4>
+              {onOpenScheduleModal && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  icon={<Video size={14} />}
+                  onClick={() => onOpenScheduleModal(application)}
+                >
+                  Schedule Interview
+                </Button>
+              )}
+            </div>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
               {statuses.map((status) => (
                 <button
                   key={status}
@@ -56,6 +72,18 @@ export default function ApplicantDetail({
                   {status}
                 </button>
               ))}
+            </div>
+          </section>
+
+          {/* Interviews section */}
+          <section className="detail-section">
+            <h4>Scheduled Interviews ({interviews.length})</h4>
+            <div style={{ marginTop: '10px' }}>
+              <InterviewList
+                interviews={interviews}
+                userRole="recruiter"
+                onEditInterview={onEditInterview}
+              />
             </div>
           </section>
 

@@ -3,6 +3,7 @@ import { UsersRound } from 'lucide-react';
 import KanbanBoard from './KanbanBoard.jsx';
 import ApplicantDetail from './ApplicantDetail.jsx';
 import CandidateTimeline from './CandidateTimeline.jsx';
+import InterviewScheduler from './InterviewScheduler.jsx';
 
 /**
  * Main AtsPipeline component — orchestrates recruiter applicant Kanban board and candidate application tracking timeline.
@@ -23,9 +24,16 @@ export default function AtsPipeline({
   setActiveTab,
   onWithdraw,
   withdrawingApplicationId,
+  onScheduleInterview,
+  onRespondToInterview,
+  submittingInterview = false,
+  submittingResponseId = null,
+  applicationInterviews = {}
 }) {
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [recruiterNote, setRecruiterNote] = useState('');
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [interviewToEdit, setInterviewToEdit] = useState(null);
 
   const handleNoteSubmit = (e) => {
     e.preventDefault();
@@ -43,8 +51,21 @@ export default function AtsPipeline({
     }
   };
 
+  const handleScheduleSubmit = async (interviewData) => {
+    if (!selectedApplication) return;
+    if (onScheduleInterview) {
+      await onScheduleInterview(selectedApplication._id, interviewData, interviewToEdit?._id);
+    }
+    setScheduleModalOpen(false);
+    setInterviewToEdit(null);
+  };
+
   // Recruiter pipeline view
   if (user.role === 'recruiter') {
+    const currentInterviews = selectedApplication
+      ? (applicationInterviews[selectedApplication._id] || selectedApplication.interviews || [])
+      : [];
+
     return (
       <div className="tab-content">
         <div className="recruiter-ats-view">
@@ -100,7 +121,30 @@ export default function AtsPipeline({
             setRecruiterNote={setRecruiterNote}
             onAddNoteSubmit={handleNoteSubmit}
             submittingNote={submittingNote}
+            onOpenScheduleModal={() => {
+              setInterviewToEdit(null);
+              setScheduleModalOpen(true);
+            }}
+            interviews={currentInterviews}
+            onEditInterview={(interview) => {
+              setInterviewToEdit(interview);
+              setScheduleModalOpen(true);
+            }}
           />
+
+          {scheduleModalOpen && (
+            <InterviewScheduler
+              isOpen={scheduleModalOpen}
+              onClose={() => {
+                setScheduleModalOpen(false);
+                setInterviewToEdit(null);
+              }}
+              onSchedule={handleScheduleSubmit}
+              application={selectedApplication}
+              existingInterview={interviewToEdit}
+              submitting={submittingInterview}
+            />
+          )}
         </div>
       </div>
     );
@@ -116,6 +160,8 @@ export default function AtsPipeline({
         onWithdraw={onWithdraw}
         withdrawingApplicationId={withdrawingApplicationId}
         onBrowseJobs={() => setActiveTab('jobs')}
+        onRespondToInterview={onRespondToInterview}
+        submittingResponseId={submittingResponseId}
       />
     </div>
   );

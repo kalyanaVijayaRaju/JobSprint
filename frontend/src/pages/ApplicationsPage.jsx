@@ -102,6 +102,53 @@ export default function ApplicationsPage() {
     }
   };
 
+  const [submittingInterview, setSubmittingInterview] = useState(false);
+  const [submittingResponseId, setSubmittingResponseId] = useState(null);
+  const [applicationInterviews, setApplicationInterviews] = useState({});
+
+  const handleScheduleInterview = async (appId, interviewData, existingInterviewId) => {
+    setSubmittingInterview(true);
+    try {
+      if (existingInterviewId) {
+        await applicationsApi.updateInterview(appId, existingInterviewId, interviewData);
+        triggerAlert('Interview rescheduled successfully');
+      } else {
+        await applicationsApi.scheduleInterview(appId, interviewData);
+        triggerAlert('Interview invitation sent to candidate!');
+      }
+
+      // Fetch fresh interviews for this application
+      const res = await applicationsApi.getInterviews(appId);
+      if (res.success) {
+        setApplicationInterviews((prev) => ({ ...prev, [appId]: res.data.interviews }));
+      }
+
+      if (selectedJobForApplicants) {
+        fetchJobApplicants(selectedJobForApplicants._id);
+      }
+    } catch (err) {
+      triggerAlert(err.message, 'error');
+    } finally {
+      setSubmittingInterview(false);
+    }
+  };
+
+  const handleRespondToInterview = async (appId, interviewId, responseStatus, candidateNotes) => {
+    setSubmittingResponseId(interviewId);
+    try {
+      await applicationsApi.respondToInterview(appId, interviewId, {
+        candidateResponseStatus: responseStatus,
+        candidateNotes
+      });
+      triggerAlert(`Interview invitation ${responseStatus.replace('_', ' ')}!`);
+      fetchMyApplications();
+    } catch (err) {
+      triggerAlert(err.message, 'error');
+    } finally {
+      setSubmittingResponseId(null);
+    }
+  };
+
   return (
     <AtsPipeline
       user={user}
@@ -119,6 +166,11 @@ export default function ApplicationsPage() {
       onWithdraw={handleWithdraw}
       withdrawingApplicationId={withdrawingApplicationId}
       setActiveTab={(tab) => navigate(`/${tab === 'jobs' ? 'jobs' : tab}`)}
+      onScheduleInterview={handleScheduleInterview}
+      onRespondToInterview={handleRespondToInterview}
+      submittingInterview={submittingInterview}
+      submittingResponseId={submittingResponseId}
+      applicationInterviews={applicationInterviews}
     />
   );
 }
