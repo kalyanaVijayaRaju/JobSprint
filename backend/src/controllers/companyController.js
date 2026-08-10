@@ -81,3 +81,63 @@ export const deleteCompany = asyncHandler(async (req, res) => {
     message: 'Company deactivated successfully'
   });
 });
+
+/**
+ * @route   GET /api/v1/companies/:id/detail
+ * @access  Public (enriched with follow status if authenticated)
+ */
+export const getCompanyDetail = asyncHandler(async (req, res) => {
+  const userId = req.user?.id || null;
+  const company = await companyService.getCompanyDetail(req.params.id, userId);
+
+  res.status(200).json({
+    success: true,
+    data: { company }
+  });
+});
+
+/**
+ * @route   GET /api/v1/companies/:id/jobs
+ * @access  Public
+ */
+export const getCompanyJobs = asyncHandler(async (req, res) => {
+  const query = {
+    page: parseInt(req.query.page, 10) || 1,
+    limit: parseInt(req.query.limit, 10) || 10,
+    status: req.query.status || 'active'
+  };
+  const result = await companyService.getCompanyJobs(req.params.id, query);
+
+  res.status(200).json({
+    success: true,
+    data: result
+  });
+});
+
+/**
+ * @route   POST /api/v1/companies/:id/follow
+ * @access  Authenticated
+ */
+export const followCompany = asyncHandler(async (req, res) => {
+  const result = await companyService.followCompany(req.user.id, req.params.id);
+
+  res.status(200).json({
+    success: true,
+    message: 'Company followed successfully',
+    data: result
+  });
+});
+
+/**
+ * @route   DELETE /api/v1/companies/:id/follow
+ * @access  Authenticated
+ */
+export const unfollowCompany = asyncHandler(async (req, res) => {
+  const result = await companyService.unfollowCompany(req.user.id, req.params.id);
+
+  res.status(200).json({
+    success: true,
+    message: 'Company unfollowed successfully',
+    data: result
+  });
+});

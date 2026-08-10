@@ -107,6 +107,15 @@ export const companiesApi = {
     return apiFetch(`/api/v1/companies${query ? `?${query}` : ''}`);
   },
   get: (id) => apiFetch(`/api/v1/companies/${id}`),
+  getDetail: (id) => apiFetch(`/api/v1/companies/${id}/detail`),
+  getJobs: (id, params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/companies/${id}/jobs${query ? `?${query}` : ''}`);
+  },
+  follow: (id) => apiFetch(`/api/v1/companies/${id}/follow`, { method: 'POST' }),
+  unfollow: (id) => apiFetch(`/api/v1/companies/${id}/follow`, { method: 'DELETE' }),
   create: (data) => apiFetch('/api/v1/companies', { method: 'POST', body: data }),
   update: (id, data) => apiFetch(`/api/v1/companies/${id}`, { method: 'PUT', body: data }),
   delete: (id) => apiFetch(`/api/v1/companies/${id}`, { method: 'DELETE' })
@@ -134,7 +143,8 @@ export const jobsApi = {
   update: (id, data) => apiFetch(`/api/v1/jobs/${id}`, { method: 'PUT', body: data }),
   delete: (id) => apiFetch(`/api/v1/jobs/${id}`, { method: 'DELETE' }),
   close: (id) => apiFetch(`/api/v1/jobs/${id}/close`, { method: 'PATCH' }),
-  reopen: (id, data) => apiFetch(`/api/v1/jobs/${id}/reopen`, { method: 'PATCH', body: data })
+  reopen: (id, data) => apiFetch(`/api/v1/jobs/${id}/reopen`, { method: 'PATCH', body: data }),
+  autocomplete: (q) => apiFetch(`/api/v1/jobs/search/autocomplete?q=${encodeURIComponent(q)}`)
 };
 
 // ---------------------------------------------------------------------------
@@ -222,5 +232,21 @@ export const jobAlertsApi = {
   list: () => apiFetch('/api/v1/job-alerts'),
   create: (data) => apiFetch('/api/v1/job-alerts', { method: 'POST', body: data }),
   delete: (id) => apiFetch(`/api/v1/job-alerts/${id}`, { method: 'DELETE' })
+};
+
+// ---------------------------------------------------------------------------
+// Analytics API
+// ---------------------------------------------------------------------------
+
+export const analyticsApi = {
+  platform: () => apiFetch('/api/v1/analytics/platform'),
+  recruiter: () => apiFetch('/api/v1/analytics/recruiter'),
+  candidate: () => apiFetch('/api/v1/analytics/candidate'),
+  trends: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/analytics/trends${query ? `?${query}` : ''}`);
+  }
 };
 

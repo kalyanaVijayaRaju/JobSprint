@@ -123,6 +123,64 @@ export const getJobs = async (query) => {
 };
 
 /**
+ * Autocomplete suggestions for job search.
+ *
+ * Returns up to 10 job title and skill matches for a prefix query.
+ * Results are deduplicated and sorted by relevance.
+ *
+ * @param {string} query - The search prefix (min 2 characters)
+ * @returns {{ suggestions: Array }}
+ */
+export const getAutocomplete = async (query) => {
+  if (!query || query.length < 2) return { suggestions: [] };
+
+  const regex = new RegExp(`^${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i');
+
+  const [titleMatches, skillMatches] = await Promise.all([
+    // Match job titles
+    Job.find(
+      { status: 'active', title: { $regex: regex } },
+      { title: 1, _id: 0 }
+    )
+      .limit(10)
+      .lean(),
+
+    // Match skills
+    Job.aggregate([
+      { $match: { status: 'active' } },
+      { $unwind: '$skillsRequired' },
+      { $match: { skillsRequired: { $regex: regex } } },
+      { $group: { _id: '$skillsRequired', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 }
+    ])
+  ]);
+
+  const seen = new Set();
+  const suggestions = [];
+
+  // Add title matches
+  for (const { title } of titleMatches) {
+    const key = title.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      suggestions.push({ text: title, type: 'title' });
+    }
+  }
+
+  // Add skill matches
+  for (const { _id: skill, count } of skillMatches) {
+    const key = skill.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      suggestions.push({ text: skill, type: 'skill', count });
+    }
+  }
+
+  return { suggestions: suggestions.slice(0, 10) };
+};
+
+/**
  * Get a single job by its ID with populated company data.
  *
  * @param {string} jobId

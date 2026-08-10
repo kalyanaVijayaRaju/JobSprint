@@ -8,6 +8,7 @@ import './styles/layout.css';
 import './styles/forms.css';
 import './styles/components.css';
 import './styles/animations.css';
+import './styles/premium.css';
 import './styles.css';
 
 function App() {

@@ -1,5 +1,7 @@
 import { Search, X } from 'lucide-react';
 import { Button } from '../ui';
+import SearchAutocomplete from './SearchAutocomplete.jsx';
+import SalaryRangeSlider from './SalaryRangeSlider.jsx';
 
 /**
  * Filter pane sidebar for candidate job discovery.
@@ -40,16 +42,11 @@ export default function JobFilters({
       <form onSubmit={onSubmit} className="filter-form">
         <div className="form-group">
           <label htmlFor="search-keyword">Search Keyword</label>
-          <div className="search-input">
-            <Search size={16} />
-            <input
-              id="search-keyword"
-              type="text"
-              placeholder="Title, description or skills..."
-              value={jobSearch}
-              onChange={(e) => setJobSearch(e.target.value)}
-            />
-          </div>
+          <SearchAutocomplete
+            value={jobSearch}
+            onChange={setJobSearch}
+            placeholder="Title, skill, or keyword..."
+          />
         </div>
 
         <div className="form-group">
@@ -97,24 +94,12 @@ export default function JobFilters({
         </div>
 
         <div className="form-group">
-          <label htmlFor="min-salary-input">Min Salary (Annual USD)</label>
-          <input
-            id="min-salary-input"
-            type="number"
-            placeholder="e.g. 50000"
-            value={salaryMinFilter}
-            onChange={(e) => setSalaryMinFilter(e.target.value)}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="max-salary-input">Max Salary (Annual USD)</label>
-          <input
-            id="max-salary-input"
-            type="number"
-            placeholder="e.g. 150000"
-            value={salaryMaxFilter}
-            onChange={(e) => setSalaryMaxFilter(e.target.value)}
+          <label>Salary Range (Annual USD)</label>
+          <SalaryRangeSlider
+            minSalary={salaryMinFilter}
+            setMinSalary={setSalaryMinFilter}
+            maxSalary={salaryMaxFilter}
+            setMaxSalary={setSalaryMaxFilter}
           />
         </div>
 

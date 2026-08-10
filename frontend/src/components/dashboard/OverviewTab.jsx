@@ -1,9 +1,13 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Clock, User } from 'lucide-react';
+import { Plus, Search, Clock } from 'lucide-react';
 import StatsGrid from './StatsGrid.jsx';
 import ApplicationFunnel from './ApplicationFunnel.jsx';
 import RecentActivity from './RecentActivity.jsx';
 import UpcomingInterviews from './UpcomingInterviews.jsx';
+import ProfileCompleteness from './ProfileCompleteness.jsx';
+import RecommendedJobs from './RecommendedJobs.jsx';
+import { analyticsApi } from '../../api/client.js';
 import { Button } from '../ui';
 
 /**
@@ -22,6 +26,17 @@ export default function OverviewTab({
   upcomingInterviews = [],
 }) {
   const navigate = useNavigate();
+  const [candidateAnalytics, setCandidateAnalytics] = useState(null);
+
+  useEffect(() => {
+    if (user?.role === 'candidate') {
+      analyticsApi.candidate()
+        .then((res) => {
+          if (res.success && res.data) setCandidateAnalytics(res.data.analytics);
+        })
+        .catch(() => {});
+    }
+  }, [user]);
 
   return (
     <div className="tab-content">
@@ -83,6 +98,16 @@ export default function OverviewTab({
         </div>
       </div>
 
+      {/* Candidate Profile Strength Widget */}
+      {user.role === 'candidate' && candidateAnalytics?.profileCompleteness && (
+        <ProfileCompleteness completeness={candidateAnalytics.profileCompleteness} />
+      )}
+
+      {/* Candidate Job Recommendations Widget */}
+      {user.role === 'candidate' && candidateAnalytics?.recommendations && (
+        <RecommendedJobs recommendations={candidateAnalytics.recommendations} />
+      )}
+
       {/* Stats Cards */}
       <StatsGrid
         user={user}
@@ -103,3 +128,4 @@ export default function OverviewTab({
     </div>
   );
 }
+

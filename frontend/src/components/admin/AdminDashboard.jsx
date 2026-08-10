@@ -1,16 +1,25 @@
-import { useEffect, useState } from 'react';
-import { Users, FileSpreadsheet } from 'lucide-react';
-import { adminApi } from '../../api/client.js';
+import { useEffect, useState, useCallback } from 'react';
+import { Users, FileSpreadsheet, BarChart3, Shield } from 'lucide-react';
+import { adminApi, analyticsApi } from '../../api/client.js';
 import UserManagement from './UserManagement.jsx';
 import AuditLogViewer from './AuditLogViewer.jsx';
 import StatusChangeDialog from './StatusChangeDialog.jsx';
+import PlatformStats from './PlatformStats.jsx';
+import TrendCharts from './TrendCharts.jsx';
+import FlaggedContent from './FlaggedContent.jsx';
 import { Tabs } from '../ui';
 
 /**
- * Main AdminDashboard component — user account controls and security audit log analysis.
+ * Main AdminDashboard component — platform analytics, user management,
+ * content moderation, and security audit log analysis.
  */
 export default function AdminDashboard({ user }) {
-  const [activeSubTab, setActiveSubTab] = useState('users'); // 'users' | 'audit'
+  const [activeSubTab, setActiveSubTab] = useState('analytics'); // 'analytics' | 'users' | 'moderation' | 'audit'
+
+  // Analytics state
+  const [analytics, setAnalytics] = useState(null);
+  const [trends, setTrends] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   // Users state
   const [users, setUsers] = useState([]);
@@ -29,6 +38,21 @@ export default function AdminDashboard({ user }) {
   const [logsFilters, setLogsFilters] = useState({ userId: '', action: '', severity: '', from: '', to: '' });
   const [logsLoading, setLogsLoading] = useState(false);
   const [logsError, setLogsError] = useState(null);
+
+  // Fetch Analytics
+  const fetchAnalytics = useCallback(() => {
+    setAnalyticsLoading(true);
+    Promise.all([
+      analyticsApi.platform(),
+      analyticsApi.trends({ period: 'daily', days: 30 })
+    ])
+      .then(([platformRes, trendsRes]) => {
+        if (platformRes.success) setAnalytics(platformRes.data.analytics);
+        if (trendsRes.success) setTrends(trendsRes.data.trends);
+      })
+      .catch(() => {})
+      .finally(() => setAnalyticsLoading(false));
+  }, []);
 
   // Fetch Users
   const fetchUsers = (page = 1) => {
@@ -81,9 +105,10 @@ export default function AdminDashboard({ user }) {
   };
 
   useEffect(() => {
-    if (activeSubTab === 'users') fetchUsers(1);
+    if (activeSubTab === 'analytics') fetchAnalytics();
+    else if (activeSubTab === 'users') fetchUsers(1);
     else if (activeSubTab === 'audit') fetchAuditLogs(1);
-  }, [activeSubTab]);
+  }, [activeSubTab, fetchAnalytics]);
 
   const handleStatusSubmit = async () => {
     if (!statusDialog.user || !statusDialog.reason.trim()) return;
@@ -103,7 +128,9 @@ export default function AdminDashboard({ user }) {
   };
 
   const adminTabs = [
+    { id: 'analytics', label: 'Platform Analytics', icon: <BarChart3 size={16} /> },
     { id: 'users', label: 'User Management', icon: <Users size={16} /> },
+    { id: 'moderation', label: 'Moderation', icon: <Shield size={16} /> },
     { id: 'audit', label: 'Security Audit Logs', icon: <FileSpreadsheet size={16} /> },
   ];
 
@@ -111,6 +138,13 @@ export default function AdminDashboard({ user }) {
     <div className="tab-content">
       <div className="admin-container">
         <Tabs tabs={adminTabs} activeTab={activeSubTab} onChange={setActiveSubTab} style={{ marginBottom: '24px' }} />
+
+        <Tabs.Panel id="analytics" activeTab={activeSubTab}>
+          <PlatformStats analytics={analytics} loading={analyticsLoading} />
+          <div style={{ marginTop: '24px' }}>
+            <TrendCharts trends={trends} loading={analyticsLoading} />
+          </div>
+        </Tabs.Panel>
 
         <Tabs.Panel id="users" activeTab={activeSubTab}>
           <UserManagement
@@ -125,6 +159,10 @@ export default function AdminDashboard({ user }) {
               setStatusDialog({ open: true, user: u, isActive, reason: '' })
             }
           />
+        </Tabs.Panel>
+
+        <Tabs.Panel id="moderation" activeTab={activeSubTab}>
+          <FlaggedContent />
         </Tabs.Panel>
 
         <Tabs.Panel id="audit" activeTab={activeSubTab}>
@@ -153,3 +191,4 @@ export default function AdminDashboard({ user }) {
     </div>
   );
 }
+

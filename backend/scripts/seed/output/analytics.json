@@ -1,0 +1,254 @@
+{
+  "topSkills": [
+    {
+      "count": 983,
+      "skill": "Git"
+    },
+    {
+      "count": 865,
+      "skill": "SQL"
+    },
+    {
+      "count": 691,
+      "skill": "Python"
+    },
+    {
+      "count": 605,
+      "skill": "JavaScript"
+    },
+    {
+      "count": 582,
+      "skill": "REST APIs"
+    },
+    {
+      "count": 570,
+      "skill": "Linux"
+    },
+    {
+      "count": 518,
+      "skill": "Docker"
+    },
+    {
+      "count": 461,
+      "skill": "CI/CD"
+    },
+    {
+      "count": 457,
+      "skill": "HTML5"
+    },
+    {
+      "count": 452,
+      "skill": "CSS3"
+    },
+    {
+      "count": 389,
+      "skill": "AWS"
+    },
+    {
+      "count": 386,
+      "skill": "React"
+    },
+    {
+      "count": 369,
+      "skill": "Node.js"
+    },
+    {
+      "count": 322,
+      "skill": "TypeScript"
+    },
+    {
+      "count": 313,
+      "skill": "Kubernetes"
+    },
+    {
+      "count": 269,
+      "skill": "Machine Learning"
+    },
+    {
+      "count": 269,
+      "skill": "Java"
+    },
+    {
+      "count": 204,
+      "skill": "MongoDB"
+    },
+    {
+      "count": 178,
+      "skill": "Statistics"
+    },
+    {
+      "count": 177,
+      "skill": "Express.js"
+    }
+  ],
+  "mostAppliedJobs": [
+    {
+      "applicationCount": 11,
+      "title": "Flutter Developer",
+      "company": "Google"
+    },
+    {
+      "applicationCount": 11,
+      "title": "Senior SRE",
+      "company": "Apple"
+    },
+    {
+      "applicationCount": 10,
+      "title": "Rust Developer",
+      "company": "Salesforce"
+    },
+    {
+      "applicationCount": 10,
+      "title": "Senior Cyber Security Engineer",
+      "company": "Postman"
+    },
+    {
+      "applicationCount": 10,
+      "title": "Principal Flutter Developer",
+      "company": "Morgan Stanley"
+    },
+    {
+      "applicationCount": 10,
+      "title": "Backend Developer",
+      "company": "Salesforce"
+    },
+    {
+      "applicationCount": 10,
+      "title": "DevOps Engineer",
+      "company": "HCLTech"
+    },
+    {
+      "applicationCount": 10,
+      "title": "Junior Cyber Security Engineer",
+      "company": "LTIMindtree"
+    },
+    {
+      "applicationCount": 9,
+      "title": "Junior Full Stack Developer",
+      "company": "Infosys"
+    },
+    {
+      "applicationCount": 9,
+      "title": "Node.js Developer",
+      "company": "Paytm"
+    }
+  ],
+  "mostActiveCompanies": [
+    {
+      "jobCount": 57,
+      "company": "Swiggy",
+      "industry": "Food Tech"
+    },
+    {
+      "jobCount": 57,
+      "company": "Intel",
+      "industry": "Semiconductors"
+    },
+    {
+      "jobCount": 56,
+      "company": "Qualcomm",
+      "industry": "Semiconductors"
+    },
+    {
+      "jobCount": 56,
+      "company": "Adobe",
+      "industry": "Technology"
+    },
+    {
+      "jobCount": 56,
+      "company": "Ola",
+      "industry": "Transportation"
+    },
+    {
+      "jobCount": 54,
+      "company": "Lenskart",
+      "industry": "E-Commerce"
+    },
+    {
+      "jobCount": 54,
+      "company": "McKinsey & Company",
+      "industry": "Consulting"
+    },
+    {
+      "jobCount": 53,
+      "company": "LTIMindtree",
+      "industry": "IT Services"
+    },
+    {
+      "jobCount": 53,
+      "company": "Stripe",
+      "industry": "Fintech"
+    },
+    {
+      "jobCount": 53,
+      "company": "Oracle",
+      "industry": "Technology"
+    }
+  ],
+  "monthlyApplications": [
+    {
+      "_id": {
+        "year": 2026,
+        "month": 4
+      },
+      "count": 44
+    },
+    {
+      "_id": {
+        "year": 2026,
+        "month": 5
+      },
+      "count": 1371
+    },
+    {
+      "_id": {
+        "year": 2026,
+        "month": 6
+      },
+      "count": 3526
+    },
+    {
+      "_id": {
+        "year": 2026,
+        "month": 7
+      },
+      "count": 5059
+    }
+  ],
+  "hiringFunnel": [
+    {
+      "_id": "applied",
+      "count": 4043
+    },
+    {
+      "_id": "screening",
+      "count": 1993
+    },
+    {
+      "_id": "interviewing",
+      "count": 1471
+    },
+    {
+      "_id": "rejected",
+      "count": 1010
+    },
+    {
+      "_id": "offered",
+      "count": 985
+    },
+    {
+      "_id": "withdrawn",
+      "count": 498
+    }
+  ],
+  "summary": {
+    "totalUsers": 1304,
+    "totalCandidates": 1002,
+    "totalRecruiters": 301,
+    "totalCompanies": 139,
+    "totalJobs": 3000,
+    "activeJobs": 2123,
+    "totalApplications": 10000,
+    "totalProfiles": 1001
+  }
+}

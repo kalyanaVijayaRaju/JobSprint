@@ -1,5 +1,8 @@
 import Company from '../models/Company.js';
 import RecruiterProfile from '../models/RecruiterProfile.js';
+import CompanyFollower from '../models/CompanyFollower.js';
+import Job from '../models/Job.js';
+import Application from '../models/Application.js';
 import ApiError from '../utils/apiError.js';
 
 /**
@@ -184,3 +187,125 @@ export const deleteCompany = async (companyId, recruiterId) => {
 
   return company;
 };
+
+// ---------------------------------------------------------------------------
+// New: Company detail, company jobs, follow/unfollow
+// ---------------------------------------------------------------------------
+
+/**
+ * Get enriched company detail with follower count, active job count,
+ * and total applications received.
+ *
+ * @param {string} companyId
+ * @param {string|null} userId - If provided, includes whether this user follows the company
+ * @returns {Object} Enriched company detail
+ */
+export const getCompanyDetail = async (companyId, userId = null) => {
+  const company = await Company.findById(companyId).lean();
+
+  if (!company) {
+    throw new ApiError(404, 'Company not found');
+  }
+
+  const [activeJobCount, totalApplications, followerCount, isFollowing] = await Promise.all([
+    Job.countDocuments({ companyId, status: 'active', expiresAt: { $gt: new Date() } }),
+
+    Job.aggregate([
+      { $match: { companyId: company._id } },
+      { $lookup: { from: 'applications', localField: '_id', foreignField: 'jobId', as: 'apps' } },
+      { $project: { appCount: { $size: '$apps' } } },
+      { $group: { _id: null, total: { $sum: '$appCount' } } }
+    ]).then((rows) => rows[0]?.total || 0),
+
+    CompanyFollower.countDocuments({ companyId }),
+
+    userId
+      ? CompanyFollower.exists({ companyId, userId }).then(Boolean)
+      : false
+  ]);
+
+  return {
+    ...company,
+    activeJobCount,
+    totalApplications,
+    followerCount,
+    isFollowing
+  };
+};
+
+/**
+ * Get paginated jobs for a specific company.
+ *
+ * @param {string} companyId
+ * @param {Object} query - { page, limit, status }
+ * @returns {{ jobs: Array, pagination: Object }}
+ */
+export const getCompanyJobs = async (companyId, query) => {
+  const company = await Company.findById(companyId).lean();
+  if (!company) throw new ApiError(404, 'Company not found');
+
+  const { page = 1, limit = 10, status = 'active' } = query;
+  const filter = { companyId: company._id, status };
+
+  if (status === 'active') {
+    filter.expiresAt = { $gt: new Date() };
+  }
+
+  const skip = (page - 1) * limit;
+
+  const [jobs, total] = await Promise.all([
+    Job.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('companyId', 'name logo')
+      .lean(),
+    Job.countDocuments(filter)
+  ]);
+
+  return {
+    jobs,
+    pagination: {
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalJobs: total,
+      limit
+    }
+  };
+};
+
+/**
+ * Follow a company. Idempotent — silently succeeds if already following.
+ *
+ * @param {string} userId
+ * @param {string} companyId
+ * @returns {{ followed: boolean, followerCount: number }}
+ */
+export const followCompany = async (userId, companyId) => {
+  const company = await Company.findById(companyId);
+  if (!company) throw new ApiError(404, 'Company not found');
+
+  try {
+    await CompanyFollower.create({ userId, companyId });
+  } catch (err) {
+    // Duplicate key = already following — idempotent success
+    if (err.code !== 11000) throw err;
+  }
+
+  const followerCount = await CompanyFollower.countDocuments({ companyId });
+  return { followed: true, followerCount };
+};
+
+/**
+ * Unfollow a company.
+ *
+ * @param {string} userId
+ * @param {string} companyId
+ * @returns {{ followed: boolean, followerCount: number }}
+ */
+export const unfollowCompany = async (userId, companyId) => {
+  await CompanyFollower.deleteOne({ userId, companyId });
+  const followerCount = await CompanyFollower.countDocuments({ companyId });
+  return { followed: false, followerCount };
+};
+

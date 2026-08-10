@@ -11,7 +11,9 @@ const JobsPage = lazy(() => import('./pages/JobsPage.jsx'));
 const ApplicationsPage = lazy(() => import('./pages/ApplicationsPage.jsx'));
 const SavedJobsPage = lazy(() => import('./pages/SavedJobsPage.jsx'));
 const CompaniesPage = lazy(() => import('./pages/CompaniesPage.jsx'));
+const CompanyDetailPage = lazy(() => import('./pages/CompanyDetailPage.jsx'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage.jsx'));
+const NotificationCenter = lazy(() => import('./components/notifications/NotificationCenter.jsx'));
 const AdminPage = lazy(() => import('./pages/AdminPage.jsx'));
 const JobDetailsPage = lazy(() => import('./pages/JobDetailsPage.jsx'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'));
@@ -135,6 +137,22 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageLoader />}>
             <CompaniesPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/companies/:companyId',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <CompanyDetailPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/notifications',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <NotificationCenter />
           </Suspense>
         ),
       },

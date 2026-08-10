@@ -9,6 +9,8 @@ import SecurityActivity from '../components/SecurityActivity.jsx';
 import JobAlertsSettings from '../components/JobAlertsSettings.jsx';
 
 
+import ResumeBuilder from '../components/profile/ResumeBuilder.jsx';
+
 export default function ProfilePage() {
   const { user } = useAuth();
   const { triggerAlert } = useApp();
@@ -146,12 +148,19 @@ export default function ProfilePage() {
         resumeUploadStatus={resumeUploadStatus}
         resumeUploadError={resumeUploadError}
       />
+
+      {user.role === 'candidate' && profile && (
+        <div style={{ marginTop: '28px' }}>
+          <ResumeBuilder profile={profile} />
+        </div>
+      )}
+
       <div className="profile-security-grid" style={{ marginTop: '24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
         <ChangePassword onSuccess={(msg) => triggerAlert(msg, 'success')} />
         {user.role === 'candidate' && <JobAlertsSettings triggerAlert={triggerAlert} />}
         <SecurityActivity />
       </div>
-
     </div>
   );
 }
+

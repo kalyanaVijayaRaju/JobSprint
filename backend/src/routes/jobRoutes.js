@@ -9,13 +9,15 @@ import {
   updateJob,
   deleteJob,
   closeJob,
-  reopenJob
+  reopenJob,
+  getAutocomplete
 } from '../controllers/jobController.js';
 
 const router = express.Router();
 
 // Public routes — anyone can browse and view jobs
 router.get('/', getJobs);
+router.get('/search/autocomplete', getAutocomplete);
 router.get('/:id', getJob);
 
 // Protected routes — only authenticated recruiters can manage jobs

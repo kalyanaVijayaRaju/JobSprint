@@ -89,3 +89,17 @@ export const reopenJob = asyncHandler(async (req, res) => {
   const job = await jobService.reopenJob(req.params.id, req.user.id, req.user.role, req.body, getRequestContext(req));
   res.status(200).json({ success: true, message: 'Job posting reopened successfully', data: { job } });
 });
+
+/**
+ * @route   GET /api/v1/jobs/search/autocomplete
+ * @access  Public
+ * @desc    Returns up to 10 title/skill suggestions for a search prefix.
+ */
+export const getAutocomplete = asyncHandler(async (req, res) => {
+  const result = await jobService.getAutocomplete(req.query.q || '');
+
+  res.status(200).json({
+    success: true,
+    data: result
+  });
+});
