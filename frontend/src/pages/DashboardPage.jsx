@@ -32,16 +32,16 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user) return;
 
-    if (user.role === 'candidate' || user.role === 'recruiter') {
+    if (user?.role === 'candidate' || user?.role === 'recruiter') {
       loadApplicationSummary();
       loadUpcomingInterviews();
     }
 
-    if (user.role === 'candidate') {
+    if (user?.role === 'candidate') {
       jobsApi.list().then(res => { if (res.success) setJobs(res.data.jobs); }).catch(() => {});
       applicationsApi.myApplications().then(res => { if (res.success) setMyApps(res.data.applications); }).catch(() => {});
       savedJobsApi.list().then(res => { if (res.success) setSavedJobs(res.data.savedJobs); }).catch(() => {});
-    } else if (user.role === 'recruiter') {
+    } else if (user?.role === 'recruiter') {
       jobsApi.list().then(res => {
         if (res.success) {
           const filtered = res.data.jobs.filter(j => j.recruiterId === user.id || j.recruiterId?._id === user.id);
@@ -57,8 +57,8 @@ export default function DashboardPage() {
     <OverviewTab
       user={user}
       profile={profile}
-      jobsCount={user.role === 'recruiter' ? recruiterJobs.length : jobs.length}
-      applicantsCount={applicationSummary?.total ?? (user.role === 'recruiter' ? recruiterJobs.reduce((acc, j) => acc + (j.applicationsCount || 0), 0) : myApps.length)}
+      jobsCount={user?.role === 'recruiter' ? recruiterJobs.length : jobs.length}
+      applicantsCount={applicationSummary?.total ?? (user?.role === 'recruiter' ? recruiterJobs.reduce((acc, j) => acc + (j.applicationsCount || 0), 0) : myApps.length)}
       savedCount={savedJobs.length}
       readiness={readiness}
       myApps={myApps}

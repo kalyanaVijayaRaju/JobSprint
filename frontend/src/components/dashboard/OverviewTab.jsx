@@ -61,14 +61,14 @@ export default function OverviewTab({
             Welcome back, {profile?.firstName || user?.email?.split('@')[0] || 'User'}! 👋
           </h2>
           <p style={{ margin: 0, opacity: 0.9, fontSize: '15px' }}>
-            {user.role === 'recruiter'
+            {user?.role === 'recruiter'
               ? 'Manage your active job listings, review applicant pipelines, and schedule interviews.'
               : 'Explore top tech roles, track your application progress, and manage your career profile.'}
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          {user.role === 'recruiter' ? (
+          {user?.role === 'recruiter' ? (
             <Button
               variant="outline"
               icon={<Plus size={16} />}
@@ -93,18 +93,18 @@ export default function OverviewTab({
             style={{ background: 'rgba(255, 255, 255, 0.15)', color: '#ffffff', borderColor: 'rgba(255, 255, 255, 0.3)' }}
             onClick={() => navigate('/applications')}
           >
-            {user.role === 'recruiter' ? 'ATS Pipelines' : 'My Applications'}
+            {user?.role === 'recruiter' ? 'ATS Pipelines' : 'My Applications'}
           </Button>
         </div>
       </div>
 
       {/* Candidate Profile Strength Widget */}
-      {user.role === 'candidate' && candidateAnalytics?.profileCompleteness && (
+      {user?.role === 'candidate' && candidateAnalytics?.profileCompleteness && (
         <ProfileCompleteness completeness={candidateAnalytics.profileCompleteness} />
       )}
 
       {/* Candidate Job Recommendations Widget */}
-      {user.role === 'candidate' && candidateAnalytics?.recommendations && (
+      {user?.role === 'candidate' && candidateAnalytics?.recommendations && (
         <RecommendedJobs recommendations={candidateAnalytics.recommendations} />
       )}
 

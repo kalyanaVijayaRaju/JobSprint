@@ -5,7 +5,7 @@ import { BriefcaseBusiness, Clock } from 'lucide-react';
  * Recent applications or recent job postings list component for dashboard.
  */
 export default function RecentActivity({ user, myApps = [], recruiterJobs = [] }) {
-  if (user.role === 'candidate') {
+  if (user?.role === 'candidate') {
     return (
       <Card variant="elevated">
         <h3 style={{ margin: '0 0 20px', fontSize: '18px', fontWeight: '700' }}>
@@ -49,7 +49,7 @@ export default function RecentActivity({ user, myApps = [], recruiterJobs = [] }
     );
   }
 
-  if (user.role === 'recruiter') {
+  if (user?.role === 'recruiter') {
     return (
       <Card variant="elevated">
         <h3 style={{ margin: '0 0 20px', fontSize: '18px', fontWeight: '700' }}>

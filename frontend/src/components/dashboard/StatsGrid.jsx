@@ -32,7 +32,7 @@ export default function StatsGrid({
             </div>
             <div>
               <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)', fontWeight: '600' }}>
-                {user.role === 'recruiter' ? 'Active Jobs Posted' : 'Open Jobs'}
+                {user?.role === 'recruiter' ? 'Active Jobs Posted' : 'Open Jobs'}
               </span>
               <h3 style={{ fontSize: '28px', fontWeight: '800', margin: '2px 0 0' }}>{jobsCount}</h3>
             </div>
@@ -58,11 +58,11 @@ export default function StatsGrid({
                 justifyContent: 'center',
               }}
             >
-              {user.role === 'recruiter' ? <UsersRound size={24} /> : <FileText size={24} />}
+              {user?.role === 'recruiter' ? <UsersRound size={24} /> : <FileText size={24} />}
             </div>
             <div>
               <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)', fontWeight: '600' }}>
-                {user.role === 'recruiter' ? 'Total Candidates' : 'My Applications'}
+                {user?.role === 'recruiter' ? 'Total Candidates' : 'My Applications'}
               </span>
               <h3 style={{ fontSize: '28px', fontWeight: '800', margin: '2px 0 0' }}>{applicantsCount}</h3>
             </div>
@@ -105,7 +105,7 @@ export default function StatsGrid({
         </div>
       </Card>
 
-      {user.role === 'candidate' && (
+      {user?.role === 'candidate' && (
         <Card variant="elevated">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
