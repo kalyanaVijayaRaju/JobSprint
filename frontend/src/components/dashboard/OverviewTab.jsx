@@ -11,11 +11,11 @@ import { analyticsApi } from '../../api/client.js';
 import { Button } from '../ui';
 
 /**
- * Main OverviewTab component for the dashboard homepage.
+ * Main OverviewTab component for the dashboard homepage with defensive guards.
  */
 export default function OverviewTab({
-  user,
-  profile,
+  user = {},
+  profile = null,
   jobsCount = 0,
   applicantsCount = 0,
   savedCount = 0,
@@ -32,11 +32,13 @@ export default function OverviewTab({
     if (user?.role === 'candidate') {
       analyticsApi.candidate()
         .then((res) => {
-          if (res.success && res.data) setCandidateAnalytics(res.data.analytics);
+          if (res?.success && res?.data) setCandidateAnalytics(res.data.analytics || null);
         })
-        .catch(() => {});
+        .catch(() => setCandidateAnalytics(null));
     }
   }, [user]);
+
+  const role = user?.role || 'candidate';
 
   return (
     <div className="tab-content">
@@ -61,14 +63,14 @@ export default function OverviewTab({
             Welcome back, {profile?.firstName || user?.email?.split('@')[0] || 'User'}! 👋
           </h2>
           <p style={{ margin: 0, opacity: 0.9, fontSize: '15px' }}>
-            {user?.role === 'recruiter'
+            {role === 'recruiter'
               ? 'Manage your active job listings, review applicant pipelines, and schedule interviews.'
               : 'Explore top tech roles, track your application progress, and manage your career profile.'}
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          {user?.role === 'recruiter' ? (
+          {role === 'recruiter' ? (
             <Button
               variant="outline"
               icon={<Plus size={16} />}
@@ -93,18 +95,18 @@ export default function OverviewTab({
             style={{ background: 'rgba(255, 255, 255, 0.15)', color: '#ffffff', borderColor: 'rgba(255, 255, 255, 0.3)' }}
             onClick={() => navigate('/applications')}
           >
-            {user?.role === 'recruiter' ? 'ATS Pipelines' : 'My Applications'}
+            {role === 'recruiter' ? 'ATS Pipelines' : 'My Applications'}
           </Button>
         </div>
       </div>
 
       {/* Candidate Profile Strength Widget */}
-      {user?.role === 'candidate' && candidateAnalytics?.profileCompleteness && (
+      {role === 'candidate' && candidateAnalytics?.profileCompleteness && (
         <ProfileCompleteness completeness={candidateAnalytics.profileCompleteness} />
       )}
 
       {/* Candidate Job Recommendations Widget */}
-      {user?.role === 'candidate' && candidateAnalytics?.recommendations && (
+      {role === 'candidate' && candidateAnalytics?.recommendations && (
         <RecommendedJobs recommendations={candidateAnalytics.recommendations} />
       )}
 
@@ -114,18 +116,17 @@ export default function OverviewTab({
         jobsCount={jobsCount}
         applicantsCount={applicantsCount}
         savedCount={savedCount}
-        interviewsCount={upcomingInterviews.length}
+        interviewsCount={upcomingInterviews?.length || 0}
       />
 
       {/* Upcoming Interviews Widget */}
-      <UpcomingInterviews upcomingInterviews={upcomingInterviews} />
+      <UpcomingInterviews upcomingInterviews={upcomingInterviews || []} />
 
       {/* Application Funnel Chart */}
       {applicationSummary && <ApplicationFunnel summary={applicationSummary} />}
 
       {/* Recent Activity Table */}
-      <RecentActivity user={user} myApps={myApps} recruiterJobs={recruiterJobs} />
+      <RecentActivity user={user} myApps={myApps || []} recruiterJobs={recruiterJobs || []} />
     </div>
   );
 }
-

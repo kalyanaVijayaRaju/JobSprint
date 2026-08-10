@@ -14,18 +14,21 @@ export default function DashboardPage() {
   const [savedJobs, setSavedJobs] = useState([]);
   const [recruiterJobs, setRecruiterJobs] = useState([]);
   const [applicationSummary, setApplicationSummary] = useState(null);
-
   const [upcomingInterviews, setUpcomingInterviews] = useState([]);
 
   const loadApplicationSummary = useCallback(() => {
     applicationsApi.summary()
-      .then((res) => { if (res.success) setApplicationSummary(res.data.summary); })
+      .then((res) => {
+        if (res?.success && res?.data) setApplicationSummary(res.data.summary || null);
+      })
       .catch(() => setApplicationSummary(null));
   }, []);
 
   const loadUpcomingInterviews = useCallback(() => {
     applicationsApi.upcomingInterviews()
-      .then((res) => { if (res.success) setUpcomingInterviews(res.data.interviews || []); })
+      .then((res) => {
+        if (res?.success && res?.data) setUpcomingInterviews(res.data.interviews || []);
+      })
       .catch(() => setUpcomingInterviews([]));
   }, []);
 
@@ -38,33 +41,51 @@ export default function DashboardPage() {
     }
 
     if (user?.role === 'candidate') {
-      jobsApi.list().then(res => { if (res.success) setJobs(res.data.jobs); }).catch(() => {});
-      applicationsApi.myApplications().then(res => { if (res.success) setMyApps(res.data.applications); }).catch(() => {});
-      savedJobsApi.list().then(res => { if (res.success) setSavedJobs(res.data.savedJobs); }).catch(() => {});
+      jobsApi.list()
+        .then((res) => { if (res?.success && res?.data?.jobs) setJobs(res.data.jobs); })
+        .catch(() => setJobs([]));
+      applicationsApi.myApplications()
+        .then((res) => { if (res?.success && res?.data?.applications) setMyApps(res.data.applications); })
+        .catch(() => setMyApps([]));
+      savedJobsApi.list()
+        .then((res) => { if (res?.success && res?.data?.savedJobs) setSavedJobs(res.data.savedJobs); })
+        .catch(() => setSavedJobs([]));
     } else if (user?.role === 'recruiter') {
-      jobsApi.list().then(res => {
-        if (res.success) {
-          const filtered = res.data.jobs.filter(j => j.recruiterId === user.id || j.recruiterId?._id === user.id);
-          setRecruiterJobs(filtered);
-        }
-      }).catch(() => {});
+      jobsApi.list()
+        .then((res) => {
+          if (res?.success && Array.isArray(res?.data?.jobs)) {
+            const filtered = res.data.jobs.filter(
+              (j) => j.recruiterId === user.id || j.recruiterId?._id === user.id
+            );
+            setRecruiterJobs(filtered);
+          }
+        })
+        .catch(() => setRecruiterJobs([]));
     }
   }, [user, loadApplicationSummary, loadUpcomingInterviews]);
 
   const { readiness } = useApp();
 
+  const isRecruiter = user?.role === 'recruiter';
+  const jobsCount = isRecruiter ? (recruiterJobs?.length || 0) : (jobs?.length || 0);
+  const applicantsCount = applicationSummary?.total ?? (
+    isRecruiter
+      ? (recruiterJobs?.reduce((acc, j) => acc + (j?.applicationsCount || 0), 0) || 0)
+      : (myApps?.length || 0)
+  );
+
   return (
     <OverviewTab
-      user={user}
-      profile={profile}
-      jobsCount={user?.role === 'recruiter' ? recruiterJobs.length : jobs.length}
-      applicantsCount={applicationSummary?.total ?? (user?.role === 'recruiter' ? recruiterJobs.reduce((acc, j) => acc + (j.applicationsCount || 0), 0) : myApps.length)}
-      savedCount={savedJobs.length}
+      user={user || {}}
+      profile={profile || null}
+      jobsCount={jobsCount}
+      applicantsCount={applicantsCount}
+      savedCount={savedJobs?.length || 0}
       readiness={readiness}
-      myApps={myApps}
-      recruiterJobs={recruiterJobs}
+      myApps={myApps || []}
+      recruiterJobs={recruiterJobs || []}
       applicationSummary={applicationSummary}
-      upcomingInterviews={upcomingInterviews}
+      upcomingInterviews={upcomingInterviews || []}
     />
   );
 }
