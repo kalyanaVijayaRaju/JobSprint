@@ -1,4 +1,4 @@
-import { useNavigate } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Sparkles, MapPin, Building2, Briefcase, ArrowRight } from 'lucide-react';
 import { Badge, Button } from '../ui';
 

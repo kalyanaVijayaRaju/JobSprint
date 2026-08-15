@@ -21,7 +21,8 @@ import {
   updateInterview,
   getApplicationInterviews,
   respondToInterview,
-  getUpcomingInterviews
+  getUpcomingInterviews,
+  bulkUpdateStatus
 } from '../controllers/applicationController.js';
 
 const router = express.Router();
@@ -127,6 +128,14 @@ router.patch(
   authorizeRoles('recruiter', 'admin'),
   validate(updateInterviewSchema),
   updateInterview
+);
+
+// Bulk status update for multiple applications
+router.patch(
+  '/bulk-status',
+  protect,
+  authorizeRoles('recruiter', 'admin'),
+  bulkUpdateStatus
 );
 
 export default router;

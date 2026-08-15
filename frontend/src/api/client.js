@@ -188,7 +188,11 @@ export const applicationsApi = {
       Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
     ).toString();
     return apiFetch(`/api/v1/applications/interviews/upcoming${query ? `?${query}` : ''}`);
-  }
+  },
+  bulkUpdateStatus: (applicationIds, status) => apiFetch('/api/v1/applications/bulk-status', {
+    method: 'PATCH',
+    body: { applicationIds, status }
+  })
 };
 
 // ---------------------------------------------------------------------------
@@ -247,6 +251,84 @@ export const analyticsApi = {
       Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
     ).toString();
     return apiFetch(`/api/v1/analytics/trends${query ? `?${query}` : ''}`);
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Messages API
+// ---------------------------------------------------------------------------
+
+export const messagesApi = {
+  conversations: () => apiFetch('/api/v1/messages/conversations'),
+  unreadCount: () => apiFetch('/api/v1/messages/unread-count'),
+  getThread: (partnerId, params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/messages/${partnerId}${query ? `?${query}` : ''}`);
+  },
+  send: (partnerId, content, applicationId) => apiFetch(`/api/v1/messages/${partnerId}`, {
+    method: 'POST',
+    body: { content, applicationId }
+  }),
+  markRead: (messageId) => apiFetch(`/api/v1/messages/${messageId}/read`, { method: 'PATCH' })
+};
+
+// ---------------------------------------------------------------------------
+// Assessments API
+// ---------------------------------------------------------------------------
+
+export const assessmentsApi = {
+  list: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/assessments${query ? `?${query}` : ''}`);
+  },
+  get: (id) => apiFetch(`/api/v1/assessments/${id}`),
+  submit: (id, data) => apiFetch(`/api/v1/assessments/${id}/submit`, { method: 'POST', body: data }),
+  myResults: () => apiFetch('/api/v1/assessments/my-results'),
+  myBadges: () => apiFetch('/api/v1/assessments/my-badges'),
+  seed: () => apiFetch('/api/v1/assessments/seed', { method: 'POST' })
+};
+
+// ---------------------------------------------------------------------------
+// Settings API
+// ---------------------------------------------------------------------------
+
+export const settingsApi = {
+  getPreferences: () => apiFetch('/api/v1/settings/preferences'),
+  updatePreferences: (data) => apiFetch('/api/v1/settings/preferences', { method: 'PATCH', body: data })
+};
+
+// ---------------------------------------------------------------------------
+// Email Templates API
+// ---------------------------------------------------------------------------
+
+export const emailTemplatesApi = {
+  list: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/email-templates${query ? `?${query}` : ''}`);
+  },
+  get: (id) => apiFetch(`/api/v1/email-templates/${id}`),
+  create: (data) => apiFetch('/api/v1/email-templates', { method: 'POST', body: data }),
+  update: (id, data) => apiFetch(`/api/v1/email-templates/${id}`, { method: 'PUT', body: data }),
+  delete: (id) => apiFetch(`/api/v1/email-templates/${id}`, { method: 'DELETE' }),
+  render: (id, variables) => apiFetch(`/api/v1/email-templates/${id}/render`, { method: 'POST', body: { variables } })
+};
+
+// ---------------------------------------------------------------------------
+// Talent Pool API
+// ---------------------------------------------------------------------------
+
+export const talentPoolApi = {
+  search: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/talent-pool/search${query ? `?${query}` : ''}`);
   }
 };
 

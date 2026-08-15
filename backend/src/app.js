@@ -21,6 +21,11 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import adminUserRoutes from './routes/adminUserRoutes.js';
 import jobAlertRoutes from './routes/jobAlertRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import messageRoutes from './routes/messageRoutes.js';
+import assessmentRoutes from './routes/assessmentRoutes.js';
+import settingsRoutes from './routes/settingsRoutes.js';
+import emailTemplateRoutes from './routes/emailTemplateRoutes.js';
+import talentPoolRoutes from './routes/talentPoolRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -111,6 +116,11 @@ app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/admin', adminUserRoutes);
 app.use('/api/v1/job-alerts', jobAlertRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
+app.use('/api/v1/messages', messageRoutes);
+app.use('/api/v1/assessments', assessmentRoutes);
+app.use('/api/v1/settings', settingsRoutes);
+app.use('/api/v1/email-templates', emailTemplateRoutes);
+app.use('/api/v1/talent-pool', talentPoolRoutes);
 
 // Unhandled HTTP route parser
 app.all('*', (req, res, next) => {

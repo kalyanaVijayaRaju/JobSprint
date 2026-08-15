@@ -21,6 +21,12 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'));
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail.jsx'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'));
 
+// New pages
+const MessagesPage = lazy(() => import('./pages/MessagesPage.jsx'));
+const AssessmentsPage = lazy(() => import('./pages/AssessmentsPage.jsx'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx'));
+const TalentPoolPage = lazy(() => import('./pages/TalentPoolPage.jsx'));
+
 // Auth Screen (static import for fast initial auth rendering)
 import AuthScreen from './components/AuthScreen.jsx';
 
@@ -146,6 +152,40 @@ export const router = createBrowserRouter([
           <Suspense fallback={<PageLoader />}>
             <CompanyDetailPage />
           </Suspense>
+        ),
+      },
+      {
+        path: '/messages',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <MessagesPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/assessments',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <AssessmentsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/settings',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <SettingsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/talent-pool',
+        element: (
+          <RouteGuard roles={['recruiter']}>
+            <Suspense fallback={<PageLoader />}>
+              <TalentPoolPage />
+            </Suspense>
+          </RouteGuard>
         ),
       },
       {

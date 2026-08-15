@@ -8,6 +8,8 @@ import { ErrorBoundary } from '../ui';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useApp } from '../../context/AppContext.jsx';
 
+import CommandPalette from './CommandPalette.jsx';
+
 /**
  * AppLayout orchestrator — sidebar navigation, header topbar, toast alerts, and route outlet wrapper.
  */
@@ -77,6 +79,10 @@ export default function AppLayout() {
     if (path === '/applications')
       return user?.role === 'recruiter' ? 'ATS Candidate Pipelines' : 'Applied Jobs Tracker';
     if (path === '/companies') return 'Company Directory';
+    if (path === '/messages') return 'Direct Messages';
+    if (path === '/assessments') return 'Skill Assessments';
+    if (path === '/settings') return 'Account Settings';
+    if (path === '/talent-pool') return 'Recruiter Talent Pool';
     if (path === '/profile') return 'Professional Profile';
     return 'Dashboard';
   };
@@ -89,6 +95,7 @@ export default function AppLayout() {
 
   return (
     <div className="app-shell">
+      <CommandPalette />
       <Toast successMsg={successMsg} errorMsg={errorMsg} />
 
       {isMobileNavOpen && (

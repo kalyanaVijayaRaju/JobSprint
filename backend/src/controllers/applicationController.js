@@ -184,3 +184,18 @@ export const getUpcomingInterviews = asyncHandler(async (req, res) => {
     : await applicationService.getRecruiterInterviewCalendar(req.user.id, result.data);
   res.status(200).json({ success: true, data: calendar });
 });
+
+/**
+ * @route   PATCH /api/v1/applications/bulk-status
+ * @access  Authenticated (Recruiter)
+ */
+export const bulkUpdateStatus = asyncHandler(async (req, res) => {
+  const { applicationIds, status } = req.body;
+  const result = await applicationService.bulkUpdateStatus(applicationIds, status, req.user.id);
+  res.status(200).json({
+    success: true,
+    message: `${result.successCount} application(s) updated, ${result.failedCount} failed`,
+    data: result
+  });
+});
+

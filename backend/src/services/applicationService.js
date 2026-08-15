@@ -543,3 +543,53 @@ export const getRecruiterInterviewCalendar = async (recruiterId, query) => {
 export const getCandidateInterviewCalendar = async (candidateId, query) => {
   return listInterviewCalendar({ candidateId }, query, false);
 };
+
+/**
+ * Bulk update status for multiple applications (recruiter action).
+ * Validates that the recruiter owns the jobs associated with all applications.
+ */
+export const bulkUpdateStatus = async (applicationIds, newStatus, recruiterId) => {
+  if (!APPLICATION_STATUSES.includes(newStatus)) {
+    throw new ApiError(400, `Invalid status: ${newStatus}`);
+  }
+
+  if (!applicationIds || applicationIds.length === 0) {
+    throw new ApiError(400, 'No application IDs provided');
+  }
+
+  if (applicationIds.length > 50) {
+    throw new ApiError(400, 'Cannot update more than 50 applications at once');
+  }
+
+  // Fetch all applications and verify recruiter owns the associated jobs
+  const applications = await Application.find({
+    _id: { $in: applicationIds }
+  }).populate('jobId', 'recruiterId');
+
+  if (applications.length !== applicationIds.length) {
+    throw new ApiError(404, 'Some applications were not found');
+  }
+
+  // Verify ownership
+  for (const app of applications) {
+    if (!app.jobId || app.jobId.recruiterId.toString() !== recruiterId.toString()) {
+      throw new ApiError(403, 'You do not have permission to update all specified applications');
+    }
+  }
+
+  // Update each application using the model method for timeline tracking
+  const results = [];
+  for (const app of applications) {
+    try {
+      await app.updateStatus(newStatus, recruiterId);
+      results.push({ id: app._id, status: 'updated' });
+    } catch (err) {
+      results.push({ id: app._id, status: 'failed', error: err.message });
+    }
+  }
+
+  const successCount = results.filter((r) => r.status === 'updated').length;
+  const failedCount = results.filter((r) => r.status === 'failed').length;
+
+  return { results, successCount, failedCount };
+};

@@ -11,6 +11,10 @@ import {
   Building2,
   Moon,
   Sun,
+  MessageSquare,
+  Award,
+  Settings,
+  Search,
 } from 'lucide-react';
 
 /**
@@ -106,6 +110,22 @@ export default function Sidebar({
         )}
 
         <NavLink
+          to="/messages"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <MessageSquare size={18} /> Messages
+        </NavLink>
+
+        <NavLink
+          to="/assessments"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <Award size={18} /> Assessments
+        </NavLink>
+
+        <NavLink
           to="/companies"
           className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
           onClick={closeMobileNav}
@@ -123,12 +143,30 @@ export default function Sidebar({
           </NavLink>
         )}
 
+        {user?.role === 'recruiter' && (
+          <NavLink
+            to="/talent-pool"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <Search size={18} /> Talent Pool
+          </NavLink>
+        )}
+
         <NavLink
           to="/profile"
           className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
           onClick={closeMobileNav}
         >
-          <User size={18} /> Profile Settings
+          <User size={18} /> Profile
+        </NavLink>
+
+        <NavLink
+          to="/settings"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <Settings size={18} /> Settings
         </NavLink>
       </nav>
 
