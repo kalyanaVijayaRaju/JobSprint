@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { authenticate } from '../middlewares/authMiddleware.js';
+import { protect } from '../middlewares/authMiddleware.js';
 import * as messageController from '../controllers/messageController.js';
 
 const router = Router();
 
 // All message routes require authentication
-router.use(authenticate);
+router.use(protect);
 
 // GET /api/v1/messages/conversations — list all conversations
 router.get('/conversations', messageController.getConversations);

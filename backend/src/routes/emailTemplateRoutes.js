@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { authenticate, authorize } from '../middlewares/authMiddleware.js';
+import { protect, authorizeRoles } from '../middlewares/authMiddleware.js';
 import * as emailTemplateController from '../controllers/emailTemplateController.js';
 
 const router = Router();
 
 // All email template routes require authentication and recruiter role
-router.use(authenticate, authorize('recruiter'));
+router.use(protect, authorizeRoles('recruiter'));
 
 router.get('/', emailTemplateController.listTemplates);
 router.post('/', emailTemplateController.createTemplate);
