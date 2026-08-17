@@ -15,6 +15,9 @@ import {
   Award,
   Settings,
   Search,
+  FileText,
+  BookOpen,
+  TrendingUp,
 } from 'lucide-react';
 
 /**
@@ -134,14 +137,48 @@ export default function Sidebar({
         </NavLink>
 
         {user?.role === 'candidate' && (
-          <NavLink
-            to="/saved-jobs"
-            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-            onClick={closeMobileNav}
-          >
-            <Bookmark size={18} /> Saved Jobs
-          </NavLink>
+          <>
+            <NavLink
+              to="/saved-jobs"
+              className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+              onClick={closeMobileNav}
+            >
+              <Bookmark size={18} /> Saved Jobs
+            </NavLink>
+
+            <NavLink
+              to="/resumes"
+              className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+              onClick={closeMobileNav}
+            >
+              <FileText size={18} /> Resume Builder
+            </NavLink>
+          </>
         )}
+
+        <NavLink
+          to="/interview-prep"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <BookOpen size={18} /> Interview Prep
+        </NavLink>
+
+        <NavLink
+          to="/feed"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <Activity size={18} /> Activity Feed
+        </NavLink>
+
+        <NavLink
+          to="/analytics"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <TrendingUp size={18} /> Analytics
+        </NavLink>
 
         {user?.role === 'recruiter' && (
           <NavLink

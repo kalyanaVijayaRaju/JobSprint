@@ -9,6 +9,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { useApp } from '../../context/AppContext.jsx';
 
 import CommandPalette from './CommandPalette.jsx';
+import OnboardingTour from '../common/OnboardingTour.jsx';
 
 /**
  * AppLayout orchestrator — sidebar navigation, header topbar, toast alerts, and route outlet wrapper.
@@ -83,6 +84,10 @@ export default function AppLayout() {
     if (path === '/assessments') return 'Skill Assessments';
     if (path === '/settings') return 'Account Settings';
     if (path === '/talent-pool') return 'Recruiter Talent Pool';
+    if (path === '/resumes') return 'Resume & CV Builder';
+    if (path === '/interview-prep') return 'Interview Prep Hub';
+    if (path === '/feed') return 'Community Activity Feed';
+    if (path === '/analytics') return 'Analytics & Insights';
     if (path === '/profile') return 'Professional Profile';
     return 'Dashboard';
   };
@@ -96,6 +101,7 @@ export default function AppLayout() {
   return (
     <div className="app-shell">
       <CommandPalette />
+      <OnboardingTour role={user?.role || 'candidate'} />
       <Toast successMsg={successMsg} errorMsg={errorMsg} />
 
       {isMobileNavOpen && (

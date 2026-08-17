@@ -26,6 +26,10 @@ const MessagesPage = lazy(() => import('./pages/MessagesPage.jsx'));
 const AssessmentsPage = lazy(() => import('./pages/AssessmentsPage.jsx'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx'));
 const TalentPoolPage = lazy(() => import('./pages/TalentPoolPage.jsx'));
+const ResumeBuilderPage = lazy(() => import('./pages/ResumeBuilderPage.jsx'));
+const InterviewPrepPage = lazy(() => import('./pages/InterviewPrepPage.jsx'));
+const ActivityFeedPage = lazy(() => import('./pages/ActivityFeedPage.jsx'));
+const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage.jsx'));
 
 // Auth Screen (static import for fast initial auth rendering)
 import AuthScreen from './components/AuthScreen.jsx';
@@ -186,6 +190,40 @@ export const router = createBrowserRouter([
               <TalentPoolPage />
             </Suspense>
           </RouteGuard>
+        ),
+      },
+      {
+        path: '/resumes',
+        element: (
+          <RouteGuard roles={['candidate']}>
+            <Suspense fallback={<PageLoader />}>
+              <ResumeBuilderPage />
+            </Suspense>
+          </RouteGuard>
+        ),
+      },
+      {
+        path: '/interview-prep',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <InterviewPrepPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/feed',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ActivityFeedPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/analytics',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <AnalyticsPage />
+          </Suspense>
         ),
       },
       {

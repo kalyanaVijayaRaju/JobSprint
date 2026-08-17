@@ -26,6 +26,13 @@ import assessmentRoutes from './routes/assessmentRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import emailTemplateRoutes from './routes/emailTemplateRoutes.js';
 import talentPoolRoutes from './routes/talentPoolRoutes.js';
+import resumeRoutes from './routes/resumeRoutes.js';
+import interviewPrepRoutes from './routes/interviewPrepRoutes.js';
+import activityFeedRoutes from './routes/activityFeedRoutes.js';
+import companyReviewRoutes from './routes/companyReviewRoutes.js';
+import recommendationRoutes from './routes/recommendationRoutes.js';
+import exportRoutes from './routes/exportRoutes.js';
+import outreachRoutes from './routes/outreachRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -121,6 +128,13 @@ app.use('/api/v1/assessments', assessmentRoutes);
 app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/email-templates', emailTemplateRoutes);
 app.use('/api/v1/talent-pool', talentPoolRoutes);
+app.use('/api/v1/resumes', resumeRoutes);
+app.use('/api/v1/interview-prep', interviewPrepRoutes);
+app.use('/api/v1/feed', activityFeedRoutes);
+app.use('/api/v1/companies/:companyId/reviews', companyReviewRoutes);
+app.use('/api/v1/recommendations', recommendationRoutes);
+app.use('/api/v1/export', exportRoutes);
+app.use('/api/v1/outreach', outreachRoutes);
 
 // Unhandled HTTP route parser
 app.all('*', (req, res, next) => {

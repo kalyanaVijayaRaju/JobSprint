@@ -332,3 +332,106 @@ export const talentPoolApi = {
   }
 };
 
+// ---------------------------------------------------------------------------
+// Resumes / CV Builder API
+// ---------------------------------------------------------------------------
+
+export const resumesApi = {
+  list: () => apiFetch('/api/v1/resumes'),
+  get: (id) => apiFetch(`/api/v1/resumes/${id}`),
+  create: (data) => apiFetch('/api/v1/resumes', { method: 'POST', body: data }),
+  update: (id, data) => apiFetch(`/api/v1/resumes/${id}`, { method: 'PUT', body: data }),
+  delete: (id) => apiFetch(`/api/v1/resumes/${id}`, { method: 'DELETE' }),
+  preview: (id) => apiFetch(`/api/v1/resumes/${id}/preview`),
+  pdf: (id) => apiFetch(`/api/v1/resumes/${id}/pdf`)
+};
+
+// ---------------------------------------------------------------------------
+// Interview Prep API
+// ---------------------------------------------------------------------------
+
+export const interviewPrepApi = {
+  listQuestions: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/interview-prep/questions${query ? `?${query}` : ''}`);
+  },
+  getQuestion: (id) => apiFetch(`/api/v1/interview-prep/questions/${id}`),
+  savePractice: (id, data) => apiFetch(`/api/v1/interview-prep/questions/${id}/practice`, { method: 'POST', body: data }),
+  toggleFavorite: (id) => apiFetch(`/api/v1/interview-prep/questions/${id}/favorite`, { method: 'POST' }),
+  getHistory: () => apiFetch('/api/v1/interview-prep/history'),
+  getFavorites: () => apiFetch('/api/v1/interview-prep/favorites'),
+  getStats: () => apiFetch('/api/v1/interview-prep/stats'),
+  seed: () => apiFetch('/api/v1/interview-prep/seed', { method: 'POST' })
+};
+
+// ---------------------------------------------------------------------------
+// Activity Feed API
+// ---------------------------------------------------------------------------
+
+export const activityFeedApi = {
+  getPublic: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/feed/public${query ? `?${query}` : ''}`);
+  },
+  getMine: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/feed/me${query ? `?${query}` : ''}`);
+  },
+  getStats: () => apiFetch('/api/v1/feed/stats')
+};
+
+// ---------------------------------------------------------------------------
+// Company Reviews API
+// ---------------------------------------------------------------------------
+
+export const companyReviewsApi = {
+  list: (companyId, params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return apiFetch(`/api/v1/companies/${companyId}/reviews${query ? `?${query}` : ''}`);
+  },
+  getStats: (companyId) => apiFetch(`/api/v1/companies/${companyId}/reviews/stats`),
+  create: (companyId, data) => apiFetch(`/api/v1/companies/${companyId}/reviews`, { method: 'POST', body: data }),
+  toggleHelpful: (companyId, reviewId) => apiFetch(`/api/v1/companies/${companyId}/reviews/${reviewId}/helpful`, { method: 'POST' })
+};
+
+// ---------------------------------------------------------------------------
+// Job Recommendations API
+// ---------------------------------------------------------------------------
+
+export const recommendationsApi = {
+  getJobs: (limit = 10) => apiFetch(`/api/v1/recommendations/jobs?limit=${limit}`)
+};
+
+// ---------------------------------------------------------------------------
+// Export / Reports API
+// ---------------------------------------------------------------------------
+
+export const exportApi = {
+  applicationsCSV: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    ).toString();
+    return `${API_BASE_URL}/api/v1/export/applications${query ? `?${query}` : ''}`;
+  },
+  analyticsCSV: () => `${API_BASE_URL}/api/v1/export/analytics`,
+  hiringSummary: () => apiFetch('/api/v1/export/hiring-summary')
+};
+
+// ---------------------------------------------------------------------------
+// Outreach API
+// ---------------------------------------------------------------------------
+
+export const outreachApi = {
+  send: (data) => apiFetch('/api/v1/outreach/send', { method: 'POST', body: data }),
+  bulkSend: (data) => apiFetch('/api/v1/outreach/bulk-send', { method: 'POST', body: data })
+};
+
+
