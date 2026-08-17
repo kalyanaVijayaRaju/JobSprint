@@ -7,6 +7,7 @@ import RecentActivity from './RecentActivity.jsx';
 import UpcomingInterviews from './UpcomingInterviews.jsx';
 import ProfileCompleteness from './ProfileCompleteness.jsx';
 import RecommendedJobs from './RecommendedJobs.jsx';
+import SmartRecommendations from './SmartRecommendations.jsx';
 import { analyticsApi } from '../../api/client.js';
 import { Button } from '../ui';
 
@@ -104,6 +105,9 @@ export default function OverviewTab({
       {role === 'candidate' && candidateAnalytics?.profileCompleteness && (
         <ProfileCompleteness completeness={candidateAnalytics.profileCompleteness} />
       )}
+
+      {/* Candidate Smart AI Recommendations */}
+      {role === 'candidate' && <SmartRecommendations />}
 
       {/* Candidate Job Recommendations Widget */}
       {role === 'candidate' && candidateAnalytics?.recommendations && (

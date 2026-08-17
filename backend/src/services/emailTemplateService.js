@@ -89,3 +89,20 @@ export const renderTemplate = async (templateId, recruiterId, variables = {}) =>
     body: renderedBody
   };
 };
+
+/**
+ * Send rendered email to candidate (simulated / SMTP hook).
+ */
+export const sendRenderedEmail = async (templateId, recruiterId, candidateEmail, variables = {}) => {
+  const rendered = await renderTemplate(templateId, recruiterId, variables);
+  
+  // Return simulated dispatch payload
+  return {
+    delivered: true,
+    recipient: candidateEmail,
+    subject: rendered.subject,
+    body: rendered.body,
+    sentAt: new Date()
+  };
+};
+

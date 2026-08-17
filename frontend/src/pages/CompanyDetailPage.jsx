@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Building2, MapPin, Globe, Users, Briefcase, Heart, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { companiesApi } from '../api/client.js';
 import CompanyJobs from '../components/companies/CompanyJobs.jsx';
+import CompanyReviewsTab from '../components/companies/CompanyReviewsTab.jsx';
 import { Button, Badge, Spinner, Tabs } from '../components/ui';
 
 /**
@@ -15,7 +16,13 @@ export default function CompanyDetailPage() {
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'jobs'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'jobs' | 'reviews'
+
+  const tabs = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'jobs', label: `Jobs (${company?.activeJobCount || 0})` },
+    { id: 'reviews', label: 'Reviews & Ratings' }
+  ];
 
   useEffect(() => {
     if (!companyId) return;
@@ -71,11 +78,6 @@ export default function CompanyDetailPage() {
       </div>
     );
   }
-
-  const tabs = [
-    { id: 'overview', label: 'Company Overview', icon: <Building2 size={16} /> },
-    { id: 'jobs', label: `Open Jobs (${company.activeJobCount || 0})`, icon: <Briefcase size={16} /> },
-  ];
 
   return (
     <div style={{ padding: '24px', maxWidth: '1100px', margin: '0 auto' }}>
@@ -249,6 +251,11 @@ export default function CompanyDetailPage() {
       {/* Jobs Tab */}
       <Tabs.Panel id="jobs" activeTab={activeTab}>
         <CompanyJobs companyId={company._id} />
+      </Tabs.Panel>
+
+      {/* Reviews Tab */}
+      <Tabs.Panel id="reviews" activeTab={activeTab}>
+        <CompanyReviewsTab companyId={company._id} />
       </Tabs.Panel>
     </div>
   );

@@ -324,3 +324,99 @@ export const expireOverdueJobs = async (now = new Date()) => {
 
   return { expiredCount: overdueJobs.length };
 };
+
+/**
+ * Get personalized job recommendations for a candidate.
+ * Scoring: skill overlap (60%), location match (20%), recency (20%).
+ */
+export const getRecommendations = async (userId, limit = 10) => {
+  const [CandidateProfile, Application, SavedJob, AssessmentResult] = await Promise.all([
+    import('../models/CandidateProfile.js').then(m => m.default),
+    import('../models/Application.js').then(m => m.default),
+    import('../models/SavedJob.js').then(m => m.default),
+    import('../models/AssessmentResult.js').then(m => m.default)
+  ]);
+
+  // Get candidate's profile for skills and location
+  const profile = await CandidateProfile.findOne({ userId }).lean();
+  const candidateSkills = (profile?.skills || []).map(s => s.toLowerCase());
+  const candidateLocation = profile?.location?.toLowerCase() || '';
+
+  // Get already-applied and saved job IDs to exclude/boost
+  const [appliedApps, savedDocs] = await Promise.all([
+    Application.find({ candidateId: userId }).select('jobId').lean(),
+    SavedJob.find({ userId }).select('jobId').lean()
+  ]);
+  const appliedJobIds = new Set(appliedApps.map(a => a.jobId.toString()));
+  const savedJobIds = new Set(savedDocs.map(s => s.jobId.toString()));
+
+  // Get badge skills from assessments
+  const badges = await AssessmentResult.find({ userId, passed: true }).select('assessmentId').lean();
+  const badgeSkills = new Set();
+
+  if (badges.length > 0) {
+    const SkillAssessment = (await import('../models/SkillAssessment.js')).default;
+    const assessments = await SkillAssessment.find({
+      _id: { $in: badges.map(b => b.assessmentId) }
+    }).select('skill').lean();
+    assessments.forEach(a => { if (a.skill) badgeSkills.add(a.skill.toLowerCase()); });
+  }
+
+  // Fetch active jobs not already applied to
+  const jobs = await Job.find({
+    status: 'active',
+    expiresAt: { $gte: new Date() }
+  }).populate('companyId', 'name logo').lean();
+
+  // Score each job
+  const scored = jobs
+    .filter(j => !appliedJobIds.has(j._id.toString()))
+    .map(job => {
+      let score = 0;
+      const reasons = [];
+      const jobSkills = (job.skillsRequired || []).map(s => s.toLowerCase());
+
+      // Skill overlap (0-60 points)
+      const matchedSkills = jobSkills.filter(s => candidateSkills.includes(s));
+      const badgeMatchedSkills = jobSkills.filter(s => badgeSkills.has(s));
+      const skillRatio = jobSkills.length ? matchedSkills.length / jobSkills.length : 0;
+      const skillScore = Math.round(skillRatio * 50);
+      const badgeBonus = Math.min(badgeMatchedSkills.length * 5, 10);
+      score += skillScore + badgeBonus;
+      if (matchedSkills.length) reasons.push(`${matchedSkills.length} skill${matchedSkills.length > 1 ? 's' : ''} match`);
+      if (badgeMatchedSkills.length) reasons.push(`${badgeMatchedSkills.length} verified badge${badgeMatchedSkills.length > 1 ? 's' : ''}`);
+
+      // Location match (0-20 points)
+      const jobLocation = (job.location || '').toLowerCase();
+      if (candidateLocation && jobLocation.includes(candidateLocation)) {
+        score += 20;
+        reasons.push('Location match');
+      } else if (job.locationType === 'remote') {
+        score += 15;
+        reasons.push('Remote friendly');
+      }
+
+      // Recency bonus (0-20 points — newer jobs score higher)
+      const ageInDays = (Date.now() - new Date(job.createdAt).getTime()) / (1000 * 60 * 60 * 24);
+      const recencyScore = Math.max(0, Math.round(20 - ageInDays));
+      score += recencyScore;
+
+      // Saved job boost (+5)
+      if (savedJobIds.has(job._id.toString())) {
+        score += 5;
+        reasons.push('You saved this job');
+      }
+
+      return {
+        ...job,
+        matchScore: Math.min(score, 100),
+        matchPercentage: Math.min(score, 100),
+        matchReasons: reasons
+      };
+    })
+    .sort((a, b) => b.matchScore - a.matchScore)
+    .slice(0, limit);
+
+  return scored;
+};
+
