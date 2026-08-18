@@ -33,6 +33,11 @@ import companyReviewRoutes from './routes/companyReviewRoutes.js';
 import recommendationRoutes from './routes/recommendationRoutes.js';
 import exportRoutes from './routes/exportRoutes.js';
 import outreachRoutes from './routes/outreachRoutes.js';
+import kanbanRoutes from './routes/kanbanRoutes.js';
+import salaryInsightRoutes from './routes/salaryInsightRoutes.js';
+import endorsementRoutes from './routes/endorsementRoutes.js';
+import scheduledInterviewRoutes from './routes/scheduledInterviewRoutes.js';
+import comparisonRoutes from './routes/comparisonRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -135,6 +140,11 @@ app.use('/api/v1/companies/:companyId/reviews', companyReviewRoutes);
 app.use('/api/v1/recommendations', recommendationRoutes);
 app.use('/api/v1/export', exportRoutes);
 app.use('/api/v1/outreach', outreachRoutes);
+app.use('/api/v1/kanban', kanbanRoutes);
+app.use('/api/v1/salary-insights', salaryInsightRoutes);
+app.use('/api/v1/endorsements', endorsementRoutes);
+app.use('/api/v1/interviews', scheduledInterviewRoutes);
+app.use('/api/v1/comparisons', comparisonRoutes);
 
 // Unhandled HTTP route parser
 app.all('*', (req, res, next) => {

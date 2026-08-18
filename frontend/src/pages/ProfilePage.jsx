@@ -11,6 +11,8 @@ import JobAlertsSettings from '../components/JobAlertsSettings.jsx';
 
 import ResumeBuilder from '../components/profile/ResumeBuilder.jsx';
 
+import EndorsementsSection from '../components/profile/EndorsementsSection.jsx';
+
 export default function ProfilePage() {
   const { user } = useAuth();
   const { triggerAlert } = useApp();
@@ -148,6 +150,12 @@ export default function ProfilePage() {
         resumeUploadStatus={resumeUploadStatus}
         resumeUploadError={resumeUploadError}
       />
+
+      {user?.id && (
+        <div style={{ marginTop: '28px', background: 'rgba(30,41,59,0.5)', padding: '24px', borderRadius: '16px', border: '1px solid rgba(148,163,184,0.1)' }}>
+          <EndorsementsSection userId={user.id} isOwnProfile={true} />
+        </div>
+      )}
 
       {user.role === 'candidate' && profile && (
         <div style={{ marginTop: '28px' }}>
