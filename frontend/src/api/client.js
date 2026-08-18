@@ -434,4 +434,61 @@ export const outreachApi = {
   bulkSend: (data) => apiFetch('/api/v1/outreach/bulk-send', { method: 'POST', body: data })
 };
 
+// ---------------------------------------------------------------------------
+// Kanban Board API
+// ---------------------------------------------------------------------------
+
+export const kanbanApi = {
+  getBoard: () => apiFetch('/api/v1/kanban/board'),
+  moveCard: (applicationId, status) => apiFetch(`/api/v1/kanban/${applicationId}/move`, { method: 'PATCH', body: { status } })
+};
+
+// ---------------------------------------------------------------------------
+// Salary Insights API
+// ---------------------------------------------------------------------------
+
+export const salaryInsightsApi = {
+  search: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null && v !== ''))
+    ).toString();
+    return apiFetch(`/api/v1/salary-insights${query ? `?${query}` : ''}`);
+  },
+  getTrends: (jobTitle) => apiFetch(`/api/v1/salary-insights/trends/${encodeURIComponent(jobTitle)}`),
+  submitReport: (data) => apiFetch('/api/v1/salary-insights/report', { method: 'POST', body: data }),
+  seed: () => apiFetch('/api/v1/salary-insights/seed', { method: 'POST' })
+};
+
+// ---------------------------------------------------------------------------
+// Endorsements API
+// ---------------------------------------------------------------------------
+
+export const endorsementsApi = {
+  endorse: (data) => apiFetch('/api/v1/endorsements', { method: 'POST', body: data }),
+  getForUser: (userId) => apiFetch(`/api/v1/endorsements/${userId}`),
+  getTopSkills: (userId) => apiFetch(`/api/v1/endorsements/${userId}/top-skills`),
+  retract: (id) => apiFetch(`/api/v1/endorsements/${id}`, { method: 'DELETE' })
+};
+
+// ---------------------------------------------------------------------------
+// Scheduled Interviews API
+// ---------------------------------------------------------------------------
+
+export const interviewsApi = {
+  list: () => apiFetch('/api/v1/interviews'),
+  schedule: (data) => apiFetch('/api/v1/interviews', { method: 'POST', body: data }),
+  update: (id, data) => apiFetch(`/api/v1/interviews/${id}`, { method: 'PUT', body: data }),
+  cancel: (id) => apiFetch(`/api/v1/interviews/${id}/cancel`, { method: 'PATCH' }),
+  calendar: (month, year) => apiFetch(`/api/v1/interviews/calendar?month=${month}&year=${year}`)
+};
+
+// ---------------------------------------------------------------------------
+// Candidate Comparison API
+// ---------------------------------------------------------------------------
+
+export const comparisonsApi = {
+  compare: (candidateIds) => apiFetch('/api/v1/comparisons', { method: 'POST', body: { candidateIds } })
+};
+
+
 

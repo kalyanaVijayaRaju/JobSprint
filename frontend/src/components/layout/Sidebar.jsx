@@ -191,6 +191,40 @@ export default function Sidebar({
         )}
 
         <NavLink
+          to="/kanban"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <Clock size={18} /> Kanban Pipeline
+        </NavLink>
+
+        <NavLink
+          to="/salary-insights"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <TrendingUp size={18} /> Salary Insights
+        </NavLink>
+
+        <NavLink
+          to="/calendar"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <Clock size={18} /> Interview Calendar
+        </NavLink>
+
+        {(user?.role === 'recruiter' || user?.role === 'admin') && (
+          <NavLink
+            to="/compare-candidates"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <UsersRound size={18} /> Compare Candidates
+          </NavLink>
+        )}
+
+        <NavLink
           to="/profile"
           className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
           onClick={closeMobileNav}
