@@ -34,6 +34,11 @@ const KanbanBoardPage = lazy(() => import('./pages/KanbanBoardPage.jsx'));
 const SalaryInsightsPage = lazy(() => import('./pages/SalaryInsightsPage.jsx'));
 const InterviewCalendarPage = lazy(() => import('./pages/InterviewCalendarPage.jsx'));
 const CandidateComparisonPage = lazy(() => import('./pages/CandidateComparisonPage.jsx'));
+const AIAnalyzerPage = lazy(() => import('./pages/AIAnalyzerPage.jsx'));
+const MockInterviewPage = lazy(() => import('./pages/MockInterviewPage.jsx'));
+const OfferEvaluatorPage = lazy(() => import('./pages/OfferEvaluatorPage.jsx'));
+const MentorshipPage = lazy(() => import('./pages/MentorshipPage.jsx'));
+const TalentRadarPage = lazy(() => import('./pages/TalentRadarPage.jsx'));
 
 // Auth Screen (static import for fast initial auth rendering)
 import AuthScreen from './components/AuthScreen.jsx';
@@ -260,6 +265,48 @@ export const router = createBrowserRouter([
           <RouteGuard roles={['recruiter', 'admin']}>
             <Suspense fallback={<PageLoader />}>
               <CandidateComparisonPage />
+            </Suspense>
+          </RouteGuard>
+        ),
+      },
+      {
+        path: '/ai-analyzer',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <AIAnalyzerPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/mock-interview',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <MockInterviewPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/offer-evaluator',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <OfferEvaluatorPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/mentorship',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <MentorshipPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/talent-radar',
+        element: (
+          <RouteGuard roles={['recruiter', 'admin']}>
+            <Suspense fallback={<PageLoader />}>
+              <TalentRadarPage />
             </Suspense>
           </RouteGuard>
         ),

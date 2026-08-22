@@ -225,6 +225,48 @@ export default function Sidebar({
         )}
 
         <NavLink
+          to="/ai-analyzer"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <FileText size={18} /> AI Resume Matcher
+        </NavLink>
+
+        <NavLink
+          to="/mock-interview"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <BookOpen size={18} /> Mock Simulator
+        </NavLink>
+
+        <NavLink
+          to="/offer-evaluator"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <TrendingUp size={18} /> Offer Evaluator
+        </NavLink>
+
+        <NavLink
+          to="/mentorship"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <UsersRound size={18} /> Mentorship Hub
+        </NavLink>
+
+        {(user?.role === 'recruiter' || user?.role === 'admin') && (
+          <NavLink
+            to="/talent-radar"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <Search size={18} /> Talent Radar
+          </NavLink>
+        )}
+
+        <NavLink
           to="/profile"
           className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
           onClick={closeMobileNav}
