@@ -490,5 +490,59 @@ export const comparisonsApi = {
   compare: (candidateIds) => apiFetch('/api/v1/comparisons', { method: 'POST', body: { candidateIds } })
 };
 
+// ---------------------------------------------------------------------------
+// AI Resume Match & ATS Analyzer API
+// ---------------------------------------------------------------------------
+
+export const aiAnalyzerApi = {
+  analyzeMatch: (data) => apiFetch('/api/v1/ai-analyzer/match', { method: 'POST', body: data }),
+  scoreResume: () => apiFetch('/api/v1/ai-analyzer/score-resume', { method: 'POST' })
+};
+
+// ---------------------------------------------------------------------------
+// Mock Interview Simulator API
+// ---------------------------------------------------------------------------
+
+export const mockInterviewsApi = {
+  start: (data) => apiFetch('/api/v1/mock-interviews/start', { method: 'POST', body: data }),
+  answer: (id, data) => apiFetch(`/api/v1/mock-interviews/${id}/answer`, { method: 'POST', body: data }),
+  finish: (id) => apiFetch(`/api/v1/mock-interviews/${id}/finish`, { method: 'POST' }),
+  history: () => apiFetch('/api/v1/mock-interviews/history')
+};
+
+// ---------------------------------------------------------------------------
+// Offer Evaluator API
+// ---------------------------------------------------------------------------
+
+export const offerEvaluatorApi = {
+  evaluate: (data) => apiFetch('/api/v1/offer-evaluator/evaluate', { method: 'POST', body: data }),
+  history: () => apiFetch('/api/v1/offer-evaluator/history')
+};
+
+// ---------------------------------------------------------------------------
+// Peer Mentorship API
+// ---------------------------------------------------------------------------
+
+export const mentorshipApi = {
+  getMentors: (params = {}) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v != null && v !== ''))
+    ).toString();
+    return apiFetch(`/api/v1/mentorship/mentors${query ? `?${query}` : ''}`);
+  },
+  bookSession: (data) => apiFetch('/api/v1/mentorship/book', { method: 'POST', body: data }),
+  mySessions: () => apiFetch('/api/v1/mentorship/my-sessions'),
+  seedMentors: () => apiFetch('/api/v1/mentorship/seed', { method: 'POST' })
+};
+
+// ---------------------------------------------------------------------------
+// Talent Radar API
+// ---------------------------------------------------------------------------
+
+export const talentRadarApi = {
+  search: (data) => apiFetch('/api/v1/talent-radar/search', { method: 'POST', body: data })
+};
+
+
 
 

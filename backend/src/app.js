@@ -38,6 +38,11 @@ import salaryInsightRoutes from './routes/salaryInsightRoutes.js';
 import endorsementRoutes from './routes/endorsementRoutes.js';
 import scheduledInterviewRoutes from './routes/scheduledInterviewRoutes.js';
 import comparisonRoutes from './routes/comparisonRoutes.js';
+import aiAnalyzerRoutes from './routes/aiAnalyzerRoutes.js';
+import mockInterviewRoutes from './routes/mockInterviewRoutes.js';
+import offerEvaluatorRoutes from './routes/offerEvaluatorRoutes.js';
+import mentorshipRoutes from './routes/mentorshipRoutes.js';
+import talentRadarRoutes from './routes/talentRadarRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -145,6 +150,11 @@ app.use('/api/v1/salary-insights', salaryInsightRoutes);
 app.use('/api/v1/endorsements', endorsementRoutes);
 app.use('/api/v1/interviews', scheduledInterviewRoutes);
 app.use('/api/v1/comparisons', comparisonRoutes);
+app.use('/api/v1/ai-analyzer', aiAnalyzerRoutes);
+app.use('/api/v1/mock-interviews', mockInterviewRoutes);
+app.use('/api/v1/offer-evaluator', offerEvaluatorRoutes);
+app.use('/api/v1/mentorship', mentorshipRoutes);
+app.use('/api/v1/talent-radar', talentRadarRoutes);
 
 // Unhandled HTTP route parser
 app.all('*', (req, res, next) => {
