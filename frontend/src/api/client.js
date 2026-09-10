@@ -543,6 +543,53 @@ export const talentRadarApi = {
   search: (data) => apiFetch('/api/v1/talent-radar/search', { method: 'POST', body: data })
 };
 
+// ---------------------------------------------------------------------------
+// Skill Gap Learning Pathfinder API
+// ---------------------------------------------------------------------------
+
+export const learningPathsApi = {
+  getPaths: () => apiFetch('/api/v1/learning-paths'),
+  createPath: (data) => apiFetch('/api/v1/learning-paths', { method: 'POST', body: data }),
+  toggleModule: (id, moduleId) => apiFetch(`/api/v1/learning-paths/${id}/modules/${moduleId}/toggle`, { method: 'PATCH' })
+};
+
+// ---------------------------------------------------------------------------
+// Candidate Video Elevator Pitches API
+// ---------------------------------------------------------------------------
+
+export const videoPitchesApi = {
+  getPitches: () => apiFetch('/api/v1/video-pitches'),
+  createPitch: (data) => apiFetch('/api/v1/video-pitches', { method: 'POST', body: data }),
+  likePitch: (id) => apiFetch(`/api/v1/video-pitches/${id}/like`, { method: 'POST' })
+};
+
+// ---------------------------------------------------------------------------
+// Job Referral Network API
+// ---------------------------------------------------------------------------
+
+export const referralsApi = {
+  getReferrals: () => apiFetch('/api/v1/referrals'),
+  requestReferral: (data) => apiFetch('/api/v1/referrals', { method: 'POST', body: data })
+};
+
+// ---------------------------------------------------------------------------
+// Live Code Playground API
+// ---------------------------------------------------------------------------
+
+export const codePlaygroundApi = {
+  getSubmissions: () => apiFetch('/api/v1/code-playground'),
+  runCode: (data) => apiFetch('/api/v1/code-playground/run', { method: 'POST', body: data })
+};
+
+// ---------------------------------------------------------------------------
+// Company Culture Alignment API
+// ---------------------------------------------------------------------------
+
+export const cultureMatchApi = {
+  getProfiles: () => apiFetch('/api/v1/culture-match'),
+  evaluateMatch: (data) => apiFetch('/api/v1/culture-match/evaluate', { method: 'POST', body: data })
+};
+
 
 
 

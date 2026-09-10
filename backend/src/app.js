@@ -43,6 +43,11 @@ import mockInterviewRoutes from './routes/mockInterviewRoutes.js';
 import offerEvaluatorRoutes from './routes/offerEvaluatorRoutes.js';
 import mentorshipRoutes from './routes/mentorshipRoutes.js';
 import talentRadarRoutes from './routes/talentRadarRoutes.js';
+import learningPathRoutes from './routes/learningPathRoutes.js';
+import videoPitchRoutes from './routes/videoPitchRoutes.js';
+import referralRoutes from './routes/referralRoutes.js';
+import codePlaygroundRoutes from './routes/codePlaygroundRoutes.js';
+import cultureMatchRoutes from './routes/cultureMatchRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -155,6 +160,11 @@ app.use('/api/v1/mock-interviews', mockInterviewRoutes);
 app.use('/api/v1/offer-evaluator', offerEvaluatorRoutes);
 app.use('/api/v1/mentorship', mentorshipRoutes);
 app.use('/api/v1/talent-radar', talentRadarRoutes);
+app.use('/api/v1/learning-paths', learningPathRoutes);
+app.use('/api/v1/video-pitches', videoPitchRoutes);
+app.use('/api/v1/referrals', referralRoutes);
+app.use('/api/v1/code-playground', codePlaygroundRoutes);
+app.use('/api/v1/culture-match', cultureMatchRoutes);
 
 // Unhandled HTTP route parser
 app.all('*', (req, res, next) => {
