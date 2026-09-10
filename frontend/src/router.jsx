@@ -39,6 +39,11 @@ const MockInterviewPage = lazy(() => import('./pages/MockInterviewPage.jsx'));
 const OfferEvaluatorPage = lazy(() => import('./pages/OfferEvaluatorPage.jsx'));
 const MentorshipPage = lazy(() => import('./pages/MentorshipPage.jsx'));
 const TalentRadarPage = lazy(() => import('./pages/TalentRadarPage.jsx'));
+const LearningPathPage = lazy(() => import('./pages/LearningPathPage.jsx'));
+const VideoPitchesPage = lazy(() => import('./pages/VideoPitchesPage.jsx'));
+const ReferralsPage = lazy(() => import('./pages/ReferralsPage.jsx'));
+const CodePlaygroundPage = lazy(() => import('./pages/CodePlaygroundPage.jsx'));
+const CultureMatchPage = lazy(() => import('./pages/CultureMatchPage.jsx'));
 
 // Auth Screen (static import for fast initial auth rendering)
 import AuthScreen from './components/AuthScreen.jsx';
@@ -309,6 +314,46 @@ export const router = createBrowserRouter([
               <TalentRadarPage />
             </Suspense>
           </RouteGuard>
+        ),
+      },
+      {
+        path: '/learning-path',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <LearningPathPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/video-pitches',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <VideoPitchesPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/referrals',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ReferralsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/code-playground',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <CodePlaygroundPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/culture-match',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <CultureMatchPage />
+          </Suspense>
         ),
       },
       {

@@ -267,6 +267,46 @@ export default function Sidebar({
         )}
 
         <NavLink
+          to="/learning-path"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <BookOpen size={18} /> Skill Pathfinder
+        </NavLink>
+
+        <NavLink
+          to="/video-pitches"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <FileText size={18} /> Video Pitches
+        </NavLink>
+
+        <NavLink
+          to="/referrals"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <UsersRound size={18} /> Referral Network
+        </NavLink>
+
+        <NavLink
+          to="/code-playground"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <Activity size={18} /> Code Sandbox
+        </NavLink>
+
+        <NavLink
+          to="/culture-match"
+          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          onClick={closeMobileNav}
+        >
+          <Building2 size={18} /> Culture Evaluator
+        </NavLink>
+
+        <NavLink
           to="/profile"
           className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
           onClick={closeMobileNav}
