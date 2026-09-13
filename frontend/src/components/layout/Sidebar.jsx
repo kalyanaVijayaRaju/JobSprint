@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import {
   Activity,
   BriefcaseBusiness,
@@ -60,8 +60,10 @@ export default function Sidebar({
       aria-label="Primary navigation"
     >
       <div className="brand">
-        <span className="brand-mark">JS</span>
-        <span>JobSprint</span>
+        <Link to="/" className="brand-logo-link" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: 'inherit' }}>
+          <span className="brand-mark">JS</span>
+          <span>JobSprint</span>
+        </Link>
         <button
           type="button"
           className="mobile-menu-close"
