@@ -131,6 +131,8 @@ export default function AppLayout() {
           readiness={readiness}
           notifications={notifications}
           unreadCount={unreadCount}
+          darkMode={darkMode}
+          toggleDarkMode={toggleDarkMode}
           onMarkAllRead={markAllNotificationsRead}
           onMarkRead={markNotificationRead}
           onDeleteNotification={deleteNotification}

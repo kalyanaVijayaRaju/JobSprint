@@ -9,8 +9,6 @@ import {
   User,
   X,
   Building2,
-  Moon,
-  Sun,
   MessageSquare,
   Award,
   Settings,
@@ -18,18 +16,27 @@ import {
   FileText,
   BookOpen,
   TrendingUp,
+  Sparkles,
+  Bot,
+  GraduationCap,
+  Code,
+  Users,
+  Compass,
+  DollarSign,
+  BarChart,
+  Calendar,
+  Shield,
+  Layers,
 } from 'lucide-react';
 
 /**
- * Sidebar navigation component with user role-based menu items and theme toggle.
+ * Categorized Sidebar navigation component.
  */
 export default function Sidebar({
   user,
   profile,
   isMobileNavOpen,
   closeMobileNav,
-  darkMode,
-  toggleDarkMode,
   onLogout,
 }) {
   const getInitials = () => {
@@ -74,268 +81,221 @@ export default function Sidebar({
       </div>
 
       <nav className="nav-list">
-        <NavLink
-          to="/dashboard"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <Activity size={18} /> Overview
-        </NavLink>
-
-        {user?.role === 'admin' && (
+        {/* CATEGORY 1: AI & SKILL ACCELERATOR */}
+        <div className="sidebar-category">
+          <div className="sidebar-category-title">🧠 AI & Skill Accelerator</div>
           <NavLink
-            to="/admin"
+            to="/ai-analyzer"
             className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
             onClick={closeMobileNav}
           >
-            <UsersRound size={18} /> Admin Console
+            <Sparkles size={16} /> AI Resume Matcher
           </NavLink>
-        )}
 
-        {user?.role !== 'admin' && (
-          <>
-            <NavLink
-              to="/jobs"
-              className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-              onClick={closeMobileNav}
-            >
-              <BriefcaseBusiness size={18} />{' '}
-              {user?.role === 'recruiter' ? 'My Job Posts' : 'Find Jobs'}
-            </NavLink>
-            <NavLink
-              to="/applications"
-              className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-              onClick={closeMobileNav}
-            >
-              <Clock size={18} /> {user?.role === 'recruiter' ? 'ATS Pipelines' : 'Applications'}
-            </NavLink>
-          </>
-        )}
-
-        <NavLink
-          to="/messages"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <MessageSquare size={18} /> Messages
-        </NavLink>
-
-        <NavLink
-          to="/assessments"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <Award size={18} /> Assessments
-        </NavLink>
-
-        <NavLink
-          to="/companies"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <Building2 size={18} /> Companies
-        </NavLink>
-
-        {user?.role === 'candidate' && (
-          <>
-            <NavLink
-              to="/saved-jobs"
-              className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-              onClick={closeMobileNav}
-            >
-              <Bookmark size={18} /> Saved Jobs
-            </NavLink>
-
-            <NavLink
-              to="/resumes"
-              className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-              onClick={closeMobileNav}
-            >
-              <FileText size={18} /> Resume Builder
-            </NavLink>
-          </>
-        )}
-
-        <NavLink
-          to="/interview-prep"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <BookOpen size={18} /> Interview Prep
-        </NavLink>
-
-        <NavLink
-          to="/feed"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <Activity size={18} /> Activity Feed
-        </NavLink>
-
-        <NavLink
-          to="/analytics"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <TrendingUp size={18} /> Analytics
-        </NavLink>
-
-        {user?.role === 'recruiter' && (
           <NavLink
-            to="/talent-pool"
+            to="/mock-interview"
             className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
             onClick={closeMobileNav}
           >
-            <Search size={18} /> Talent Pool
+            <Bot size={16} /> Mock Simulator
           </NavLink>
-        )}
 
-        <NavLink
-          to="/kanban"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <Clock size={18} /> Kanban Pipeline
-        </NavLink>
-
-        <NavLink
-          to="/salary-insights"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <TrendingUp size={18} /> Salary Insights
-        </NavLink>
-
-        <NavLink
-          to="/calendar"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <Clock size={18} /> Interview Calendar
-        </NavLink>
-
-        {(user?.role === 'recruiter' || user?.role === 'admin') && (
           <NavLink
-            to="/compare-candidates"
+            to="/learning-path"
             className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
             onClick={closeMobileNav}
           >
-            <UsersRound size={18} /> Compare Candidates
+            <GraduationCap size={16} /> Skill Pathfinder
           </NavLink>
-        )}
 
-        <NavLink
-          to="/ai-analyzer"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <FileText size={18} /> AI Resume Matcher
-        </NavLink>
-
-        <NavLink
-          to="/mock-interview"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <BookOpen size={18} /> Mock Simulator
-        </NavLink>
-
-        <NavLink
-          to="/offer-evaluator"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <TrendingUp size={18} /> Offer Evaluator
-        </NavLink>
-
-        <NavLink
-          to="/mentorship"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <UsersRound size={18} /> Mentorship Hub
-        </NavLink>
-
-        {(user?.role === 'recruiter' || user?.role === 'admin') && (
           <NavLink
-            to="/talent-radar"
+            to="/code-playground"
             className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
             onClick={closeMobileNav}
           >
-            <Search size={18} /> Talent Radar
+            <Code size={16} /> Code Sandbox
           </NavLink>
-        )}
 
-        <NavLink
-          to="/learning-path"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <BookOpen size={18} /> Skill Pathfinder
-        </NavLink>
+          <NavLink
+            to="/interview-prep"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <BookOpen size={16} /> Interview Prep
+          </NavLink>
+        </div>
 
-        <NavLink
-          to="/video-pitches"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <FileText size={18} /> Video Pitches
-        </NavLink>
+        {/* CATEGORY 2: NETWORK & RECRUITMENT */}
+        <div className="sidebar-category">
+          <div className="sidebar-category-title">🤝 Network & Recruitment</div>
+          <NavLink
+            to="/mentorship"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <Users size={16} /> Mentorship Hub
+          </NavLink>
 
-        <NavLink
-          to="/referrals"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <UsersRound size={18} /> Referral Network
-        </NavLink>
+          <NavLink
+            to="/referrals"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <UsersRound size={16} /> Referral Network
+          </NavLink>
 
-        <NavLink
-          to="/code-playground"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <Activity size={18} /> Code Sandbox
-        </NavLink>
+          {(user?.role === 'recruiter' || user?.role === 'admin') && (
+            <NavLink
+              to="/talent-radar"
+              className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+              onClick={closeMobileNav}
+            >
+              <Compass size={16} /> Talent Radar
+            </NavLink>
+          )}
 
-        <NavLink
-          to="/culture-match"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <Building2 size={18} /> Culture Evaluator
-        </NavLink>
+          {user?.role === 'recruiter' && (
+            <NavLink
+              to="/talent-pool"
+              className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+              onClick={closeMobileNav}
+            >
+              <Search size={16} /> Talent Pool
+            </NavLink>
+          )}
 
-        <NavLink
-          to="/profile"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
-        >
-          <User size={18} /> Profile
-        </NavLink>
+          <NavLink
+            to="/feed"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <Activity size={16} /> Activity Feed
+          </NavLink>
+        </div>
 
-        <NavLink
-          to="/settings"
-          className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-          onClick={closeMobileNav}
+        {/* CATEGORY 3: CAREER & INSIGHTS */}
+        <div className="sidebar-category">
+          <div className="sidebar-category-title">📊 Career & Insights</div>
+          <NavLink
+            to="/salary-insights"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <DollarSign size={16} /> Salary Insights
+          </NavLink>
+
+          <NavLink
+            to="/offer-evaluator"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <TrendingUp size={16} /> Offer Evaluator
+          </NavLink>
+
+          <NavLink
+            to="/culture-match"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <Building2 size={16} /> Culture Evaluator
+          </NavLink>
+
+          <NavLink
+            to="/kanban"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <Layers size={16} /> Kanban Pipeline
+          </NavLink>
+
+          <NavLink
+            to="/calendar"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <Calendar size={16} /> Interview Calendar
+          </NavLink>
+
+          {(user?.role === 'recruiter' || user?.role === 'admin') && (
+            <NavLink
+              to="/compare-candidates"
+              className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+              onClick={closeMobileNav}
+            >
+              <UsersRound size={16} /> Compare Candidates
+            </NavLink>
+          )}
+
+          {user?.role === 'candidate' && (
+            <>
+              <NavLink
+                to="/resumes"
+                className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+                onClick={closeMobileNav}
+              >
+                <FileText size={16} /> Resume Builder
+              </NavLink>
+
+              <NavLink
+                to="/saved-jobs"
+                className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+                onClick={closeMobileNav}
+              >
+                <Bookmark size={16} /> Saved Jobs
+              </NavLink>
+            </>
+          )}
+
+          <NavLink
+            to="/analytics"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <BarChart size={16} /> Analytics
+          </NavLink>
+        </div>
+
+        {/* CATEGORY 4: ACCOUNT & SYSTEM */}
+        <div className="sidebar-category">
+          <div className="sidebar-category-title">⚙️ Account & System</div>
+          <NavLink
+            to="/profile"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <User size={16} /> Profile
+          </NavLink>
+
+          <NavLink
+            to="/settings"
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+            onClick={closeMobileNav}
+          >
+            <Settings size={16} /> Settings
+          </NavLink>
+
+          {user?.role === 'admin' && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+              onClick={closeMobileNav}
+            >
+              <Shield size={16} /> Admin Console
+            </NavLink>
+          )}
+        </div>
+
+        <button
+          type="button"
+          className="nav-link-btn logout-btn"
+          onClick={() => {
+            closeMobileNav();
+            onLogout();
+          }}
         >
-          <Settings size={18} /> Settings
-        </NavLink>
+          <LogOut size={16} /> Sign Out
+        </button>
       </nav>
-
-      <button
-        type="button"
-        className="btn btn-outline dark-mode-btn"
-        onClick={toggleDarkMode}
-        aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-      >
-        {darkMode ? <Sun size={16} /> : <Moon size={16} />}
-        {darkMode ? 'Light Mode' : 'Dark Mode'}
-      </button>
-
-      <button type="button" className="btn btn-outline logout-btn" onClick={onLogout}>
-        <LogOut size={16} /> Log Out
-      </button>
     </aside>
   );
 }
