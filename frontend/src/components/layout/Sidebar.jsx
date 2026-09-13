@@ -60,7 +60,7 @@ export default function Sidebar({
       aria-label="Primary navigation"
     >
       <div className="brand">
-        <Link to="/" className="brand-logo-link" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: 'inherit' }}>
+        <Link to="/dashboard" className="brand-logo-link" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: 'inherit' }}>
           <span className="brand-mark">JS</span>
           <span>JobSprint</span>
         </Link>
