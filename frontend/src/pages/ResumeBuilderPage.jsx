@@ -193,7 +193,7 @@ export default function ResumeBuilderPage() {
 
       {!activeResume ? (
         <EmptyState
-          icon={FileText}
+          icon={<FileText size={40} />}
           title="No resumes found"
           description="Create your first resume using our ATS-friendly templates."
           actionLabel="Create Resume"

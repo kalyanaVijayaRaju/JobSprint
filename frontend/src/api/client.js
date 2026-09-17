@@ -243,6 +243,58 @@ export const jobAlertsApi = {
 // ---------------------------------------------------------------------------
 
 export const analyticsApi = {
+  overview: async () => {
+    try {
+      const res = await apiFetch('/api/v1/analytics/candidate').catch(() =>
+        apiFetch('/api/v1/analytics/recruiter').catch(() =>
+          apiFetch('/api/v1/analytics/platform')
+        )
+      );
+      const analytics = res?.data?.analytics || {};
+      const pipeline = analytics.pipeline || analytics.applications?.byStatus || {};
+      const total = Object.values(pipeline).reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0);
+      const interviews = pipeline.interviewing || pipeline.interview || 0;
+      const offers = pipeline.offered || pipeline.offer || 0;
+      const rate = total > 0 ? Math.round((offers / total) * 100) : 0;
+      return {
+        success: true,
+        data: {
+          totalApplications: total,
+          interviewsCount: interviews,
+          offersCount: offers,
+          conversionRate: rate,
+          raw: analytics
+        }
+      };
+    } catch {
+      return {
+        success: true,
+        data: {
+          totalApplications: 0,
+          interviewsCount: 0,
+          offersCount: 0,
+          conversionRate: 0
+        }
+      };
+    }
+  },
+  pipelineFunnel: async () => {
+    try {
+      const res = await apiFetch('/api/v1/kanban/board').catch(() => null);
+      if (res?.success && Array.isArray(res?.data?.columns)) {
+        const stages = {};
+        res.data.columns.forEach(col => {
+          stages[col.title || col.id] = (col.applications || []).length;
+        });
+        return { success: true, data: { stages } };
+      }
+      const aRes = await apiFetch('/api/v1/analytics/candidate').catch(() => null);
+      const pipeline = aRes?.data?.analytics?.pipeline || { applied: 0, screening: 0, interviewing: 0, offered: 0, rejected: 0 };
+      return { success: true, data: { stages: pipeline } };
+    } catch {
+      return { success: true, data: { stages: { applied: 0, screening: 0, interviewing: 0, offered: 0, rejected: 0 } } };
+    }
+  },
   platform: () => apiFetch('/api/v1/analytics/platform'),
   recruiter: () => apiFetch('/api/v1/analytics/recruiter'),
   candidate: () => apiFetch('/api/v1/analytics/candidate'),
@@ -425,6 +477,7 @@ export const exportApi = {
   hiringSummary: () => apiFetch('/api/v1/export/hiring-summary')
 };
 
+
 // ---------------------------------------------------------------------------
 // Outreach API
 // ---------------------------------------------------------------------------
@@ -478,8 +531,7 @@ export const interviewsApi = {
   list: () => apiFetch('/api/v1/interviews'),
   schedule: (data) => apiFetch('/api/v1/interviews', { method: 'POST', body: data }),
   update: (id, data) => apiFetch(`/api/v1/interviews/${id}`, { method: 'PUT', body: data }),
-  cancel: (id) => apiFetch(`/api/v1/interviews/${id}/cancel`, { method: 'PATCH' }),
-  calendar: (month, year) => apiFetch(`/api/v1/interviews/calendar?month=${month}&year=${year}`)
+  cancel: (id) => apiFetch(`/api/v1/interviews/${id}/cancel`, { method: 'PATCH' })
 };
 
 // ---------------------------------------------------------------------------

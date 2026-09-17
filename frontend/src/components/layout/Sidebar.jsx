@@ -210,14 +210,6 @@ export default function Sidebar({
             <Layers size={16} /> Kanban Pipeline
           </NavLink>
 
-          <NavLink
-            to="/calendar"
-            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
-            onClick={closeMobileNav}
-          >
-            <Calendar size={16} /> Interview Calendar
-          </NavLink>
-
           {(user?.role === 'recruiter' || user?.role === 'admin') && (
             <NavLink
               to="/compare-candidates"

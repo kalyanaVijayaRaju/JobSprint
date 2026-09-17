@@ -32,7 +32,6 @@ const ActivityFeedPage = lazy(() => import('./pages/ActivityFeedPage.jsx'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage.jsx'));
 const KanbanBoardPage = lazy(() => import('./pages/KanbanBoardPage.jsx'));
 const SalaryInsightsPage = lazy(() => import('./pages/SalaryInsightsPage.jsx'));
-const InterviewCalendarPage = lazy(() => import('./pages/InterviewCalendarPage.jsx'));
 const CandidateComparisonPage = lazy(() => import('./pages/CandidateComparisonPage.jsx'));
 const AIAnalyzerPage = lazy(() => import('./pages/AIAnalyzerPage.jsx'));
 const MockInterviewPage = lazy(() => import('./pages/MockInterviewPage.jsx'));
@@ -253,14 +252,6 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageLoader />}>
             <SalaryInsightsPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: '/calendar',
-        element: (
-          <Suspense fallback={<PageLoader />}>
-            <InterviewCalendarPage />
           </Suspense>
         ),
       },
