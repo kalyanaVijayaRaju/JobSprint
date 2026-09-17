@@ -6,7 +6,7 @@ import logger from './utils/logger.js';
 
 // Register Uncaught Exception Handler
 process.on('uncaughtException', (err) => {
-  logger.error('Uncaught exception. Server is shutting down.', { error: err });
+  logger.error(`Uncaught exception. Server is shutting down: ${err?.stack || err?.message || err}`);
   process.exit(1);
 });
 

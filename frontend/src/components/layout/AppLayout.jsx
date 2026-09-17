@@ -7,6 +7,7 @@ import Toast from './Toast.jsx';
 import { ErrorBoundary } from '../ui';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useApp } from '../../context/AppContext.jsx';
+import { profileApi } from '../../api/client.js';
 
 import CommandPalette from './CommandPalette.jsx';
 import OnboardingTour from '../common/OnboardingTour.jsx';
@@ -46,16 +47,14 @@ export default function AppLayout() {
   // Load profile for sidebar display
   useEffect(() => {
     if (!user) return;
-    import('../../api/client.js').then(({ profileApi }) => {
-      profileApi
-        .get()
-        .then((res) => {
-          if (res.success && res.data.profile) {
-            setProfile(res.data.profile);
-          }
-        })
-        .catch(() => setProfile(null));
-    });
+    profileApi
+      .get()
+      .then((res) => {
+        if (res.success && res.data.profile) {
+          setProfile(res.data.profile);
+        }
+      })
+      .catch(() => setProfile(null));
   }, [user]);
 
   // Close mobile nav on Escape key

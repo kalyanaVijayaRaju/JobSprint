@@ -116,7 +116,7 @@ export default function ActivityFeedPage() {
         <div style={{ padding: 40, textAlign: 'center' }}><Spinner size="lg" label="Loading activity feed..." /></div>
       ) : activities.length === 0 ? (
         <EmptyState
-          icon={Activity}
+          icon={<Activity size={40} />}
           title="No activities yet"
           description="Be the first to apply for a job or take a skill assessment!"
         />
